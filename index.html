@@ -517,16 +517,20 @@ body{background:var(--bg);font-family:'Inter',sans-serif;font-size:14px;}
       <button class="btn-close-modal" onclick="closeModal()">Close</button>
     </div>
     <div id="extend-section" style="padding:0 0 8px;">
-      <div style="display:flex;align-items:center;gap:10px;padding:10px 0;">
-        <div style="font-size:13px;font-weight:500;color:var(--dark);flex:1;">Extend by</div>
-        <button onclick="window.changeExtend(-1)" style="width:32px;height:32px;border-radius:50%;border:0.5px solid #e0dbd0;background:var(--bg);font-size:18px;cursor:pointer;display:flex;align-items:center;justify-content:center;">−</button>
-        <div style="text-align:center;min-width:40px;">
-          <div style="font-family:'Syne',sans-serif;font-size:20px;font-weight:800;color:var(--dark);" id="extend-hrs">1</div>
-          <div style="font-size:10px;color:var(--light);">hour(s)</div>
+      <div style="font-size:11px;font-weight:600;color:var(--light);text-transform:uppercase;letter-spacing:.08em;margin-bottom:8px;">Edit duration</div>
+      <div style="display:flex;align-items:center;gap:10px;background:var(--surface);border-radius:var(--r);padding:10px 14px;border:0.5px solid #e0dbd0;">
+        <button onclick="window.changeExtend(-1)" style="width:36px;height:36px;border-radius:50%;border:0.5px solid #e0dbd0;background:var(--bg);font-size:20px;cursor:pointer;display:flex;align-items:center;justify-content:center;font-weight:700;">−</button>
+        <div style="flex:1;text-align:center;">
+          <div style="font-family:'Syne',sans-serif;font-size:24px;font-weight:800;color:var(--dark);" id="extend-hrs">1</div>
+          <div style="font-size:10px;color:var(--light);" id="extend-lbl">hr to add</div>
         </div>
-        <button onclick="window.changeExtend(1)" style="width:32px;height:32px;border-radius:50%;border:0.5px solid #e0dbd0;background:var(--bg);font-size:18px;cursor:pointer;display:flex;align-items:center;justify-content:center;">+</button>
+        <button onclick="window.changeExtend(1)" style="width:36px;height:36px;border-radius:50%;border:0.5px solid #e0dbd0;background:var(--bg);font-size:20px;cursor:pointer;display:flex;align-items:center;justify-content:center;font-weight:700;">+</button>
       </div>
-      <button onclick="window.applyExtension()" style="width:100%;padding:12px;border-radius:var(--r);border:none;background:var(--ari);color:#fff;font-family:'Syne',sans-serif;font-size:14px;font-weight:700;cursor:pointer;">Extend Booking</button>
+      <div id="extend-preview" style="font-size:11px;color:var(--keer);text-align:center;margin-top:6px;"></div>
+      <div style="display:flex;gap:8px;margin-top:8px;">
+        <button onclick="window.applyExtension(false)" style="flex:1;padding:11px;border-radius:var(--r);border:none;background:#fee2e2;color:#991b1b;font-family:'Syne',sans-serif;font-size:12px;font-weight:700;cursor:pointer;">− Remove hrs</button>
+        <button onclick="window.applyExtension(true)" style="flex:1;padding:11px;border-radius:var(--r);border:none;background:var(--ari);color:#fff;font-family:'Syne',sans-serif;font-size:12px;font-weight:700;cursor:pointer;">+ Add hrs</button>
+      </div>
     </div>
     <div class="modal-wa-row" style="flex-direction:column;gap:8px;">
       <div style="display:flex;gap:8px;">
@@ -743,16 +747,24 @@ function setSyncStatus(s){
 function initDateStrip(){
   const strip=document.getElementById('date-strip');
   strip.innerHTML='';
-  for(let i=0;i<14;i++){
+  const todayStr = new Date().toISOString().split('T')[0];
+  let todayEl = null;
+  for(let i=-30;i<60;i++){
     const d=new Date(); d.setDate(d.getDate()+i);
     const dateStr=d.toISOString().split('T')[0];
     const div=document.createElement('div');
-    div.className='dc'+(i===0?' sel':'');
+    const isToday = i===0;
+    div.className='dc'+(isToday?' sel':'');
+    if(i<0) div.style.opacity='0.5';
     div.innerHTML=`<div>${d.getDate()}</div><div class="dc-day">${DS[d.getDay()].slice(0,3)}</div>`;
     div.onclick=()=>selectDate(dateStr,div);
     strip.appendChild(div);
-    if(i===0) selectDate(dateStr,div,true);
+    if(isToday){ todayEl=div; selectDate(dateStr,div,true); }
   }
+  // Scroll to today after render
+  setTimeout(()=>{
+    if(todayEl) todayEl.scrollIntoView({inline:'center',behavior:'auto'});
+  },50);
 }
 
 function selectDate(dateStr,el,silent=false){
@@ -1631,46 +1643,71 @@ window.changeExtend = function(delta){
   extendHrs = Math.max(1, Math.min(8, extendHrs + delta));
   const el = document.getElementById('extend-hrs');
   if(el) el.textContent = extendHrs;
+  // Update preview
+  const b = bookings[modalBookingId];
+  if(b){
+    const parts = (b.slotRaw||'9|2').split('|');
+    const startH = parseInt(parts[0]);
+    const oldDur = parseInt(parts[1]);
+    const addDur = oldDur + extendHrs;
+    const remDur = Math.max(1, oldDur - extendHrs);
+    const prev = document.getElementById('extend-preview');
+    if(prev) prev.textContent = '+ → ' + formatSlot(startH, addDur) + '  |  − → ' + formatSlot(startH, remDur);
+  }
 };
 
-window.applyExtension = async function(){
+window.applyExtension = async function(isAdd){
   const b = bookings[modalBookingId]; if(!b) return;
-  const oldSlotRaw = b.slotRaw || '9|2';
-  const parts = oldSlotRaw.split('|');
+  const parts = (b.slotRaw||'9|2').split('|');
   const startH = parseInt(parts[0]);
   const oldDur = parseInt(parts[1]);
-  const newDur = oldDur + extendHrs;
+  const newDur = isAdd ? oldDur + extendHrs : Math.max(1, oldDur - extendHrs);
   const newEnd = startH + newDur;
 
   if(newEnd > 21){
-    showToast('Cannot extend past 9pm!', 3000);
+    showToast('Cannot go past 9pm!', 3000);
+    return;
+  }
+  if(newDur < 1){
+    showToast('Minimum 1 hour!', 3000);
     return;
   }
 
-  // Check if extended slot conflicts with another booking
-  const dayBookings = Object.values(bookings).filter(bk=>bk.date===b.date && bk.studio===b.studio && bk.id!==b.id);
-  const bookedRaw = dayBookings.map(bk=>bk.slotRaw||bk.slot);
-  if(slotOverlaps(bookedRaw, startH+oldDur, extendHrs)){
-    showToast('Extension conflicts with another booking!', 3000);
-    return;
+  // Check conflict only when adding hours
+  if(isAdd){
+    const dayBookings = Object.values(bookings).filter(bk=>bk.date===b.date && (bk.studio||'photo')===(b.studio||'photo') && bk.id!==b.id);
+    const bookedRaw = dayBookings.map(bk=>bk.slotRaw||bk.slot);
+    if(slotOverlaps(bookedRaw, startH+oldDur, extendHrs)){
+      showToast('Conflicts with another booking!', 3000);
+      return;
+    }
   }
 
   const newSlotRaw = startH+'|'+newDur;
   const newSlotLabel = formatSlot(startH, newDur);
   bookings[modalBookingId].slotRaw = newSlotRaw;
   bookings[modalBookingId].slot = newSlotLabel;
-  bookings[modalBookingId].extended = (bookings[modalBookingId].extended||0) + extendHrs;
+  // Recalculate total based on new duration
+  bookings[modalBookingId].total = newDur * 750;
+  const adv = Number(bookings[modalBookingId].advance)||0;
+  bookings[modalBookingId].balance = bookings[modalBookingId].paid ? 0 : Math.max(0, newDur*750 - adv);
 
   await save();
   syncToSheets(bookings[modalBookingId]);
 
-  // Update modal display
   document.getElementById('modal-meta').textContent = newSlotLabel + ' · ' + new Date(b.date).toLocaleDateString('en-IN',{day:'numeric',month:'short'});
-  showToast('Extended by '+extendHrs+' hour'+(extendHrs>1?'s':'')+' ✓ New slot: '+newSlotLabel, 4000);
+  document.getElementById('modal-adv').textContent = '₹'+adv.toLocaleString('en-IN');
+  const newBal = bookings[modalBookingId].balance;
+  document.getElementById('modal-balance').textContent = bookings[modalBookingId].paid ? '₹0 (Cleared)' : '₹'+newBal.toLocaleString('en-IN');
+
+  const action = isAdd ? 'Extended' : 'Reduced';
+  showToast(action+' to '+newSlotLabel+' ✓', 4000);
   renderTodayBookings();
   extendHrs = 1;
   const el = document.getElementById('extend-hrs');
   if(el) el.textContent = 1;
+  const prev = document.getElementById('extend-preview');
+  if(prev) prev.textContent = '';
 };
 
 // ── FIREBASE ──
