@@ -1252,7 +1252,7 @@ window.generateInvoicePDF = function(b){
   doc.setFontSize(10);
   doc.text('Rental Photo Studio, Nerkundram, Chennai', 15, 25);
   doc.setFontSize(9);
-  doc.text('+91 XXXXX XXXXX  |  magizh@studio.com', 15, 31);
+  doc.text('+91 8072 659 679  |  @magizh_studio_', 15, 31);
 
   // INVOICE label top right
   doc.setFont('helvetica', 'bold');
@@ -1325,28 +1325,20 @@ window.generateInvoicePDF = function(b){
   doc.text('Rs.' + total.toLocaleString('en-IN'), 190, 120, { align:'right' });
   doc.setTextColor(26, 122, 74);
   doc.text('- Rs.' + adv.toLocaleString('en-IN'), 190, 128, { align:'right' });
-  // If paid in full, show total paid
-  if(actuallyPaid && adv < total){
-    doc.setTextColor(100, 100, 100);
-    doc.setFont('helvetica', 'normal');
-    doc.text('Balance cleared', 130, 134);
-    doc.setTextColor(26, 122, 74);
-    doc.text('✓ Paid', 190, 134, { align:'right' });
-  }
 
   // Divider
   doc.setDrawColor(200, 200, 200);
   doc.line(130, 133, 195, 133);
 
   // FINAL
-  const isPaid = actuallyPaid && bal === 0;
-  doc.setFillColor(isPaid ? 220 : 252, isPaid ? 252 : 235, isPaid ? 231 : 235);
+  // If booking is marked as paid, show FULLY PAID regardless of advance amount
+  doc.setFillColor(actuallyPaid ? 220 : 252, actuallyPaid ? 252 : 235, actuallyPaid ? 231 : 235);
   doc.rect(130, 137, 65, 14, 'F');
   doc.setFont('helvetica', 'bold');
   doc.setFontSize(12);
-  doc.setTextColor(isPaid ? 22 : 153, isPaid ? 101 : 45, isPaid ? 52 : 45);
-  doc.text(isPaid ? 'FULLY PAID' : 'BALANCE DUE', 135, 146);
-  doc.text('Rs.' + bal.toLocaleString('en-IN'), 190, 146, { align:'right' });
+  doc.setTextColor(actuallyPaid ? 22 : 153, actuallyPaid ? 101 : 45, actuallyPaid ? 52 : 45);
+  doc.text(actuallyPaid ? 'FULLY PAID' : 'BALANCE DUE', 135, 146);
+  doc.text(actuallyPaid ? 'Rs.' + total.toLocaleString('en-IN') : 'Rs.' + bal.toLocaleString('en-IN'), 190, 146, { align:'right' });
 
   // THANK YOU MESSAGE
   doc.setFont('helvetica', 'italic');
@@ -1363,7 +1355,7 @@ window.generateInvoicePDF = function(b){
   doc.line(15, 270, 195, 270);
   doc.setFontSize(8);
   doc.setTextColor(150, 150, 150);
-  doc.text('Magizh Rental Photo Studio  |  Nerkundram, Chennai  |  ' + now, 105, 278, { align:'center' });
+  doc.text('Magizh Rental Photo Studio  |  +91 8072 659 679  |  @magizh_studio_', 105, 278, { align:'center' });
   doc.text('This is a computer-generated invoice.', 105, 283, { align:'center' });
 
   return doc;
