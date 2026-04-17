@@ -247,6 +247,7 @@ body{background:var(--bg);font-family:'Inter',sans-serif;font-size:14px;}
 .meq{font-size:9px;font-weight:600;text-align:center;}
 .meq.ok{color:var(--keer);} .meq.off{color:var(--raja);}
 </style>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 </head>
 <body>
 <div class="app">
@@ -515,14 +516,32 @@ body{background:var(--bg);font-family:'Inter',sans-serif;font-size:14px;}
       <button class="btn-paid" id="modal-pay-btn" onclick="markFullPayment()">Mark Full Payment</button>
       <button class="btn-close-modal" onclick="closeModal()">Close</button>
     </div>
-    <div class="modal-wa-row">
-      <button class="btn-wa-client" onclick="sendClientWhatsApp()">
-        <svg width="14" height="14" viewBox="0 0 24 24" fill="none"><path d="M12 2C6.48 2 2 6.48 2 12c0 1.85.5 3.58 1.37 5.07L2 22l5.11-1.34A9.93 9.93 0 0012 22c5.52 0 10-4.48 10-10S17.52 2 12 2z" fill="white"/><path d="M9 11c.55 0 1-.45 1-1V9c0-.55-.45-1-1-1s-1 .45-1 1v1c0 .55.45 1 1 1zm6 0c.55 0 1-.45 1-1V9c0-.55-.45-1-1-1s-1 .45-1 1v1c0 .55.45 1 1 1zm-3 5c2.33 0 4.31-1.46 5.11-3.5H6.89C7.69 14.54 9.67 16 12 16z" fill="#25D366"/></svg>
-        Send Client
-      </button>
-      <button class="btn-wa-team" onclick="sendTeamWhatsApp()">
-        <svg width="14" height="14" viewBox="0 0 24 24" fill="none"><path d="M12 2C6.48 2 2 6.48 2 12c0 1.85.5 3.58 1.37 5.07L2 22l5.11-1.34A9.93 9.93 0 0012 22c5.52 0 10-4.48 10-10S17.52 2 12 2z" fill="white"/></svg>
-        Notify Team
+    <div id="extend-section" style="padding:0 0 8px;">
+      <div style="display:flex;align-items:center;gap:10px;padding:10px 0;">
+        <div style="font-size:13px;font-weight:500;color:var(--dark);flex:1;">Extend by</div>
+        <button onclick="window.changeExtend(-1)" style="width:32px;height:32px;border-radius:50%;border:0.5px solid #e0dbd0;background:var(--bg);font-size:18px;cursor:pointer;display:flex;align-items:center;justify-content:center;">−</button>
+        <div style="text-align:center;min-width:40px;">
+          <div style="font-family:'Syne',sans-serif;font-size:20px;font-weight:800;color:var(--dark);" id="extend-hrs">1</div>
+          <div style="font-size:10px;color:var(--light);">hour(s)</div>
+        </div>
+        <button onclick="window.changeExtend(1)" style="width:32px;height:32px;border-radius:50%;border:0.5px solid #e0dbd0;background:var(--bg);font-size:18px;cursor:pointer;display:flex;align-items:center;justify-content:center;">+</button>
+      </div>
+      <button onclick="window.applyExtension()" style="width:100%;padding:12px;border-radius:var(--r);border:none;background:var(--ari);color:#fff;font-family:'Syne',sans-serif;font-size:14px;font-weight:700;cursor:pointer;">Extend Booking</button>
+    </div>
+    <div class="modal-wa-row" style="flex-direction:column;gap:8px;">
+      <div style="display:flex;gap:8px;">
+        <button class="btn-wa-client" onclick="sendClientWhatsApp()">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none"><path d="M12 2C6.48 2 2 6.48 2 12c0 1.85.5 3.58 1.37 5.07L2 22l5.11-1.34A9.93 9.93 0 0012 22c5.52 0 10-4.48 10-10S17.52 2 12 2z" fill="white"/></svg>
+          Send Details
+        </button>
+        <button class="btn-wa-team" onclick="sendTeamWhatsApp()">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none"><path d="M12 2C6.48 2 2 6.48 2 12c0 1.85.5 3.58 1.37 5.07L2 22l5.11-1.34A9.93 9.93 0 0012 22c5.52 0 10-4.48 10-10S17.52 2 12 2z" fill="white"/></svg>
+          Notify Team
+        </button>
+      </div>
+      <button class="btn-wa-client" style="background:#1A7A4A;width:100%;" onclick="sendInvoiceWhatsApp()">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8l-6-6z" stroke="white" stroke-width="2"/><path d="M14 2v6h6M9 13h6M9 17h6" stroke="white" stroke-width="2" stroke-linecap="round"/></svg>
+        Send Invoice to Client
       </button>
     </div>
 
@@ -545,6 +564,7 @@ async function syncToSheets(booking) {
     const dur = booking.slotRaw ? parseInt(booking.slotRaw.split('|')[1]||1) : 1;
     const bal = booking.paid ? 0 : (booking.balance || Math.max(0,(booking.total||0)-(booking.advance||0)));
     const data = {
+      bookingId: booking.id,
       studio:    booking.studioName || 'Photography Studio',
       date:      new Date(booking.date).toLocaleDateString('en-IN',{day:'numeric',month:'short',year:'numeric'}),
       name:      booking.name,
@@ -575,7 +595,7 @@ async function syncToSheets(booking) {
 
 // ── STUDIO CONSTANTS ── update these as needed
 const STUDIO_UPI    = "magizh@upi";
-const STUDIO_LOC    = "https://maps.app.goo.gl/YourLocationLink";
+const STUDIO_LOC    = "https://maps.app.goo.gl/vdCkBeZE7Vg1tJra8";
 const TEAM_GROUP    = "https://chat.whatsapp.com/L2qwfveE7SdCHZEB4Tge7d"; // team group link
 
 const MUHURTHAM={1:[28],2:[6,8,13,15,16,20],3:[5,6,8,15,16,25],4:[6,12,13,16,20,23,30],5:[8,13,14,18,28,29],6:[4,7,17,18,24,25],7:[2,5,12],8:[23,30,31],9:[7,13,17],10:[25,30],11:[1,11,13,15,16,20,29],12:[4,6,10,13,14]};
@@ -590,8 +610,28 @@ function formatSlot(start, dur){ return HOUR_LABELS[start-9]+' – '+HOUR_LABELS
 function slotOverlaps(existingSlots, startH, dur){
   const newEnd = startH + dur;
   return existingSlots.some(s=>{
-    const parts = s.split('|'); // stored as "startH|dur"
-    const eS=parseInt(parts[0]), eE=eS+parseInt(parts[1]);
+    if(!s) return false;
+    let eS, eE;
+    if(s.indexOf('|') !== -1){
+      // new format: "startH|dur"
+      const parts = s.split('|');
+      eS = parseInt(parts[0]);
+      eE = eS + parseInt(parts[1]);
+    } else {
+      // old format: "12pm – 2pm (2hrs)" — parse from label
+      const match = s.match(/(\d+)(am|pm)\s*[–-]\s*(\d+)(am|pm)/i);
+      if(!match) return false;
+      const h2n = (h,p) => {
+        h = parseInt(h);
+        p = p.toLowerCase();
+        if(p==='am' && h===12) return 0;
+        if(p==='pm' && h!==12) return h+12;
+        return h;
+      };
+      eS = h2n(match[1], match[2]);
+      eE = h2n(match[3], match[4]);
+    }
+    if(isNaN(eS) || isNaN(eE)) return false;
     return startH < eE && newEnd > eS;
   });
 }
@@ -747,18 +787,22 @@ function renderSlots(){
   }).join('');
 }
 
+const HOURLY_RATE = 750;
+
 window.selectStart = function(h){
   selStartH = h; selDur = 2;
   document.getElementById('dur-section').style.display='block';
   document.getElementById('form-section').style.display='block';
   updateDurDisplay();
   renderSlots();
-  // attach live balance calc
+  // Auto-calculate total based on hourly rate
   setTimeout(()=>{
     const totalEl = document.getElementById('f-total');
     const advEl   = document.getElementById('f-adv');
     const balEl   = document.getElementById('f-balance');
     if(totalEl && advEl && balEl){
+      // Auto-fill total based on duration
+      totalEl.value = selDur * HOURLY_RATE;
       const calc = ()=>{
         const t = parseFloat(totalEl.value)||0;
         const a = parseFloat(advEl.value)||0;
@@ -766,6 +810,7 @@ window.selectStart = function(h){
         balEl.textContent = 'Rs.' + b.toLocaleString('en-IN');
         balEl.style.color = b > 0 ? 'var(--raja)' : 'var(--keer)';
       };
+      calc();
       totalEl.oninput = calc;
       advEl.oninput   = calc;
     }
@@ -790,6 +835,21 @@ function updateDurDisplay(){
   document.getElementById('slot-summary').textContent = conflict ? '⚠️ This duration overlaps with an existing booking — adjust hours' : `✓ ${HOUR_LABELS[selStartH-9]} to ${HOUR_LABELS[endH-9]} is available`;
   document.getElementById('slot-summary').style.color = conflict ? '#991b1b' : 'var(--keer)';
   selSlot = formatSlot(selStartH, selDur);
+
+  // Auto-update total amount based on duration @ Rs 750/hr
+  const totalEl = document.getElementById('f-total');
+  const advEl = document.getElementById('f-adv');
+  const balEl = document.getElementById('f-balance');
+  if(totalEl){
+    totalEl.value = selDur * 750;
+    if(balEl && advEl){
+      const t = parseFloat(totalEl.value)||0;
+      const a = parseFloat(advEl.value)||0;
+      const b = Math.max(0, t-a);
+      balEl.textContent = 'Rs.' + b.toLocaleString('en-IN');
+      balEl.style.color = b > 0 ? 'var(--raja)' : 'var(--keer)';
+    }
+  }
 }
 
 window.selectSlot=function(slot){
@@ -833,29 +893,67 @@ window.confirmBooking=async function(){
   openModal(id);
 };
 
+let bookingFilter = 'today';
+
+window.setBookingFilter = function(f){
+  bookingFilter = f;
+  ['today','upcoming','past','all'].forEach(k=>{
+    const btn = document.getElementById('bf-'+k);
+    if(btn){
+      if(k===f){
+        btn.style.background = 'var(--raja)';
+        btn.style.color = '#fff';
+        btn.style.borderColor = 'var(--raja)';
+      } else {
+        btn.style.background = 'var(--surface)';
+        btn.style.color = 'var(--dark)';
+        btn.style.borderColor = '#e0dbd0';
+      }
+    }
+  });
+  renderTodayBookings();
+};
+
 function renderTodayBookings(){
   const list=document.getElementById('booking-list');
-  const todayStr=selDate||today.toISOString().split('T')[0];
+  const todayStr = new Date().toISOString().split('T')[0];
   const studioLabel = selStudio==='photo' ? '📸 Photography Studio' : '🎙️ Podcast Studio';
   const lbl = document.getElementById('bookings-label');
-  if(lbl) lbl.textContent = studioLabel + ' — ' + new Date(todayStr).toLocaleDateString('en-IN',{day:'numeric',month:'short'});
-  const dayBookings=Object.values(bookings).filter(b=>b.date===todayStr && (b.studio||'photo')===selStudio).sort((a,b)=>{
+  const filterLabel = bookingFilter==='today' ? "Today's" : bookingFilter==='upcoming' ? 'Upcoming' : bookingFilter==='past' ? 'Past' : 'All';
+  if(lbl) lbl.textContent = studioLabel + ' — ' + filterLabel + ' bookings';
+
+  let dayBookings = Object.values(bookings).filter(b=>(b.studio||'photo')===selStudio);
+
+  if(bookingFilter==='today'){
+    dayBookings = dayBookings.filter(b=>b.date===todayStr);
+  } else if(bookingFilter==='upcoming'){
+    dayBookings = dayBookings.filter(b=>b.date > todayStr);
+  } else if(bookingFilter==='past'){
+    dayBookings = dayBookings.filter(b=>b.date < todayStr);
+  }
+
+  dayBookings.sort((a,b)=>{
+    if(a.date !== b.date) {
+      return bookingFilter==='past' ? b.date.localeCompare(a.date) : a.date.localeCompare(b.date);
+    }
     const aS=parseInt((a.slotRaw||'0|2').split('|')[0]);
     const bS=parseInt((b.slotRaw||'0|2').split('|')[0]);
     return aS-bS;
   });
-  if(!dayBookings.length){list.innerHTML='<div class="bl-empty">No bookings for this day</div>';return;}
-  const todayDateStr = new Date().toISOString().split('T')[0];
-  const tomorrowDate = new Date(); tomorrowDate.setDate(tomorrowDate.getDate()+1);
-  const tomorrowStr = tomorrowDate.toISOString().split('T')[0];
+  if(!dayBookings.length){list.innerHTML='<div class="bl-empty">No '+filterLabel.toLowerCase()+' bookings</div>';return;}
+  const todayDateStr = todayStr;
   list.innerHTML=dayBookings.map(b=>{
     const isToday = b.date === todayDateStr;
+    const dateLabel = isToday ? 'Today' : new Date(b.date).toLocaleDateString('en-IN',{day:'numeric',month:'short',weekday:'short'});
     const reminderBtn = isToday ? `<button class="btn-reminder" onclick="event.stopPropagation();sendReminderWhatsApp('${b.id}')">
       <svg width="10" height="10" viewBox="0 0 24 24" fill="white"><path d="M12 2C6.48 2 2 6.48 2 12c0 1.85.5 3.58 1.37 5.07L2 22l5.11-1.34A9.93 9.93 0 0012 22c5.52 0 10-4.48 10-10S17.52 2 12 2z" fill="white"/></svg>
       Remind
     </button>` : '';
     return `<div class="bitem" onclick="openModal('${b.id}')">
-      <div class="bitem-info"><div class="bitem-name">${b.name}</div><div class="bitem-meta">${b.slot} · ${b.type}</div></div>
+      <div class="bitem-info">
+        <div class="bitem-name">${b.name}</div>
+        <div class="bitem-meta"><span style="color:var(--raja);font-weight:600;">${dateLabel}</span> · ${b.slot} · ${b.type}</div>
+      </div>
       <div style="display:flex;align-items:center;gap:6px;">
         ${reminderBtn}
         <span class="badge ${b.paid?'badge-paid':b.advance>0?'badge-adv':'badge-pend'}">${b.paid?'Paid':b.advance>0?'Advance':'Pending'}</span>
@@ -1093,8 +1191,6 @@ Your shoot at *Magizh Rental Photo Studio* is confirmed ✅
 
 📍 *Location:* ${STUDIO_LOC}
 
-💳 *UPI ID for balance payment:* \`${STUDIO_UPI}\`
-
 Please arrive 10 minutes early. Looking forward to capturing your special moments! 🌟
 
 — Magizh Studio Team`;
@@ -1119,6 +1215,162 @@ Checklist:
 ☐ Prepare props
 ☐ Collect balance after shoot`;
 }
+
+window.generateInvoicePDF = function(b){
+  const { jsPDF } = window.jspdf;
+  const doc = new jsPDF({ unit:'mm', format:'a4' });
+  const total = Number(b.total)||0;
+  const adv = Number(b.advance)||0;
+  const bal = b.paid ? 0 : Math.max(0, total - adv);
+  const studioName = b.studioName || 'Photography Studio';
+  const dateStr = new Date(b.date).toLocaleDateString('en-IN',{day:'numeric',month:'long',year:'numeric'});
+  const now = new Date().toLocaleString('en-IN',{day:'numeric',month:'short',year:'numeric',hour:'2-digit',minute:'2-digit'});
+  const invNo = 'MZ-' + b.id.slice(-6).toUpperCase();
+
+  // HEADER — Orange band
+  doc.setFillColor(232, 96, 26);
+  doc.rect(0, 0, 210, 40, 'F');
+  doc.setTextColor(255, 255, 255);
+  doc.setFont('helvetica', 'bold');
+  doc.setFontSize(24);
+  doc.text('MAGIZH STUDIO', 15, 18);
+  doc.setFont('helvetica', 'normal');
+  doc.setFontSize(10);
+  doc.text('Rental Photo Studio, Nerkundram, Chennai', 15, 25);
+  doc.setFontSize(9);
+  doc.text('+91 XXXXX XXXXX  |  magizh@studio.com', 15, 31);
+
+  // INVOICE label top right
+  doc.setFont('helvetica', 'bold');
+  doc.setFontSize(22);
+  doc.text('INVOICE', 195, 18, { align:'right' });
+  doc.setFont('helvetica', 'normal');
+  doc.setFontSize(9);
+  doc.text('#' + invNo, 195, 25, { align:'right' });
+  doc.text(now, 195, 31, { align:'right' });
+
+  // BILL TO
+  doc.setTextColor(130, 130, 130);
+  doc.setFontSize(9);
+  doc.setFont('helvetica', 'bold');
+  doc.text('BILL TO', 15, 55);
+  doc.setTextColor(20, 20, 20);
+  doc.setFontSize(13);
+  doc.text(b.name, 15, 62);
+  doc.setFont('helvetica', 'normal');
+  doc.setFontSize(10);
+  doc.text('Phone: ' + b.phone, 15, 68);
+
+  // STUDIO INFO right side
+  doc.setTextColor(130, 130, 130);
+  doc.setFont('helvetica', 'bold');
+  doc.setFontSize(9);
+  doc.text('BOOKING DATE', 195, 55, { align:'right' });
+  doc.setTextColor(20, 20, 20);
+  doc.setFont('helvetica', 'normal');
+  doc.setFontSize(11);
+  doc.text(dateStr, 195, 62, { align:'right' });
+  doc.setFontSize(10);
+  doc.text(studioName, 195, 68, { align:'right' });
+
+  // LINE
+  doc.setDrawColor(230, 230, 230);
+  doc.line(15, 78, 195, 78);
+
+  // TABLE HEADER
+  doc.setFillColor(26, 26, 26);
+  doc.rect(15, 85, 180, 10, 'F');
+  doc.setTextColor(255, 255, 255);
+  doc.setFont('helvetica', 'bold');
+  doc.setFontSize(10);
+  doc.text('DESCRIPTION', 20, 91);
+  doc.text('SLOT', 100, 91);
+  doc.text('HOURS', 140, 91, { align:'center' });
+  doc.text('AMOUNT', 190, 91, { align:'right' });
+
+  // TABLE ROW
+  const dur = b.slotRaw ? parseInt(b.slotRaw.split('|')[1]||1) : 1;
+  doc.setTextColor(20, 20, 20);
+  doc.setFont('helvetica', 'normal');
+  doc.setFontSize(10);
+  doc.text(b.type, 20, 103);
+  doc.text(b.slot, 100, 103);
+  doc.text(String(dur), 140, 103, { align:'center' });
+  doc.text('Rs.' + total.toLocaleString('en-IN'), 190, 103, { align:'right' });
+
+  doc.setDrawColor(230, 230, 230);
+  doc.line(15, 108, 195, 108);
+
+  // TOTALS
+  doc.setFont('helvetica', 'normal');
+  doc.setFontSize(10);
+  doc.setTextColor(100, 100, 100);
+  doc.text('Subtotal', 130, 120);
+  doc.text('Advance Paid', 130, 128);
+  doc.setTextColor(20, 20, 20);
+  doc.text('Rs.' + total.toLocaleString('en-IN'), 190, 120, { align:'right' });
+  doc.setTextColor(26, 122, 74);
+  doc.text('- Rs.' + adv.toLocaleString('en-IN'), 190, 128, { align:'right' });
+
+  // Divider
+  doc.setDrawColor(200, 200, 200);
+  doc.line(130, 133, 195, 133);
+
+  // FINAL
+  doc.setFillColor(b.paid ? 220 : 252, b.paid ? 252 : 235, b.paid ? 231 : 235);
+  doc.rect(130, 137, 65, 14, 'F');
+  doc.setFont('helvetica', 'bold');
+  doc.setFontSize(12);
+  doc.setTextColor(b.paid ? 22 : 153, b.paid ? 101 : 45, b.paid ? 52 : 45);
+  doc.text(b.paid ? 'PAID' : 'BALANCE DUE', 135, 146);
+  doc.text('Rs.' + bal.toLocaleString('en-IN'), 190, 146, { align:'right' });
+
+  // THANK YOU MESSAGE
+  doc.setFont('helvetica', 'italic');
+  doc.setFontSize(11);
+  doc.setTextColor(80, 80, 80);
+  doc.text('Thank you for choosing Magizh Studio!', 15, 175);
+  doc.setFont('helvetica', 'normal');
+  doc.setFontSize(9);
+  doc.setTextColor(130, 130, 130);
+  doc.text('We hope you had a wonderful experience. Tag us @magizhstudio on Instagram!', 15, 181);
+
+  // FOOTER
+  doc.setDrawColor(230, 230, 230);
+  doc.line(15, 270, 195, 270);
+  doc.setFontSize(8);
+  doc.setTextColor(150, 150, 150);
+  doc.text('Magizh Rental Photo Studio  |  Nerkundram, Chennai  |  ' + now, 105, 278, { align:'center' });
+  doc.text('This is a computer-generated invoice.', 105, 283, { align:'center' });
+
+  return doc;
+};
+
+window.sendInvoiceWhatsApp = async function(){
+  const b = bookings[modalBookingId]; if(!b) return;
+  if(typeof window.jspdf === 'undefined'){
+    showToast('PDF library not loaded yet, please wait...', 3000);
+    return;
+  }
+  try {
+    const doc = window.generateInvoicePDF(b);
+    const fileName = 'Invoice_' + b.name.replace(/\s+/g,'_') + '_' + b.date + '.pdf';
+    // Download the PDF
+    doc.save(fileName);
+    // Send WhatsApp message with instruction to attach
+    setTimeout(()=>{
+      const phone = String(b.phone).replace(/\D/g,'');
+      const total = Number(b.total)||0;
+      const msg = 'Hi ' + b.name + '! 🙏\n\nHere is your invoice from *Magizh Studio* for ' + b.type + ' on ' + new Date(b.date).toLocaleDateString('en-IN',{day:'numeric',month:'long'}) + '.\n\n*Total:* Rs.' + total.toLocaleString('en-IN') + '\n*Status:* ' + (b.paid?'✅ Fully Paid':'Balance pending') + '\n\nPDF invoice downloaded — please attach it to this chat. Thank you! 📸';
+      const url = 'https://wa.me/91' + phone + '?text=' + encodeURIComponent(msg);
+      window.open(url, '_blank');
+      showToast('PDF downloaded! Attach it in WhatsApp that just opened.', 5000);
+    }, 800);
+  } catch(e){
+    console.error(e);
+    showToast('PDF generation failed: '+e.message, 4000);
+  }
+};
 
 window.sendClientWhatsApp = function(){
   const b = bookings[modalBookingId]; if(!b) return;
@@ -1370,6 +1622,55 @@ window.resetAllData = async function(){
   renderShift();
   renderAnnual();
   showToast('All data cleared successfully ✓', 3000);
+};
+
+// ── EXTEND BOOKING ──
+let extendHrs = 1;
+
+window.changeExtend = function(delta){
+  extendHrs = Math.max(1, Math.min(8, extendHrs + delta));
+  const el = document.getElementById('extend-hrs');
+  if(el) el.textContent = extendHrs;
+};
+
+window.applyExtension = async function(){
+  const b = bookings[modalBookingId]; if(!b) return;
+  const oldSlotRaw = b.slotRaw || '9|2';
+  const parts = oldSlotRaw.split('|');
+  const startH = parseInt(parts[0]);
+  const oldDur = parseInt(parts[1]);
+  const newDur = oldDur + extendHrs;
+  const newEnd = startH + newDur;
+
+  if(newEnd > 21){
+    showToast('Cannot extend past 9pm!', 3000);
+    return;
+  }
+
+  // Check if extended slot conflicts with another booking
+  const dayBookings = Object.values(bookings).filter(bk=>bk.date===b.date && bk.studio===b.studio && bk.id!==b.id);
+  const bookedRaw = dayBookings.map(bk=>bk.slotRaw||bk.slot);
+  if(slotOverlaps(bookedRaw, startH+oldDur, extendHrs)){
+    showToast('Extension conflicts with another booking!', 3000);
+    return;
+  }
+
+  const newSlotRaw = startH+'|'+newDur;
+  const newSlotLabel = formatSlot(startH, newDur);
+  bookings[modalBookingId].slotRaw = newSlotRaw;
+  bookings[modalBookingId].slot = newSlotLabel;
+  bookings[modalBookingId].extended = (bookings[modalBookingId].extended||0) + extendHrs;
+
+  await save();
+  syncToSheets(bookings[modalBookingId]);
+
+  // Update modal display
+  document.getElementById('modal-meta').textContent = newSlotLabel + ' · ' + new Date(b.date).toLocaleDateString('en-IN',{day:'numeric',month:'short'});
+  showToast('Extended by '+extendHrs+' hour'+(extendHrs>1?'s':'')+' ✓ New slot: '+newSlotLabel, 4000);
+  renderTodayBookings();
+  extendHrs = 1;
+  const el = document.getElementById('extend-hrs');
+  if(el) el.textContent = 1;
 };
 
 // ── FIREBASE ──
