@@ -2,7 +2,7 @@
   "name": "Magizh Studio",
   "short_name": "Magizh",
   "description": "Magizh Rental Photo Studio — Booking & Shift Manager",
-  "start_url": "/",
+  "start_url": "/index.html",
   "display": "standalone",
   "background_color": "#f5f0e8",
   "theme_color": "#E8601A",

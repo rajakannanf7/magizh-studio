@@ -228,9 +228,58 @@ body{background:var(--bg);font-family:'Inter',sans-serif;font-size:14px;}
 /* TOAST */
 .toast{position:fixed;bottom:100px;left:50%;transform:translateX(-50%);background:var(--dark);color:#fff;padding:10px 20px;border-radius:20px;font-size:13px;font-weight:500;opacity:0;transition:opacity .3s;z-index:200;pointer-events:none;white-space:nowrap;}
 .toast.show{opacity:1;}
+
+/* APP LOADER */
+#app-loader{
+position:fixed;
+inset:0;
+background:#f5f0e8;
+display:flex;
+align-items:center;
+justify-content:center;
+flex-direction:column;
+z-index:9999;
+transition:opacity .3s ease;
+}
+.loader-logo{
+width:70px;
+height:70px;
+background:#E8601A;
+border-radius:22px;
+display:flex;
+align-items:center;
+justify-content:center;
+margin-bottom:16px;
+box-shadow:0 10px 25px rgba(0,0,0,.12);
+}
+.loader-text{
+font-family:'Syne',sans-serif;
+font-size:22px;
+font-weight:800;
+color:#1a1a1a;
+}
+.loader-sub{
+font-size:12px;
+color:#666;
+margin-top:4px;
+}
+
 </style>
 </head>
 <body>
+
+<div id="app-loader">
+  <div class="loader-logo">
+    <svg width="32" height="32" viewBox="0 0 24 24" fill="none">
+      <rect x="2" y="6" width="20" height="14" rx="2" stroke="#fff" stroke-width="2"/>
+      <circle cx="12" cy="13" r="3" stroke="#fff" stroke-width="2"/>
+      <path d="M8 6l1.5-3h5L16 6" stroke="#fff" stroke-width="2"/>
+    </svg>
+  </div>
+  <div class="loader-text">Magizh Studio</div>
+  <div class="loader-sub">Loading workspace...</div>
+</div>
+
 <div class="app">
 
 <!-- LOGIN -->
@@ -812,6 +861,7 @@ window.confirmBooking=async function(){
   const studioName=selStudio==='photo'?'Photography Studio':'Podcast Studio';
   const id='bk-'+Date.now();
   bookings[id]={id,name,phone,type,date:selDate,slot:slotLabel,slotRaw,studio:selStudio,studioName,total,discount:disc,advance:adv,balance,paid:false,createdBy:currentUser,createdAt:Date.now()};
+  backupBookings();
   await save();
   syncToSheets(bookings[id]);
   document.getElementById('f-name').value='';
@@ -903,6 +953,7 @@ window.markFullPayment=async function(){
   if(!modalBookingId)return;
   bookings[modalBookingId].paid=true;
   bookings[modalBookingId].balance=0;
+  backupBookings();
   await save();
   syncToSheets(bookings[modalBookingId]);
   // Update modal in-place (don't close — let user send invoice)
@@ -933,6 +984,7 @@ window.applyExtension=async function(isAdd){
   bookings[modalBookingId].total=newDur*HOURLY_RATE;
   const adv=Number(b.advance)||0,disc=Number(b.discount)||0;
   bookings[modalBookingId].balance=b.paid?0:Math.max(0,newDur*HOURLY_RATE-disc-adv);
+  backupBookings();
   await save();
   syncToSheets(bookings[modalBookingId]);
   document.getElementById('modal-slot').textContent=bookings[modalBookingId].slot;
@@ -1051,16 +1103,19 @@ window.lockAdmin=function(){
 window.resetAllBookings=async function(){
   if(!confirm('Delete ALL bookings permanently?'))return;
   if(!confirm('Last chance — are you sure?'))return;
-  bookings={};await save();renderBookingList();showToast('All bookings deleted',3000);
+  bookings={};backupBookings();
+  await save();renderBookingList();showToast('All bookings deleted',3000);
 };
 window.resetAllSwaps=async function(){
   if(!confirm('Clear all swaps?'))return;
-  swaps={};logs={};await save();renderShift();showToast('Swaps cleared',3000);
+  swaps={};logs={};backupBookings();
+  await save();renderShift();showToast('Swaps cleared',3000);
 };
 window.factoryReset=async function(){
   if(!confirm('Factory reset? Deletes EVERYTHING!'))return;
   if(!confirm('Last chance!'))return;
-  bookings={};swaps={};logs={};await save();renderBookingList();renderShift();showToast('Factory reset done',3000);
+  bookings={};swaps={};logs={};backupBookings();
+  await save();renderBookingList();renderShift();showToast('Factory reset done',3000);
 };
 
 // ── SHIFT ──
@@ -1138,16 +1193,19 @@ window.confirmSwap=async function(){
   const pA=asgn(selDay),pB=asgn(selG);
   swaps[k][selDay]=pB;swaps[k][selG]=pA;
   logs[k].unshift({id:Date.now(),text:DS[new Date(sYr,sMo,selDay).getDay()]+' '+selDay+' '+MS[sMo]+' → '+P[pB].name+'   ·   '+DS[new Date(sYr,sMo,selG).getDay()]+' '+selG+' '+MS[sMo]+' → '+P[pA].name,dayA:selDay,dayB:selG});
+  backupBookings();
   await save();window.resetSwap();
 };
 window.undoSwap=async function(id){
   const l=logs[mk()],e=l?l.find(x=>x.id===id):null;if(!e)return;
   const s=swaps[mk()];if(s){delete s[e.dayA];delete s[e.dayB];}
-  logs[mk()]=l.filter(x=>x.id!==id);await save();renderShift();
+  logs[mk()]=l.filter(x=>x.id!==id);backupBookings();
+  await save();renderShift();
 };
 document.getElementById('shift-prev').onclick=()=>{_cache={};window.resetSwap();sMo--;if(sMo<0){sMo=11;sYr--;}renderShift();};
 document.getElementById('shift-next').onclick=()=>{_cache={};window.resetSwap();sMo++;if(sMo>11){sMo=0;sYr++;}renderShift();};
-document.getElementById('reset-swaps-btn').onclick=async()=>{delete swaps[mk()];delete logs[mk()];await save();_cache={};window.resetSwap();};
+document.getElementById('reset-swaps-btn').onclick=async()=>{delete swaps[mk()];delete logs[mk()];backupBookings();
+  await save();_cache={};window.resetSwap();};
 
 // ── ANNUAL ──
 function renderAnnual(){
@@ -1172,6 +1230,42 @@ function renderAnnual(){
 }
 
 renderShift();
+
+// GLOBAL ERROR HANDLER
+window.onerror = function(message, source, line, col, error){
+  console.error('App Error:', message);
+  showToast('Something went wrong. Please refresh the app.');
+};
+
+// HIDE LOADER
+window.addEventListener('load',()=>{
+  setTimeout(()=>{
+    const loader=document.getElementById('app-loader');
+    if(loader){
+      loader.style.opacity='0';
+      setTimeout(()=>loader.remove(),300);
+    }
+  },700);
+});
+
+// LOCAL BACKUP
+function backupBookings(){
+  try{
+    localStorage.setItem('magizh_backup_bookings', JSON.stringify(bookings));
+  }catch(e){
+    console.error('Backup failed',e);
+  }
+}
+
+// SERVICE WORKER REGISTER
+if('serviceWorker' in navigator){
+  window.addEventListener('load',()=>{
+    navigator.serviceWorker.register('/sw.js')
+      .then(()=>console.log('SW registered'))
+      .catch(err=>console.error('SW failed',err));
+  });
+}
+
 </script>
 </body>
 </html>
