@@ -11,7 +11,7 @@
 <meta name="theme-color" content="#E8601A">
 <title>Magizh Studio</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800=Inter:wght@300;400;500;600=swap" rel="stylesheet">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 <style>
 *{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent;}
@@ -318,7 +318,7 @@ margin-top:4px;
           <span class="user-chip" id="b-user-chip"></span>
         </div>
         <div class="hero-title">Booking</div>
-        <div class="hero-sub">Select date &amp; time slot</div>
+        <div class="hero-sub">Select date </div>
       </div>
 
       <!-- Studio selector -->
@@ -588,7 +588,7 @@ const ADMIN_PW = '2023';
 const STUDIO_LOC = "https://maps.app.goo.gl/vdCkBeZE7Vg1tJra8";
 const SHEETS_URL = "https://script.google.com/macros/s/AKfycbxqTIGogoUiQRI0aDRZZmmKa9KmN_CLWv6lZAfGDMw1KGdxRmiG9XZapNLNfeNjYyymrw/exec";
 
-// ── MUHURTHAM & GOVT ──
+// ── MUHURTHAM ──
 const MUHURTHAM={1:[28],2:[6,8,13,15,16,20],3:[5,6,8,15,16,25],4:[6,12,13,16,20,23,30],5:[8,13,14,18,28,29],6:[4,7,17,18,24,25],7:[2,5,12],8:[23,30,31],9:[7,13,17],10:[25,30],11:[1,11,13,15,16,20,29],12:[4,6,10,13,14]};
 const GOVT={1:[1,15,16,17,26],2:[],3:[19,21,31],4:[2,10,14],5:[1,28],6:[26],7:[18],8:[15,26],9:[],10:[2,22,24],11:[8,15],12:[25]};
 const P=[{name:'Ari',role:'weekends + holidays',c:'a'},{name:'Raja',role:'work from home',c:'r'},{name:'Keerthi',role:'freelancer',c:'k'}];
@@ -637,7 +637,7 @@ function slotOverlaps(existingRaw,startH,dur){
       const p=s.split('|');
       const eS=parseInt(p[0]),eE=eS+parseInt(p[1]);
       if(isNaN(eS)||isNaN(eE))return false;
-      return startH<eE&&newEnd>eS;
+      return startH<eE>eS;
     }
     return false;
   });
@@ -722,7 +722,7 @@ window.switchTab=function(tab){
     document.getElementById('page-'+t).classList.toggle('active',t===tab);
     document.getElementById('tab-'+t).classList.toggle('active',t===tab);
   });
-  if(tab==='annual'&&adminUnlocked)renderAnnual();
+  if(tab==='annual')renderAnnual();
 };
 
 // ── STUDIO SELECTOR ──
@@ -788,13 +788,13 @@ function selectDate(dateStr,el,silent=false){
 function renderSlots(){
   const grid=document.getElementById('slot-grid');
   if(!grid)return;
-  const dayBookings=Object.values(bookings).filter(b=>b.date===selDate&&(b.studio||'photo')===selStudio);
+  const dayBookings=Object.values(bookings).filter(b=>b.date===selDate(b.studio||'photo')===selStudio);
   grid.innerHTML=HOUR_LABELS.slice(0,-1).map((lbl,i)=>{
     const h=9+i;
     const isBooked=dayBookings.some(b=>{
       const p=(b.slotRaw||'').split('|');
       const bS=parseInt(p[0]),bD=parseInt(p[1]||1);
-      return !isNaN(bS)&&h>=bS&&h<bS+bD;
+      return !isNaN(bS)>=bS<bS+bD;
     });
     const isSel=selStartH===h;
     const cls=isBooked?'booked':isSel?'sel':'free';
@@ -826,7 +826,7 @@ function updateDurDisplay(){
   document.getElementById('dur-display').textContent=selDur;
   document.getElementById('dur-hrs-lbl').textContent=selDur===1?'hour':'hours';
   const endH=selStartH+selDur;
-  const dayBookings=Object.values(bookings).filter(b=>b.date===selDate&&(b.studio||'photo')===selStudio);
+  const dayBookings=Object.values(bookings).filter(b=>b.date===selDate(b.studio||'photo')===selStudio);
   const bookedRaw=dayBookings.map(b=>b.slotRaw||'');
   const conflict=slotOverlaps(bookedRaw,selStartH,selDur);
   const sumEl=document.getElementById('slot-summary');
@@ -857,7 +857,7 @@ window.confirmBooking=async function(){
   const phone=document.getElementById('f-phone').value.trim();
   const type=document.getElementById('f-type').value;
   if(!name||!phone||!type||!selStartH){showToast('Please fill all fields and select a start time');return;}
-  const dayBookings=Object.values(bookings).filter(b=>b.date===selDate&&(b.studio||'photo')===selStudio);
+  const dayBookings=Object.values(bookings).filter(b=>b.date===selDate(b.studio||'photo')===selStudio);
   const bookedRaw=dayBookings.map(b=>b.slotRaw||'');
   if(slotOverlaps(bookedRaw,selStartH,selDur)){showToast('Slot conflicts with existing booking!');return;}
   const slotRaw=selStartH+'|'+selDur;
@@ -1076,7 +1076,7 @@ window.applyExtension=async function(isAdd){
   const newDur=isAdd?oldDur+extendHrs:Math.max(1,oldDur-extendHrs);
   if(startH+newDur>21){showToast('Cannot go past 9pm!');return;}
   if(isAdd){
-    const dayBookings=Object.values(bookings).filter(bk=>bk.date===b.date&&(bk.studio||'photo')===(b.studio||'photo')&&bk.id!==b.id);
+    const dayBookings=Object.values(bookings).filter(bk=>bk.date===b.date(bk.studio||'photo')===(b.studio||'photo')!==b.id);
     if(slotOverlaps(dayBookings.map(bk=>bk.slotRaw||''),startH+oldDur,extendHrs)){showToast('Conflicts with another booking!');return;}
   }
   bookings[modalBookingId].slotRaw=startH+'|'+newDur;
@@ -1234,8 +1234,8 @@ function getSchedule(y,m){
   free.forEach((d,i)=>{res[d]=i<rajaFree?1:2;});
   return _cache[k]=res;
 }
-function asgn(d){const s=swaps[mk()];return(s&&s[d]!==undefined)?s[d]:getSchedule(sYr,sMo)[d]??0;}
-const isSw=d=>{const s=swaps[mk()];return s&&s[d]!==undefined;};
+function asgn(d){const s=swaps[mk()];return(s[d]!==undefined)?s[d]:getSchedule(sYr,sMo)[d]??0;}
+const isSw=d=>{const s=swaps[mk()];return s[d]!==undefined;};
 
 function renderShift(){
   document.getElementById('shift-hero-title').textContent=MONTHS[sMo]+' '+sYr;
@@ -1247,12 +1247,12 @@ function renderShift(){
   for(let i=0;i<fd;i++)html+='<div class="cday empty"></div>';
   for(let d=1;d<=dim;d++){
     const pi=asgn(d);
-    const isT=today.getDate()===d&&today.getMonth()===sMo&&today.getFullYear()===sYr;
+    const isT=today.getDate()===d()===sMo()===sYr;
     const sw=isSw(d),sel=selDay===d;
     const muh=isMuh(sYr,sMo,d),gov=isGov(sYr,sMo,d);
     const icon=muh?'*':gov?'#':'';
     let ex='';
-    if(step===3&&selP!==null){ex=(asgn(d)===selP&&d!==selDay)?' ghi':(d!==selDay?' gdim':'');}
+    if(step===3!==null){ex=(asgn(d)===selP!==selDay)?' ghi':(d!==selDay?' gdim':'');}
     html+='<div class="cday p-'+P[pi].c+(isT?' today':'')+(sw?' swapped':'')+(sel?' sel':'')+ex+'" onclick="tapCal('+d+')">'+'<span class="cdn">'+d+icon+'</span><span class="cdb">'+P[pi].name+'</span></div>';
   }
   document.getElementById('cal-grid').innerHTML=html;
