@@ -536,7 +536,12 @@ margin-top:4px;
     <div class="modal-row"><span class="modal-row-label">Shoot type</span><span class="modal-row-val" id="modal-type"></span></div>
     <div class="modal-row"><span class="modal-row-label">Slot</span><span class="modal-row-val" id="modal-slot"></span></div>
     <div class="modal-row"><span class="modal-row-label">Total</span><span class="modal-row-val" id="modal-total"></span></div>
-    <div class="modal-row"><span class="modal-row-label">Discount</span><span class="modal-row-val" id="modal-discount"></span></div>
+    <div class="modal-row">
+<span class="modal-row-label">Discount</span>
+<input id="modal-discount-input" type="number" min="0"
+style="width:90px;padding:6px 10px;border:1px solid #ddd;border-radius:8px;text-align:right;font-weight:600;"
+onchange="updateDiscount()">
+</div>
     <div class="modal-row"><span class="modal-row-label">Advance paid</span><span class="modal-row-val" id="modal-adv"></span></div>
     <div class="modal-row"><span class="modal-row-label">Balance due</span><span class="modal-row-val" id="modal-balance"></span></div>
     <div class="modal-row"><span class="modal-row-label">Status</span><span class="modal-row-val" id="modal-status"></span></div>
@@ -968,6 +973,48 @@ function renderUpcomingBookings(){
 
 
 
+
+window.updateDiscount=function(){
+  try{
+    if(!modalBookingId || !bookings[modalBookingId]) return;
+
+    const b = bookings[modalBookingId];
+    const discountInput = document.getElementById('modal-discount-input');
+
+    if(!discountInput) return;
+
+    const discount = Number(discountInput.value)||0;
+    const total = Number(b.total)||0;
+    const advance = Number(b.advance)||0;
+
+    const balance = Math.max(0,(total-discount)-advance);
+
+    b.discount = discount;
+    b.balance = balance;
+    b.paid = balance===0;
+
+    const balEl=document.getElementById('modal-balance');
+    if(balEl){
+      balEl.textContent='₹'+balance.toLocaleString('en-IN');
+    }
+
+    const statusEl=document.getElementById('modal-status');
+    if(statusEl){
+      statusEl.textContent=b.paid?'✅ Fully Paid':'Pending';
+    }
+
+    backupBookings();
+
+    if(typeof save==='function'){
+      save();
+    }
+
+  }catch(err){
+    console.error('Discount update failed',err);
+  }
+}
+
+
 // ── MODAL ──
 
 window.openModal=function(id){
@@ -984,7 +1031,7 @@ window.openModal=function(id){
   document.getElementById('modal-type').textContent=b.type;
   document.getElementById('modal-slot').textContent=b.slot;
   document.getElementById('modal-total').textContent='₹'+total.toLocaleString('en-IN');
-  document.getElementById('modal-discount').textContent=disc>0?'₹'+disc.toLocaleString('en-IN'):'—';
+  document.getElementById('modal-discount-input').value=disc||0;
   const safeAdv = adv > (total*2) ? Math.floor(adv/10) : adv;
 document.getElementById('modal-adv').textContent='₹'+Number(safeAdv).toLocaleString('en-IN');
   document.getElementById('modal-balance').textContent='₹'+bal.toLocaleString('en-IN');
