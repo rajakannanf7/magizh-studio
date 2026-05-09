@@ -1080,7 +1080,7 @@ window.sendInvoicePDF=function(){
 };
 
 // ── ADMIN ──
-const ADMIN_PASS='2023';let adminUnlocked=false;
+const ADMIN_PASS='2023';
 window.checkAdminPw=function(){
   const v=document.getElementById('admin-pw').value;
   if(v===ADMIN_PASS){
@@ -1256,6 +1256,15 @@ function backupBookings(){
     console.error('Backup failed',e);
   }
 }
+
+
+setTimeout(()=>{
+  const loader=document.getElementById('app-loader');
+  if(loader){
+    loader.style.display='none';
+  }
+},5000);
+
 
 // SERVICE WORKER REGISTER
 if('serviceWorker' in navigator){
