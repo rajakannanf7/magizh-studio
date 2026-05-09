@@ -1107,27 +1107,79 @@ window.applyExtension=async function(isAdd){
   renderSlots();
 };
 
+// ── WHATSAPP GROUP ──
+const TEAM_GROUP_LINK='https://chat.whatsapp.com/L2qwfveE7SdCHZEB4Tge7d';
+
+// ── HELPERS: read live discount from modal input ──
+function getLiveDiscount(){
+  const inp=document.getElementById('modal-discount-input');
+  return inp?Number(inp.value)||0:0;
+}
+
 // ── WHATSAPP ──
 window.sendClientWhatsApp=function(){
   const b=bookings[modalBookingId];if(!b)return;
   const phone=cleanPhone(b.phone);
+  const dur=b.slotRaw?parseInt(b.slotRaw.split('|')[1]||1):1;
+  const total=Number(b.total)||(dur*HOURLY_RATE);
+  const disc=getLiveDiscount();
+  const adv=Number(b.advance)||0;
+  const afterDisc=Math.max(0,total-disc);
+  const bal=b.paid?0:Math.max(0,afterDisc-adv);
   const dateStr=new Date(b.date).toLocaleDateString('en-IN',{weekday:'long',day:'numeric',month:'long',year:'numeric'});
-  const msg='Hi '+b.name+'! 👋\n\nYour shoot at *Magizh Rental Photo Studio* is confirmed ✅\n\n📅 *Date:* '+dateStr+'\n⏰ *Slot:* '+b.slot+'\n📸 *Shoot type:* '+b.type+'\n💰 *Advance paid: Rs.'+Math.min(Number(b.advance)||0,Number(b.total)||0).toLocaleString('en-IN')+'\n\n📍 *Location:* '+STUDIO_LOC+'\n\nPlease arrive 10 minutes early!\n— Magizh Studio Team';
+  let msg='Hi '+b.name+'! 👋\n\nYour shoot at *Magizh Rental Photo Studio* is confirmed ✅\n\n';
+  msg+='📅 *Date:* '+dateStr+'\n';
+  msg+='⏰ *Slot:* '+b.slot+'\n';
+  msg+='📸 *Shoot type:* '+b.type+'\n\n';
+  msg+='💵 *Total:* ₹'+total.toLocaleString('en-IN')+'\n';
+  if(disc>0)msg+='🏷️ *Discount:* - ₹'+disc.toLocaleString('en-IN')+'\n';
+  if(disc>0)msg+='✅ *After discount:* ₹'+afterDisc.toLocaleString('en-IN')+'\n';
+  msg+='💰 *Advance paid:* ₹'+adv.toLocaleString('en-IN')+'\n';
+  msg+='🔖 *Balance due:* ₹'+bal.toLocaleString('en-IN')+'\n\n';
+  msg+='📍 *Location:* '+STUDIO_LOC+'\n\nPlease arrive 10 minutes early!\n— Magizh Studio Team';
   window.open('https://wa.me/91'+phone+'?text='+encodeURIComponent(msg),'_blank');
 };
 
 window.sendTeamWhatsApp=function(){
   const b=bookings[modalBookingId];if(!b)return;
-  const dateStr=new Date(b.date).toLocaleDateString('en-IN',{weekday:'short',day:'numeric',month:'short'});
-  const msg='🆕 *New Booking — Magizh Studio*\n\n👤 '+b.name+'\n📞 '+b.phone+'\n📅 '+dateStr+'\n⏰ '+b.slot+'\n '+b.type+'\n💰 Advance: ₹'+Number(b.advance).toLocaleString('en-IN')+'\n🏢 '+b.studioName+'\n🔖 Booked by: '+currentUser;
-  window.open('https://wa.me/919876543210?text='+encodeURIComponent(msg),'_blank');
+  const dur=b.slotRaw?parseInt(b.slotRaw.split('|')[1]||1):1;
+  const total=Number(b.total)||(dur*HOURLY_RATE);
+  const disc=getLiveDiscount();
+  const adv=Number(b.advance)||0;
+  const afterDisc=Math.max(0,total-disc);
+  const bal=b.paid?0:Math.max(0,afterDisc-adv);
+  const dateStr=new Date(b.date).toLocaleDateString('en-IN',{weekday:'short',day:'numeric',month:'short',year:'numeric'});
+  let msg='🆕 *New Booking — Magizh Studio*\n\n';
+  msg+='👤 *Client:* '+b.name+'\n';
+  msg+='📞 *Phone:* '+b.phone+'\n';
+  msg+='📅 *Date:* '+dateStr+'\n';
+  msg+='⏰ *Slot:* '+b.slot+'\n';
+  msg+='📸 *Shoot type:* '+b.type+'\n';
+  msg+='🏢 *Studio:* '+(b.studioName||'Photography Studio')+'\n\n';
+  msg+='💵 *Total:* ₹'+total.toLocaleString('en-IN')+'\n';
+  if(disc>0)msg+='🏷️ *Discount:* - ₹'+disc.toLocaleString('en-IN')+'\n';
+  if(disc>0)msg+='✅ *After discount:* ₹'+afterDisc.toLocaleString('en-IN')+'\n';
+  msg+='💰 *Advance:* ₹'+adv.toLocaleString('en-IN')+'\n';
+  msg+='🔖 *Balance:* ₹'+bal.toLocaleString('en-IN')+'\n';
+  msg+='📊 *Status:* '+(b.paid?'✅ Fully Paid':adv>0?'⏳ Advance Paid':'❌ Pending')+'\n\n';
+  msg+='🔖 *Booked by:* '+currentUser;
+  window.open(TEAM_GROUP_LINK+'?text='+encodeURIComponent(msg),'_blank');
 };
 
 window.sendReminderWhatsApp=function(){
   const b=bookings[modalBookingId];if(!b)return;
   const phone=cleanPhone(b.phone);
+  const dur=b.slotRaw?parseInt(b.slotRaw.split('|')[1]||1):1;
+  const total=Number(b.total)||(dur*HOURLY_RATE);
+  const disc=getLiveDiscount();
+  const adv=Number(b.advance)||0;
+  const bal=b.paid?0:Math.max(0,Math.max(0,total-disc)-adv);
   const dateStr=new Date(b.date).toLocaleDateString('en-IN',{weekday:'long',day:'numeric',month:'long'});
-  const msg='Hi '+b.name+'! 👋\n\nReminder for your shoot *tomorrow* at Magizh Studio \n\n📅 *Date:* '+dateStr+'\n⏰ *Slot:* '+b.slot+'\n📍 *Location:* '+STUDIO_LOC+'\n\nPlease arrive 10 minutes early!\n— Magizh Studio';
+  let msg='Hi '+b.name+'! 👋\n\nReminder for your shoot *tomorrow* at Magizh Studio 📸\n\n';
+  msg+='📅 *Date:* '+dateStr+'\n';
+  msg+='⏰ *Slot:* '+b.slot+'\n';
+  if(bal>0)msg+='🔖 *Balance due:* ₹'+bal.toLocaleString('en-IN')+'\n';
+  msg+='📍 *Location:* '+STUDIO_LOC+'\n\nPlease arrive 10 minutes early!\n— Magizh Studio';
   window.open('https://wa.me/91'+phone+'?text='+encodeURIComponent(msg),'_blank');
 };
 
@@ -1140,9 +1192,14 @@ window.sendInvoicePDF=function(){
     const doc=new jsPDF({unit:'mm',format:'a4'});
     const dur=b.slotRaw?parseInt(b.slotRaw.split('|')[1]||1):1;
     const total=Number(b.total)||(dur*HOURLY_RATE);
-    const disc=Number(b.discount)||0;
+    // ── Always read live discount from modal input ──
+    const disc=getLiveDiscount();
+    // save it back so it persists
+    b.discount=disc;
+    bookings[modalBookingId].discount=disc;
     const adv=Number(b.advance)||0;
-    const bal=b.paid?0:Math.max(0,total-disc-adv);
+    const afterDisc=Math.max(0,total-disc);
+    const bal=b.paid?0:Math.max(0,afterDisc-adv);
     const invNo='MZ-'+b.id.slice(-6).toUpperCase();
     const dateStr=new Date(b.date).toLocaleDateString('en-IN',{day:'numeric',month:'long',year:'numeric'});
     const now=new Date().toLocaleString('en-IN',{day:'numeric',month:'short',year:'numeric',hour:'2-digit',minute:'2-digit'});
@@ -1159,36 +1216,66 @@ window.sendInvoicePDF=function(){
     doc.setTextColor(130,130,130);doc.setFont('helvetica','bold');doc.setFontSize(9);doc.text('BOOKING DATE',195,52,{align:'right'});
     doc.setTextColor(20,20,20);doc.setFont('helvetica','normal');doc.setFontSize(11);doc.text(dateStr,195,59,{align:'right'});
     doc.setFontSize(10);doc.text(b.studioName||'Photography Studio',195,65,{align:'right'});
-    // Table
+    // Table header
     doc.setFillColor(26,26,26);doc.rect(15,78,180,10,'F');
     doc.setTextColor(255,255,255);doc.setFont('helvetica','bold');doc.setFontSize(10);
     doc.text('DESCRIPTION',20,84);doc.text('SLOT',100,84);doc.text('HRS',145,84,{align:'center'});doc.text('AMOUNT',190,84,{align:'right'});
     doc.setTextColor(20,20,20);doc.setFont('helvetica','normal');doc.setFontSize(10);
     doc.text(b.type,20,96);doc.text(b.slot,100,96);doc.text(String(dur),145,96,{align:'center'});doc.text('Rs.'+total.toLocaleString('en-IN'),190,96,{align:'right'});
     doc.setDrawColor(230,230,230);doc.line(15,100,195,100);
-    // Totals
+    // Totals — always show discount row if >0, always show after-discount
+    let rowY=108;
     doc.setTextColor(100,100,100);doc.setFontSize(10);
-    if(disc>0){doc.text('Discount',130,108);doc.setTextColor(153,27,27);doc.text('- Rs.'+disc.toLocaleString('en-IN'),190,108,{align:'right'});}
-    doc.setTextColor(100,100,100);doc.text('Advance Paid',130,disc>0?116:108);
-    const pdfSafeAdv = adv > (total*2) ? Math.floor(adv/10) : adv;doc.setTextColor(26,122,74);doc.text('- Rs.'+Math.min(Number(adv)||0, Number(total)||0).toLocaleString('en-IN'),190,disc>0?116:108,{align:'right'});
-    const balY=disc>0?124:116;
-    doc.setFillColor(b.paid?220:252,b.paid?252:235,b.paid?231:235);doc.rect(130,balY+2,65,14,'F');
-    doc.setFont('helvetica','bold');doc.setFontSize(12);doc.setTextColor(b.paid?22:153,b.paid?101:45,b.paid?52:45);
-    doc.text(b.paid?'FULLY PAID':'BALANCE DUE',135,balY+11);
-    const pdfFinal=Math.max(0,total-disc); const pdfBal=Math.max(0,pdfFinal-pdfSafeAdv); doc.text('Rs.'+pdfBal.toLocaleString('en-IN'),190,balY+11,{align:'right'});
+    if(disc>0){
+      doc.text('Discount',130,rowY);
+      doc.setTextColor(153,27,27);
+      doc.text('- Rs.'+disc.toLocaleString('en-IN'),190,rowY,{align:'right'});
+      rowY+=8;
+      doc.setTextColor(26,26,26);doc.setFont('helvetica','bold');
+      doc.text('After Discount',130,rowY);
+      doc.text('Rs.'+afterDisc.toLocaleString('en-IN'),190,rowY,{align:'right'});
+      doc.setFont('helvetica','normal');
+      rowY+=8;
+    }
+    doc.setTextColor(100,100,100);
+    doc.text('Advance Paid',130,rowY);
+    doc.setTextColor(26,122,74);
+    doc.text('- Rs.'+adv.toLocaleString('en-IN'),190,rowY,{align:'right'});
+    rowY+=8;
+    // Balance box
+    doc.setFillColor(b.paid?220:252,b.paid?252:235,b.paid?231:235);
+    doc.rect(130,rowY+2,65,14,'F');
+    doc.setFont('helvetica','bold');doc.setFontSize(12);
+    doc.setTextColor(b.paid?22:153,b.paid?101:45,b.paid?52:45);
+    doc.text(b.paid?'FULLY PAID':'BALANCE DUE',135,rowY+11);
+    doc.text('Rs.'+bal.toLocaleString('en-IN'),190,rowY+11,{align:'right'});
     // Footer
-    doc.setFont('helvetica','italic');doc.setFontSize(11);doc.setTextColor(80,80,80);doc.text('Thank you for choosing Magizh Studio | Contact: +91 80726 59679',15,160);
-    doc.setFont('helvetica','normal');doc.setFontSize(9);doc.setTextColor(130,130,130);doc.text('Tag us @magizh_studio_ on Instagram',15,166);
+    doc.setFont('helvetica','italic');doc.setFontSize(11);doc.setTextColor(80,80,80);
+    doc.text('Thank you for choosing Magizh Studio | Contact: +91 80726 59679',15,160);
+    doc.setFont('helvetica','normal');doc.setFontSize(9);doc.setTextColor(130,130,130);
+    doc.text('Tag us @magizh_studio_ on Instagram',15,166);
     doc.setDrawColor(230,230,230);doc.line(15,270,195,270);
-    doc.setFontSize(8);doc.setTextColor(150,150,150);doc.text('Magizh Rental Photo Studio  |  +91 8072 659 679  |  @magizh_studio_',105,277,{align:'center'});
+    doc.setFontSize(8);doc.setTextColor(150,150,150);
+    doc.text('Magizh Rental Photo Studio  |  +91 8072 659 679  |  @magizh_studio_',105,277,{align:'center'});
     const fileName='Invoice_'+b.name.replace(/\s+/g,'_')+'_'+b.date+'.pdf';
     doc.save(fileName);
+    // After PDF saves → open group chat with pre-filled invoice summary so they can attach the PDF
     setTimeout(()=>{
-      const phone=cleanPhone(b.phone);
-      const msg='Hi '+b.name+'! 🙏\n\nYour invoice from *Magizh Studio* is ready 📄\n\n*'+b.type+'* on '+dateStr+'\n*Total After Discount:* Rs.'+Math.max(0,total-disc).toLocaleString('en-IN')+'\n*Status:* '+(b.paid?'✅ Fully Paid':'Balance pending')+'\n\nPDF downloaded — please attach it here. Thank you!';
-      window.open('https://wa.me/91'+phone+'?text='+encodeURIComponent(msg),'_blank');
-      showToast('PDF saved! Attach it in WhatsApp.',5000);
+      let msg='📄 *Invoice — '+b.name+'*\n\n';
+      msg+='📸 *'+b.type+'* | '+b.slot+'\n';
+      msg+='📅 '+dateStr+'\n\n';
+      msg+='💵 *Total:* ₹'+total.toLocaleString('en-IN')+'\n';
+      if(disc>0)msg+='🏷️ *Discount:* - ₹'+disc.toLocaleString('en-IN')+'\n';
+      if(disc>0)msg+='✅ *After discount:* ₹'+afterDisc.toLocaleString('en-IN')+'\n';
+      msg+='💰 *Advance:* ₹'+adv.toLocaleString('en-IN')+'\n';
+      msg+='🔖 *Balance:* ₹'+bal.toLocaleString('en-IN')+'\n';
+      msg+='📊 *Status:* '+(b.paid?'✅ Fully Paid':'⏳ Balance pending')+'\n\n';
+      msg+='_PDF downloaded — attach the file above_';
+      window.open(TEAM_GROUP_LINK+'?text='+encodeURIComponent(msg),'_blank');
+      showToast('PDF saved! Attach it in the group chat.',5000);
     },800);
+    backupBookings();
+    save();
   }catch(e){showToast('PDF error: '+e.message,4000);}
 };
 
