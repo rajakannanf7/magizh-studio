@@ -907,7 +907,7 @@ function renderBookingList(){
   list.innerHTML=items.map(b=>{
     const dt=b.date===ts?'Today':new Date(b.date).toLocaleDateString('en-IN',{day:'numeric',month:'short',weekday:'short'});
     const reminderBtn=b.date===ts?'<button class="btn-reminder" onclick="event.stopPropagation();openModal(\''+b.id+'\')" style="background:#25D366;border:none;border-radius:6px;padding:4px 8px;font-size:10px;color:#fff;cursor:pointer;">Invoice</button>':'';
-    return '<div class="bitem" onclick="openModal(\''+b.id+'\')">'
+    return '<div class="bitem" data-booking="'+b.id+'" onclick="openModal(this.dataset.booking)">'
       +'<div class="bitem-info">'
       +'<div class="bitem-name">'+b.name+'</div>'
       +'<div class="bitem-meta"><span style="color:var(--raja);font-weight:600;">'+dt+'</span> · '+b.slot+' · '+b.type+'</div>'
@@ -948,7 +948,7 @@ function renderUpcomingBookings(){
       weekday:'short'
     });
 
-    return '<div class="bitem" onclick="openModal(\''+b.id+'\')">'
+    return '<div class="bitem" data-booking="'+b.id+'" onclick="openModal(this.dataset.booking)">'
       +'<div class="bitem-info">'
       +'<div class="bitem-name">'+b.name+'</div>'
       +'<div class="bitem-meta">'
@@ -1018,6 +1018,8 @@ window.updateModalPayment=function(){
 // ── MODAL ──
 
 window.openModal=function(id){
+  try{
+
   const b=bookings[id]; if(!b)return;
   modalBookingId=id;
   const dur=b.slotRaw?parseInt(b.slotRaw.split('|')[1]||1):1;
@@ -1039,6 +1041,9 @@ window.openModal=function(id){
   extendHrs=1;
   document.getElementById('extend-hrs').textContent=1;
   document.getElementById('payment-modal').classList.add('open');
+  }catch(err){
+    console.error('Modal open failed',err);
+  }
 };
 
 window.closeModal=function(){document.getElementById('payment-modal').classList.remove('open');};
