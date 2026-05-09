@@ -12,7 +12,8 @@
 <title>Magizh Studio</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
-<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+<script>
 function openTeamBooking(details){
   const msg = encodeURIComponent(
 `NEW BOOKING
@@ -29,7 +30,6 @@ Please check booking dashboard.`
 
   window.open('https://wa.me/?text=' + msg,'_blank');
 }
-
 </script>
 <style>
 *{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent;}
@@ -906,7 +906,7 @@ window.confirmBooking=async function(){
 
 function renderBookingList(){
   const list=document.getElementById('booking-list');
-  const studioLabel=selStudio==='photo'?' Photography':'🎙️ Podcast';
+  const studioLabel=selStudio==='photo'?'📷 Photography':'🎙️ Podcast';
   const lbl=document.getElementById('booking-list-label');
   const selectedDateLabel = selDate
     ? new Date(selDate).toLocaleDateString('en-IN',{day:'numeric',month:'short',weekday:'short'})
@@ -1112,7 +1112,7 @@ window.sendClientWhatsApp=function(){
   const b=bookings[modalBookingId];if(!b)return;
   const phone=cleanPhone(b.phone);
   const dateStr=new Date(b.date).toLocaleDateString('en-IN',{weekday:'long',day:'numeric',month:'long',year:'numeric'});
-  const msg='Hi '+b.name+'! 👋\n\nYour shoot at *Magizh Rental Photo Studio* is confirmed ✅\n\n📅 *Date:* '+dateStr+'\n⏰ *Slot:* '+b.slot+'\n *Shoot type:* '+b.type+'\n💰 *Advance paid: Rs.'+Math.min(Number(advance)||0,Number(total)||0).toLocaleString('en-IN')+'\n\n📍 *Location:* '+STUDIO_LOC+'\n\nPlease arrive 10 minutes early!\n— Magizh Studio Team';
+  const msg='Hi '+b.name+'! 👋\n\nYour shoot at *Magizh Rental Photo Studio* is confirmed ✅\n\n📅 *Date:* '+dateStr+'\n⏰ *Slot:* '+b.slot+'\n📸 *Shoot type:* '+b.type+'\n💰 *Advance paid: Rs.'+Math.min(Number(b.advance)||0,Number(b.total)||0).toLocaleString('en-IN')+'\n\n📍 *Location:* '+STUDIO_LOC+'\n\nPlease arrive 10 minutes early!\n— Magizh Studio Team';
   window.open('https://wa.me/91'+phone+'?text='+encodeURIComponent(msg),'_blank');
 };
 
@@ -1375,12 +1375,7 @@ function backupBookings(){
 }
 
 
-setTimeout(()=>{
-  const loader=document.getElementById('app-loader');
-  if(loader){
-    loader.style.display='none';
-  }
-},5000);
+
 
 
 // SERVICE WORKER REGISTER
@@ -1393,44 +1388,8 @@ if('serviceWorker' in navigator){
 }
 
 </script>
-<script>
-setTimeout(()=>{
-  try{
-    const nav=document.querySelector('.bottom-nav');
-    if(nav) nav.style.display='flex';
-
-    document.querySelectorAll('.tab-shift,.tab-admin').forEach(el=>{
-      el.style.display='flex';
-      el.hidden=false;
-    });
-  }catch(e){
-    console.log(e);
-  }
-},300);
-</script>
 
 
-
-<script>
-setTimeout(()=>{
-  try{
-    const shift=document.getElementById('tab-shift');
-    const annual=document.getElementById('tab-annual');
-
-    if(shift){
-      shift.style.display='flex';
-      shift.hidden=false;
-    }
-
-    if(annual){
-      annual.style.display='flex';
-      annual.hidden=false;
-    }
-  }catch(e){
-    console.log(e);
-  }
-},500);
-</script>
 
 </body>
 </html>
