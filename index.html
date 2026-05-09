@@ -6,10 +6,13 @@
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="apple-mobile-web-app-title" content="Magizh">
-<meta name="theme-color" content="#0f0f0f">
+<meta name="mobile-web-app-capable" content="yes">
+<link rel="manifest" href="manifest.json">
+<meta name="theme-color" content="#E8601A">
 <title>Magizh Studio</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 <style>
 *{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent;}
 :root{
@@ -22,7 +25,7 @@ html,body{height:100%;overflow:hidden;}
 body{background:var(--bg);font-family:'Inter',sans-serif;font-size:14px;}
 .app{max-width:430px;margin:0 auto;height:100vh;display:flex;flex-direction:column;overflow:hidden;}
 
-/* ── LOGIN ── */
+/* LOGIN */
 #login-screen{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:32px 24px;background:var(--bg);}
 .login-logo{width:56px;height:56px;background:var(--raja);border-radius:18px;display:flex;align-items:center;justify-content:center;margin-bottom:16px;}
 .login-title{font-family:'Syne',sans-serif;font-size:24px;font-weight:800;color:var(--dark);margin-bottom:4px;}
@@ -36,14 +39,14 @@ body{background:var(--bg);font-family:'Inter',sans-serif;font-size:14px;}
 .login-av{width:28px;height:28px;border-radius:50%;background:rgba(255,255,255,.25);display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700;color:#fff;}
 .login-role{font-size:11px;font-weight:400;opacity:.7;margin-left:auto;}
 
-/* ── MAIN LAYOUT ── */
+/* MAIN */
 #main-screen{flex:1;display:none;flex-direction:column;overflow:hidden;}
 #main-screen.active{display:flex;}
 .pages{flex:1;overflow:hidden;position:relative;}
 .page{position:absolute;inset:0;overflow-y:auto;display:none;-webkit-overflow-scrolling:touch;}
 .page.active{display:block;}
 
-/* ── TAB BAR ── */
+/* TAB BAR */
 .tabbar{display:flex;background:#0f0f0f;padding:8px 8px 20px;flex-shrink:0;}
 .tab{flex:1;display:flex;flex-direction:column;align-items:center;gap:3px;padding:7px 4px;border-radius:12px;cursor:pointer;border:none;background:none;transition:background .15s;}
 .tab.active{background:var(--raja);}
@@ -51,7 +54,7 @@ body{background:var(--bg);font-family:'Inter',sans-serif;font-size:14px;}
 .tab-lbl{font-size:9px;font-weight:600;letter-spacing:.05em;text-transform:uppercase;color:rgba(255,255,255,.3);font-family:'Inter',sans-serif;}
 .tab.active .tab-lbl{color:#fff;}
 
-/* ── HERO ── */
+/* HERO */
 .hero{padding:52px 20px 20px;position:relative;}
 .hero-booking{background:var(--raja);}
 .hero-shift{background:var(--ari);}
@@ -67,7 +70,7 @@ body{background:var(--bg);font-family:'Inter',sans-serif;font-size:14px;}
 .hero-title{font-family:'Syne',sans-serif;font-size:32px;font-weight:800;color:#fff;line-height:1;}
 .hero-sub{font-size:12px;color:rgba(255,255,255,.5);margin-top:3px;}
 
-/* ── BOOKING ── */
+/* BOOKING */
 .sec{padding:16px 16px 0;}
 .sec-lbl{font-size:10px;font-weight:600;letter-spacing:.1em;text-transform:uppercase;color:var(--light);margin-bottom:8px;}
 .date-strip{display:flex;gap:6px;overflow-x:auto;padding-bottom:4px;}
@@ -80,22 +83,20 @@ body{background:var(--bg);font-family:'Inter',sans-serif;font-size:14px;}
 .dc.sel .dc-day{color:rgba(255,255,255,.7);}
 
 .slot-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:6px;}
-.slot{border-radius:10px;padding:9px 4px;text-align:center;font-size:11px;font-weight:600;cursor:pointer;transition:transform .1s;}
+.slot{border-radius:10px;padding:10px 4px;text-align:center;font-size:12px;font-weight:600;cursor:pointer;transition:all .15s;border:0.5px solid #e0dbd0;}
 .slot:active{transform:scale(.93);}
-.slot.free{background:var(--surface);color:var(--dark);border:0.5px solid #e0dbd0;}
-.slot.booked{background:#fee2e2;color:#991b1b;cursor:default;}
-.slot.sel{background:var(--raja);color:#fff;}
-.slot-time{font-size:9px;font-weight:400;margin-top:1px;opacity:.7;}
+.slot.free{background:var(--surface);color:var(--dark);}
+.slot.booked{background:#fee2e2;color:#991b1b;cursor:default;border-color:#fca5a5;text-decoration:line-through;}
+.slot.sel{background:var(--raja);color:#fff;border-color:var(--raja);transform:scale(1.04);}
 
 .field{background:var(--surface);border-radius:var(--r);padding:12px 14px;margin-bottom:6px;}
 .field-lbl{font-size:10px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;color:var(--light);margin-bottom:3px;}
-.field input,select{width:100%;background:transparent;border:none;outline:none;font-size:14px;font-family:'Inter',sans-serif;color:var(--dark);}
+.field input,.field select{width:100%;background:transparent;border:none;outline:none;font-size:14px;font-family:'Inter',sans-serif;color:var(--dark);}
 .field select{-webkit-appearance:none;cursor:pointer;}
 .field input::placeholder{color:var(--lighter);}
 
 .btn-confirm{background:var(--dark);border-radius:var(--r);padding:14px;text-align:center;font-size:14px;font-weight:700;color:#fff;margin:14px 16px 0;cursor:pointer;font-family:'Syne',sans-serif;border:none;width:calc(100% - 32px);transition:transform .1s;}
 .btn-confirm:active{transform:scale(.97);}
-.btn-confirm:disabled{opacity:.4;cursor:default;}
 
 .booking-list{padding:16px;}
 .bl-empty{text-align:center;padding:20px;font-size:13px;color:var(--light);}
@@ -109,10 +110,10 @@ body{background:var(--bg);font-family:'Inter',sans-serif;font-size:14px;}
 .badge-paid{background:#dcfce7;color:#166534;}
 .badge-pend{background:#fee2e2;color:#991b1b;}
 
-/* ── PAYMENT MODAL ── */
+/* MODAL */
 .modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:100;display:none;align-items:flex-end;justify-content:center;max-width:430px;margin:0 auto;}
 .modal-overlay.open{display:flex;}
-.modal-box{background:var(--surface);border-radius:24px 24px 0 0;padding:20px;width:100%;padding-bottom:36px;}
+.modal-box{background:var(--surface);border-radius:24px 24px 0 0;padding:20px;width:100%;padding-bottom:36px;max-height:90vh;overflow-y:auto;}
 .modal-handle{width:36px;height:3px;background:#e0dbd0;border-radius:2px;margin:0 auto 16px;}
 .modal-title{font-family:'Syne',sans-serif;font-size:18px;font-weight:700;color:var(--dark);margin-bottom:4px;}
 .modal-meta{font-size:12px;color:var(--light);margin-bottom:16px;}
@@ -120,11 +121,10 @@ body{background:var(--bg);font-family:'Inter',sans-serif;font-size:14px;}
 .modal-row-label{font-size:13px;color:var(--mid);}
 .modal-row-val{font-size:13px;font-weight:600;color:var(--dark);}
 .modal-actions{display:flex;gap:8px;margin-top:16px;}
-.btn-paid{flex:1;padding:13px;border-radius:var(--r);border:none;background:var(--keer);color:#fff;font-size:14px;font-weight:700;cursor:pointer;font-family:'Syne',sans-serif;}
-.btn-paid:active{transform:scale(.97);}
-.btn-close-modal{flex:1;padding:13px;border-radius:var(--r);border:0.5px solid #e0dbd0;background:transparent;color:var(--mid);font-size:14px;cursor:pointer;font-family:'Inter',sans-serif;}
+.btn-paid{flex:1;padding:13px;border-radius:var(--r);border:none;background:var(--keer);color:#fff;font-size:13px;font-weight:700;cursor:pointer;font-family:'Syne',sans-serif;}
+.btn-close-modal{flex:1;padding:13px;border-radius:var(--r);border:0.5px solid #e0dbd0;background:transparent;color:var(--mid);font-size:13px;cursor:pointer;}
 
-/* ── SHIFT ── */
+/* SHIFT */
 .shift-swap-panel{background:var(--dark);margin:0;padding:14px 16px 12px;border-radius:0 0 20px 20px;}
 .ssp-head{display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;}
 .ssp-title{font-family:'Syne',sans-serif;font-size:15px;font-weight:700;color:#fff;}
@@ -144,7 +144,6 @@ body{background:var(--bg);font-family:'Inter',sans-serif;font-size:14px;}
 .ssp-opt-role{font-size:11px;color:rgba(255,255,255,.55);margin-top:1px;}
 .ssp-hint{font-size:11px;color:rgba(255,255,255,.5);padding:2px 0 6px;}
 .ssp-back{font-size:11px;color:rgba(255,255,255,.4);border:none;background:none;cursor:pointer;text-decoration:underline;padding:4px 0;font-family:'Inter',sans-serif;}
-
 .shift-confirm-rows{background:rgba(255,255,255,.06);border-radius:var(--r);padding:12px 14px;margin-bottom:10px;}
 .scr-row{display:flex;align-items:center;gap:8px;margin-bottom:6px;}
 .scr-row:last-child{margin-bottom:0;}
@@ -154,7 +153,6 @@ body{background:var(--bg);font-family:'Inter',sans-serif;font-size:14px;}
 .scr-badge.p-a{background:var(--ari);}
 .scr-badge.p-r{background:var(--raja);}
 .scr-badge.p-k{background:var(--keer);}
-
 .cal-section{padding:12px 16px 0;}
 .wds{display:grid;grid-template-columns:repeat(7,1fr);gap:3px;margin-bottom:4px;}
 .wd{text-align:center;font-size:9px;font-weight:600;letter-spacing:.04em;color:var(--light);}
@@ -173,13 +171,10 @@ body{background:var(--bg);font-family:'Inter',sans-serif;font-size:14px;}
 .cday.swapped::after{content:'';position:absolute;bottom:3px;right:3px;width:5px;height:5px;border-radius:50%;background:#fbbf24;}
 .cdn{font-size:10px;font-weight:500;color:rgba(255,255,255,.6);display:block;margin-bottom:3px;font-family:'Inter',sans-serif;}
 .cdb{font-family:'Syne',sans-serif;font-size:9px;font-weight:700;color:#fff;display:block;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
-
-.shift-nav{display:flex;align-items:center;justify-content:space-between;padding:0 16px 8px;}
 .shift-nav-month{font-family:'Syne',sans-serif;font-size:18px;font-weight:700;color:var(--dark);}
 .shift-nav-btns{display:flex;gap:6px;}
 .nav-btn{width:32px;height:32px;border-radius:50%;background:var(--surface);border:0.5px solid #e0dbd0;cursor:pointer;display:flex;align-items:center;justify-content:center;color:var(--dark);}
 .nav-btn:active{transform:scale(.9);}
-
 .pcards{display:flex;gap:8px;padding:12px 16px 0;}
 .pc{flex:1;border-radius:var(--r);padding:10px;}
 .pc-a{background:var(--ari);}
@@ -188,11 +183,9 @@ body{background:var(--bg);font-family:'Inter',sans-serif;font-size:14px;}
 .pc-name{font-size:10px;font-weight:700;color:#fff;}
 .pc-days{font-family:'Syne',sans-serif;font-size:22px;font-weight:800;color:#fff;line-height:1;}
 .pc-role{font-size:8px;letter-spacing:.06em;text-transform:uppercase;color:rgba(255,255,255,.5);margin-top:2px;}
-
 .shift-info{margin:12px 16px 0;background:var(--surface);border-radius:var(--r);padding:12px 14px;border:0.5px solid #e0dbd0;}
 .shift-info-row{font-size:11px;color:var(--mid);line-height:1.8;}
 .shift-info-row strong{color:var(--dark);}
-
 .swap-logs{padding:12px 16px 0;}
 .log-head{font-size:10px;font-weight:600;letter-spacing:.1em;text-transform:uppercase;color:var(--light);margin-bottom:6px;}
 .log-item{background:var(--surface);border-radius:var(--r);padding:10px 12px;margin-bottom:5px;display:flex;align-items:center;gap:8px;border:0.5px solid #e0dbd0;}
@@ -201,13 +194,12 @@ body{background:var(--bg);font-family:'Inter',sans-serif;font-size:14px;}
 .reset-row{padding:10px 16px 20px;text-align:right;}
 .reset-btn{font-size:11px;color:var(--light);border:none;background:none;cursor:pointer;text-decoration:underline;font-family:'Inter',sans-serif;}
 
-/* ── ANNUAL ── */
+/* ADMIN */
 .ann-stats{display:grid;grid-template-columns:1fr 1fr;gap:8px;padding:16px 16px 0;}
 .astat{background:var(--surface);border-radius:var(--r);padding:12px 14px;border:0.5px solid #e0dbd0;}
 .astat-lbl{font-size:10px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;color:var(--light);margin-bottom:3px;}
 .astat-val{font-family:'Syne',sans-serif;font-size:26px;font-weight:800;color:var(--dark);}
 .astat-sub{font-size:10px;color:var(--light);margin-top:1px;}
-
 .bal-section{padding:16px 16px 0;}
 .bal-card{background:var(--surface);border-radius:var(--r);padding:14px;border:0.5px solid #e0dbd0;}
 .bal-lbl{font-size:10px;font-weight:600;letter-spacing:.1em;text-transform:uppercase;color:var(--light);margin-bottom:10px;}
@@ -217,7 +209,6 @@ body{background:var(--bg);font-family:'Inter',sans-serif;font-size:14px;}
 .bal-track{flex:1;height:7px;border-radius:4px;background:var(--surface2);overflow:hidden;}
 .bal-fill{height:100%;border-radius:4px;}
 .bal-pct{font-size:11px;font-weight:600;color:var(--mid);min-width:28px;text-align:right;}
-
 .month-section{padding:16px 16px 0;}
 .month-sec-lbl{font-size:10px;font-weight:600;letter-spacing:.1em;text-transform:uppercase;color:var(--light);margin-bottom:8px;}
 .month-hdr{display:grid;grid-template-columns:44px repeat(3,1fr) 48px;gap:4px;padding:5px 10px;background:var(--surface2);border-radius:8px 8px 0 0;}
@@ -233,6 +224,10 @@ body{background:var(--bg);font-family:'Inter',sans-serif;font-size:14px;}
 .mnum.a{color:var(--ari);} .mnum.r{color:var(--raja);} .mnum.k{color:var(--keer);}
 .meq{font-size:9px;font-weight:600;text-align:center;}
 .meq.ok{color:var(--keer);} .meq.off{color:var(--raja);}
+
+/* TOAST */
+.toast{position:fixed;bottom:100px;left:50%;transform:translateX(-50%);background:var(--dark);color:#fff;padding:10px 20px;border-radius:20px;font-size:13px;font-weight:500;opacity:0;transition:opacity .3s;z-index:200;pointer-events:none;white-space:nowrap;}
+.toast.show{opacity:1;}
 </style>
 </head>
 <body>
@@ -241,30 +236,22 @@ body{background:var(--bg);font-family:'Inter',sans-serif;font-size:14px;}
 <!-- LOGIN -->
 <div id="login-screen">
   <div class="login-logo">
-    <svg width="28" height="28" viewBox="0 0 24 24" fill="none"><path d="M12 3C10.3 3 9 4.3 9 6s1.3 3 3 3 3-1.3 3-3-1.3-3-3-3zM5 20c0-3.3 3.1-6 7-6s7 2.7 7 6" stroke="#fff" stroke-width="2" stroke-linecap="round"/><rect x="2" y="2" width="20" height="20" rx="4" stroke="#fff" stroke-width="2" stroke-dasharray="0"/></svg>
+    <svg width="28" height="28" viewBox="0 0 24 24" fill="none"><rect x="2" y="6" width="20" height="14" rx="2" stroke="#fff" stroke-width="2"/><circle cx="12" cy="13" r="3" stroke="#fff" stroke-width="2"/><path d="M8 6l1.5-3h5L16 6" stroke="#fff" stroke-width="2"/></svg>
   </div>
   <div class="login-title">Magizh Studio</div>
   <div class="login-sub">Who's using the app today?</div>
   <div class="login-options">
     <button class="login-btn login-btn-a" onclick="login('Ari','a')">
-      <div class="login-av">A</div>
-      Ari
-      <span class="login-role">Weekends only</span>
+      <div class="login-av">A</div>Ari<span class="login-role">Weekends only</span>
     </button>
     <button class="login-btn login-btn-r" onclick="login('Raja','r')">
-      <div class="login-av">R</div>
-      Raja
-      <span class="login-role">Work from home</span>
+      <div class="login-av">R</div>Raja<span class="login-role">Work from home</span>
     </button>
     <button class="login-btn login-btn-k" onclick="login('Keerthi','k')">
-      <div class="login-av">K</div>
-      Keerthi
-      <span class="login-role">Freelancer</span>
+      <div class="login-av">K</div>Keerthi<span class="login-role">Freelancer</span>
     </button>
     <button class="login-btn" style="background:#888;color:#fff;" onclick="login('Inba','inba')">
-      <div class="login-av" style="background:rgba(255,255,255,.25);">I</div>
-      Inba
-      <span class="login-role">Booking only</span>
+      <div class="login-av" style="background:rgba(255,255,255,.25);">I</div>Inba<span class="login-role">Booking only</span>
     </button>
   </div>
 </div>
@@ -278,38 +265,59 @@ body{background:var(--bg);font-family:'Inter',sans-serif;font-size:14px;}
       <div class="hero hero-booking">
         <div class="hero-top">
           <span class="hero-eye">Magizh Studio</span>
-          <div class="live-pill"><div class="live-dot" id="b-sync-dot"></div><span class="live-txt" id="b-sync-txt">connecting</span></div>
+          <div class="live-pill"><div class="live-dot off" id="b-sync-dot"></div><span class="live-txt" id="b-sync-txt">connecting</span></div>
           <span class="user-chip" id="b-user-chip"></span>
         </div>
         <div class="hero-title">Booking</div>
         <div class="hero-sub">Select date &amp; time slot</div>
       </div>
 
+      <!-- Studio selector -->
+      <div class="sec" style="padding-bottom:4px;">
+        <div class="sec-lbl">Select Studio</div>
+        <div style="display:flex;gap:8px;">
+          <div id="studio-photo" onclick="selectStudio('photo')" style="flex:1;padding:14px 12px;border-radius:var(--r);background:var(--raja);cursor:pointer;text-align:center;border:3px solid var(--raja);transition:all .15s;">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" style="display:block;margin:0 auto 6px;"><rect x="2" y="6" width="20" height="14" rx="2" stroke="white" stroke-width="2"/><circle cx="12" cy="13" r="3" stroke="white" stroke-width="2"/><path d="M8 6l1.5-3h5L16 6" stroke="white" stroke-width="2" stroke-linejoin="round"/></svg>
+            <div style="font-family:'Syne',sans-serif;font-size:13px;font-weight:700;color:#fff;">Photography</div>
+            <div style="font-size:10px;color:rgba(255,255,255,.7);margin-top:2px;">Studio 1</div>
+          </div>
+          <div id="studio-pod" onclick="selectStudio('pod')" style="flex:1;padding:14px 12px;border-radius:var(--r);background:var(--surface);cursor:pointer;text-align:center;border:3px solid #e0dbd0;transition:all .15s;">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" style="display:block;margin:0 auto 6px;"><rect x="9" y="2" width="6" height="10" rx="3" stroke="#1a1a1a" stroke-width="2"/><path d="M5 10a7 7 0 0014 0" stroke="#1a1a1a" stroke-width="2" stroke-linecap="round"/><line x1="12" y1="17" x2="12" y2="21" stroke="#1a1a1a" stroke-width="2" stroke-linecap="round"/><line x1="8" y1="21" x2="16" y2="21" stroke="#1a1a1a" stroke-width="2" stroke-linecap="round"/></svg>
+            <div style="font-family:'Syne',sans-serif;font-size:13px;font-weight:700;color:var(--dark);">Podcast</div>
+            <div style="font-size:10px;color:var(--light);margin-top:2px;">Studio 2</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Date strip -->
       <div class="sec">
-        <div class="sec-lbl">Pick a date</div>
+        <div class="sec-lbl" id="bookings-label">Pick a Date</div>
         <div class="date-strip" id="date-strip"></div>
       </div>
 
+      <!-- Slot grid -->
       <div class="sec" id="slot-section" style="display:none;">
-        <div class="sec-lbl">Start time · 9am – 9pm</div>
+        <div class="sec-lbl">Start Time · 9am – 9pm</div>
         <div class="slot-grid" id="slot-grid"></div>
       </div>
 
+      <!-- Duration picker -->
       <div class="sec" id="dur-section" style="display:none;">
         <div class="sec-lbl">Duration</div>
         <div style="display:flex;align-items:center;gap:12px;background:var(--surface);border-radius:var(--r);padding:12px 14px;border:0.5px solid #e0dbd0;">
-          <button onclick="changeDur(-1)" style="width:36px;height:36px;border-radius:50%;border:0.5px solid #e0dbd0;background:var(--bg);font-size:20px;font-weight:700;cursor:pointer;">−</button>
+          <button onclick="changeDur(-1)" style="width:38px;height:38px;border-radius:50%;border:0.5px solid #e0dbd0;background:var(--bg);font-size:22px;font-weight:700;cursor:pointer;display:flex;align-items:center;justify-content:center;">−</button>
           <div style="flex:1;text-align:center;">
-            <div style="font-family:'Syne',sans-serif;font-size:24px;font-weight:800;color:var(--dark);" id="dur-display">2</div>
+            <div style="font-family:'Syne',sans-serif;font-size:28px;font-weight:800;color:var(--dark);" id="dur-display">2</div>
             <div style="font-size:10px;color:var(--light);" id="dur-hrs-lbl">hours</div>
           </div>
-          <button onclick="changeDur(1)" style="width:36px;height:36px;border-radius:50%;border:0.5px solid #e0dbd0;background:var(--bg);font-size:20px;font-weight:700;cursor:pointer;">+</button>
+          <button onclick="changeDur(1)" style="width:38px;height:38px;border-radius:50%;border:0.5px solid #e0dbd0;background:var(--bg);font-size:22px;font-weight:700;cursor:pointer;display:flex;align-items:center;justify-content:center;">+</button>
         </div>
-        <div style="font-size:11px;color:var(--keer);text-align:center;margin-top:6px;font-weight:600;" id="slot-summary"></div>
+        <div style="font-size:12px;color:var(--keer);text-align:center;margin-top:8px;font-weight:600;" id="slot-summary"></div>
       </div>
 
+      <!-- Client form -->
       <div class="sec" id="form-section" style="display:none;">
-        <div class="sec-lbl">Client details</div>
+        <div class="sec-lbl">Client Details</div>
         <div class="field"><div class="field-lbl">Client name</div><input id="f-name" type="text" placeholder="Full name"></div>
         <div class="field"><div class="field-lbl">Contact number</div><input id="f-phone" type="tel" placeholder="+91 00000 00000"></div>
         <div class="field"><div class="field-lbl">Shoot type</div>
@@ -324,22 +332,41 @@ body{background:var(--bg);font-family:'Inter',sans-serif;font-size:14px;}
             <option>Other</option>
           </select>
         </div>
-        <div class="sec-lbl" style="margin-top:10px;">Payment</div>
-        <div class="field"><div class="field-lbl">Total amount (₹)</div><input id="f-total" type="number" placeholder="Auto-calculated" min="0" readonly style="color:var(--mid);"></div>
-        <div class="field" style="display:flex;align-items:center;gap:10px;">
-          <div style="flex:1;"><div class="field-lbl">Discount (₹)</div><input id="f-discount" type="number" placeholder="0" min="0" oninput="recalcTotal()"></div>
-          <div style="flex:1;"><div class="field-lbl">After discount</div><div id="f-after-discount" style="font-size:14px;font-weight:600;color:var(--keer);padding-top:4px;">₹0</div></div>
+        <div class="sec-lbl" style="margin-top:12px;">Payment</div>
+        <div class="field" style="background:#f9f6f0;">
+          <div class="field-lbl">Total (₹750/hr)</div>
+          <div style="font-family:'Syne',sans-serif;font-size:20px;font-weight:800;color:var(--dark);" id="f-total-display">₹0</div>
         </div>
-        <div class="field"><div class="field-lbl">Advance paid (₹)</div><input id="f-adv" type="number" placeholder="0" min="0" oninput="recalcBalance()"></div>
-        <div class="field" style="background:var(--surface2);">
-          <div class="field-lbl">Balance due (₹)</div>
-          <div id="f-balance" style="font-size:15px;font-weight:700;color:var(--raja);">₹0</div>
+        <div class="field">
+          <div class="field-lbl">Discount (₹)</div>
+          <input id="f-discount" type="number" placeholder="0" min="0" oninput="recalcPayment()">
         </div>
-        <button class="btn-confirm" id="btn-confirm" onclick="confirmBooking()">Confirm Booking</button>
+        <div class="field" style="background:#f0faf4;">
+          <div class="field-lbl">After discount</div>
+          <div style="font-family:'Syne',sans-serif;font-size:18px;font-weight:700;color:var(--keer);" id="f-after-discount">₹0</div>
+        </div>
+        <div class="field">
+          <div class="field-lbl">Advance paid (₹)</div>
+          <input id="f-adv" type="number" placeholder="0" min="0" oninput="recalcPayment()">
+        </div>
+        <div class="field" style="background:#fff8f5;">
+          <div class="field-lbl">Balance due</div>
+          <div style="font-family:'Syne',sans-serif;font-size:18px;font-weight:700;color:var(--raja);" id="f-balance">₹0</div>
+        </div>
+        <button class="btn-confirm" onclick="confirmBooking()">Confirm Booking</button>
+        <div style="height:20px;"></div>
       </div>
 
+      <!-- Booking list -->
       <div class="sec" style="margin-top:16px;">
-        <div class="sec-lbl">Today's bookings</div>
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;">
+          <div class="sec-lbl" style="margin-bottom:0;" id="booking-list-label">Today's Bookings</div>
+          <div style="display:flex;gap:6px;">
+            <button id="bf-today" onclick="setFilter('today')" style="font-size:10px;font-weight:600;padding:4px 10px;border-radius:20px;border:none;background:var(--raja);color:#fff;cursor:pointer;">Today</button>
+            <button id="bf-all" onclick="setFilter('all')" style="font-size:10px;font-weight:600;padding:4px 10px;border-radius:20px;border:0.5px solid #e0dbd0;background:transparent;color:var(--mid);cursor:pointer;">All</button>
+            <button id="bf-past" onclick="setFilter('past')" style="font-size:10px;font-weight:600;padding:4px 10px;border-radius:20px;border:0.5px solid #e0dbd0;background:transparent;color:var(--mid);cursor:pointer;">Past</button>
+          </div>
+        </div>
       </div>
       <div class="booking-list" id="booking-list"></div>
     </div>
@@ -349,57 +376,85 @@ body{background:var(--bg);font-family:'Inter',sans-serif;font-size:14px;}
       <div class="hero hero-shift">
         <div class="hero-top">
           <span class="hero-eye">Magizh Studio</span>
-          <div class="live-pill"><div class="live-dot" id="s-sync-dot"></div><span class="live-txt" id="s-sync-txt">connecting</span></div>
+          <div class="live-pill"><div class="live-dot off" id="s-sync-dot"></div><span class="live-txt" id="s-sync-txt">connecting</span></div>
           <span class="user-chip" id="s-user-chip"></span>
         </div>
-        <div class="hero-title" id="shift-hero-title">April 2026</div>
+        <div class="hero-title" id="shift-hero-title">2026</div>
         <div class="hero-sub">Tap a day to swap</div>
       </div>
-
       <div id="swap-panel" style="display:none;"></div>
-
       <div style="padding:12px 16px 4px;display:flex;align-items:center;justify-content:space-between;">
         <div class="shift-nav-month" id="shift-month-label"></div>
         <div class="shift-nav-btns">
-          <button class="nav-btn" id="shift-prev">
-            <svg width="14" height="14" viewBox="0 0 24 24" fill="none"><path d="M15 18l-6-6 6-6" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
-          </button>
-          <button class="nav-btn" id="shift-next">
-            <svg width="14" height="14" viewBox="0 0 24 24" fill="none"><path d="M9 18l6-6-6-6" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
-          </button>
+          <button class="nav-btn" id="shift-prev"><svg width="14" height="14" viewBox="0 0 24 24" fill="none"><path d="M15 18l-6-6 6-6" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg></button>
+          <button class="nav-btn" id="shift-next"><svg width="14" height="14" viewBox="0 0 24 24" fill="none"><path d="M9 18l6-6-6-6" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg></button>
         </div>
       </div>
-
       <div class="pcards" id="shift-pcards"></div>
-
       <div class="cal-section">
         <div class="wds">
           <div class="wd wk">SUN</div><div class="wd">MON</div><div class="wd">TUE</div><div class="wd">WED</div><div class="wd">THU</div><div class="wd">FRI</div><div class="wd wk">SAT</div>
         </div>
         <div class="cgrid" id="cal-grid"></div>
       </div>
-
       <div class="shift-info" id="shift-info"></div>
       <div class="swap-logs" id="swap-logs"></div>
       <div class="reset-row"><button class="reset-btn" id="reset-swaps-btn">Reset all swaps this month</button></div>
       <div style="height:20px;"></div>
     </div>
 
-    <!-- ANNUAL PAGE -->
+    <!-- ADMIN PAGE -->
     <div class="page" id="page-annual">
-      <div class="hero hero-annual">
-        <div class="hero-top">
-          <span class="hero-eye">Magizh Studio · 2026</span>
-          <div class="live-pill"><div class="live-dot" id="a-sync-dot"></div><span class="live-txt" id="a-sync-txt">connecting</span></div>
-          <span class="user-chip" id="a-user-chip"></span>
+      <div id="admin-gate">
+        <div class="hero hero-annual">
+          <div class="hero-top">
+            <span class="hero-eye">Magizh Studio</span>
+            <div class="live-pill"><div class="live-dot off" id="a-sync-dot"></div><span class="live-txt" id="a-sync-txt">connecting</span></div>
+            <span class="user-chip" id="a-user-chip"></span>
+          </div>
+          <div class="hero-title">Admin</div>
+          <div class="hero-sub">Enter password to continue</div>
         </div>
-        <div class="hero-title">Annual Report</div>
-        <div class="hero-sub">Full year 2026 breakdown</div>
+        <div style="padding:40px 24px;display:flex;flex-direction:column;align-items:center;">
+          <div style="width:64px;height:64px;background:var(--surface);border-radius:20px;display:flex;align-items:center;justify-content:center;margin-bottom:20px;border:0.5px solid #e0dbd0;">
+            <svg width="28" height="28" viewBox="0 0 24 24" fill="none"><rect x="3" y="11" width="18" height="11" rx="2" stroke="#1a1a1a" stroke-width="2"/><path d="M7 11V7a5 5 0 0110 0v4" stroke="#1a1a1a" stroke-width="2" stroke-linecap="round"/><circle cx="12" cy="16" r="1.5" fill="#1a1a1a"/></svg>
+          </div>
+          <div style="font-family:'Syne',sans-serif;font-size:22px;font-weight:800;margin-bottom:6px;">Admin Access</div>
+          <input id="admin-pw" type="password" placeholder="Password" onkeydown="if(event.key==='Enter')checkAdminPw()" style="width:100%;max-width:280px;padding:14px 16px;border-radius:var(--r);border:1.5px solid #e0dbd0;background:var(--surface);font-size:18px;text-align:center;letter-spacing:6px;margin-bottom:10px;outline:none;font-family:'Inter',sans-serif;">
+          <button onclick="checkAdminPw()" style="width:100%;max-width:280px;padding:14px;border-radius:var(--rl);border:none;background:var(--keer);color:#fff;font-family:'Syne',sans-serif;font-size:15px;font-weight:700;cursor:pointer;">Unlock</button>
+          <div id="admin-err" style="font-size:12px;color:#cc0000;text-align:center;margin-top:10px;display:none;">Wrong password. Try again.</div>
+        </div>
       </div>
-      <div class="ann-stats" id="ann-stats"></div>
-      <div class="bal-section" id="bal-section"></div>
-      <div class="month-section" id="month-section"></div>
-      <div style="height:20px;"></div>
+      <div id="admin-panel" style="display:none;">
+        <div class="hero hero-annual">
+          <div class="hero-top">
+            <span class="hero-eye">Magizh Studio · Admin</span>
+            <div class="live-pill"><div class="live-dot"></div><span class="live-txt">unlocked</span></div>
+            <button onclick="lockAdmin()" style="background:rgba(255,255,255,.15);border:none;border-radius:8px;padding:4px 10px;font-size:11px;font-weight:600;color:#fff;cursor:pointer;">Lock</button>
+          </div>
+          <div class="hero-title">Admin Panel</div>
+          <div class="hero-sub">Report + Controls</div>
+        </div>
+        <div class="ann-stats" id="ann-stats"></div>
+        <div class="bal-section" id="bal-section"></div>
+        <div class="month-section" id="month-section"></div>
+        <div style="padding:20px 16px 0;">
+          <div class="sec-lbl">Controls</div>
+          <div style="background:var(--surface);border-radius:var(--r);border:0.5px solid #e0dbd0;overflow:hidden;margin-bottom:8px;">
+            <div style="padding:12px 16px;border-bottom:0.5px solid #f0ece4;"><div style="font-size:13px;font-weight:600;">Delete all bookings</div><div style="font-size:11px;color:var(--light);margin-top:1px;">Permanently clears all booking data</div></div>
+            <button onclick="resetAllBookings()" style="width:100%;padding:12px;border:none;background:#fee2e2;color:#991b1b;font-size:13px;font-weight:700;cursor:pointer;font-family:'Syne',sans-serif;">Delete All Bookings</button>
+          </div>
+          <div style="background:var(--surface);border-radius:var(--r);border:0.5px solid #e0dbd0;overflow:hidden;margin-bottom:8px;">
+            <div style="padding:12px 16px;border-bottom:0.5px solid #f0ece4;"><div style="font-size:13px;font-weight:600;">Clear all swaps</div><div style="font-size:11px;color:var(--light);margin-top:1px;">Reset shift swap history only</div></div>
+            <button onclick="resetAllSwaps()" style="width:100%;padding:12px;border:none;background:#fef9c3;color:#854d0e;font-size:13px;font-weight:700;cursor:pointer;font-family:'Syne',sans-serif;">Clear All Swaps</button>
+          </div>
+          <div style="background:var(--surface);border-radius:var(--r);border:0.5px solid #e0dbd0;overflow:hidden;margin-bottom:20px;">
+            <div style="padding:12px 16px;border-bottom:0.5px solid #f0ece4;"><div style="font-size:13px;font-weight:600;">Factory reset</div><div style="font-size:11px;color:var(--light);margin-top:1px;">Wipe everything</div></div>
+            <button onclick="factoryReset()" style="width:100%;padding:12px;border:none;background:#1a1a1a;color:#fff;font-size:13px;font-weight:700;cursor:pointer;font-family:'Syne',sans-serif;">Factory Reset</button>
+          </div>
+        </div>
+        <div style="height:30px;"></div>
+      </div>
     </div>
 
   </div>
@@ -407,7 +462,7 @@ body{background:var(--bg);font-family:'Inter',sans-serif;font-size:14px;}
   <!-- TAB BAR -->
   <div class="tabbar">
     <button class="tab active" id="tab-booking" onclick="switchTab('booking')">
-      <svg width="18" height="18" viewBox="0 0 24 24" fill="none"><rect x="3" y="4" width="18" height="18" rx="2.5" stroke="white" stroke-width="2"/><path d="M16 2v4M8 2v4M3 10h18" stroke="white" stroke-width="2" stroke-linecap="round"/><circle cx="8" cy="16" r="1.5" fill="white"/><circle cx="12" cy="16" r="1.5" fill="white"/><circle cx="16" cy="16" r="1.5" fill="white"/></svg>
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none"><rect x="3" y="4" width="18" height="18" rx="2.5" stroke="white" stroke-width="2"/><path d="M16 2v4M8 2v4M3 10h18" stroke="white" stroke-width="2" stroke-linecap="round"/></svg>
       <span class="tab-lbl">Booking</span>
     </button>
     <button class="tab" id="tab-shift" onclick="switchTab('shift')">
@@ -415,8 +470,8 @@ body{background:var(--bg);font-family:'Inter',sans-serif;font-size:14px;}
       <span class="tab-lbl">Shift</span>
     </button>
     <button class="tab" id="tab-annual" onclick="switchTab('annual')">
-      <svg width="18" height="18" viewBox="0 0 24 24" fill="none"><rect x="3" y="12" width="4" height="9" rx="1.5" fill="white"/><rect x="10" y="7" width="4" height="14" rx="1.5" fill="white"/><rect x="17" y="3" width="4" height="18" rx="1.5" fill="white"/></svg>
-      <span class="tab-lbl">Annual</span>
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none"><rect x="3" y="11" width="18" height="11" rx="2" stroke="white" stroke-width="2"/><path d="M7 11V7a5 5 0 0110 0v4" stroke="white" stroke-width="2" stroke-linecap="round"/></svg>
+      <span class="tab-lbl">Admin</span>
     </button>
   </div>
 </div>
@@ -428,31 +483,56 @@ body{background:var(--bg);font-family:'Inter',sans-serif;font-size:14px;}
     <div class="modal-title" id="modal-client-name"></div>
     <div class="modal-meta" id="modal-meta"></div>
     <div class="modal-row"><span class="modal-row-label">Shoot type</span><span class="modal-row-val" id="modal-type"></span></div>
+    <div class="modal-row"><span class="modal-row-label">Slot</span><span class="modal-row-val" id="modal-slot"></span></div>
+    <div class="modal-row"><span class="modal-row-label">Total</span><span class="modal-row-val" id="modal-total"></span></div>
+    <div class="modal-row"><span class="modal-row-label">Discount</span><span class="modal-row-val" id="modal-discount"></span></div>
     <div class="modal-row"><span class="modal-row-label">Advance paid</span><span class="modal-row-val" id="modal-adv"></span></div>
     <div class="modal-row"><span class="modal-row-label">Balance due</span><span class="modal-row-val" id="modal-balance"></span></div>
     <div class="modal-row"><span class="modal-row-label">Status</span><span class="modal-row-val" id="modal-status"></span></div>
+    <!-- Extend section -->
+    <div id="extend-section" style="padding:12px 0 0;">
+      <div class="sec-lbl">Edit Duration</div>
+      <div style="display:flex;align-items:center;gap:10px;background:var(--surface2);border-radius:var(--r);padding:10px 14px;">
+        <button onclick="changeExtend(-1)" style="width:34px;height:34px;border-radius:50%;border:0.5px solid #e0dbd0;background:#fff;font-size:18px;font-weight:700;cursor:pointer;">−</button>
+        <div style="flex:1;text-align:center;">
+          <div style="font-family:'Syne',sans-serif;font-size:22px;font-weight:800;" id="extend-hrs">1</div>
+          <div style="font-size:10px;color:var(--light);">hr(s) to adjust</div>
+        </div>
+        <button onclick="changeExtend(1)" style="width:34px;height:34px;border-radius:50%;border:0.5px solid #e0dbd0;background:#fff;font-size:18px;font-weight:700;cursor:pointer;">+</button>
+      </div>
+      <div style="display:flex;gap:8px;margin-top:8px;">
+        <button onclick="applyExtension(false)" style="flex:1;padding:10px;border-radius:var(--r);border:none;background:#fee2e2;color:#991b1b;font-size:12px;font-weight:700;cursor:pointer;font-family:'Syne',sans-serif;">− Reduce</button>
+        <button onclick="applyExtension(true)" style="flex:1;padding:10px;border-radius:var(--r);border:none;background:var(--ari);color:#fff;font-size:12px;font-weight:700;cursor:pointer;font-family:'Syne',sans-serif;">+ Extend</button>
+      </div>
+    </div>
     <div class="modal-actions">
       <button class="btn-paid" id="modal-pay-btn" onclick="markFullPayment()">Mark Full Payment</button>
       <button class="btn-close-modal" onclick="closeModal()">Close</button>
     </div>
-    <button id="modal-invoice-btn" onclick="sendInvoiceWhatsApp()" style="display:none;width:100%;margin-top:10px;padding:13px;border-radius:var(--r);border:none;background:var(--keer);color:#fff;font-size:14px;font-weight:700;cursor:pointer;font-family:'Syne',sans-serif;">
-      📄 Send Invoice to Client
-    </button>
-    <div style="display:flex;gap:6px;margin-top:8px;">
-      <button onclick="sendClientWhatsApp()" style="flex:1;padding:11px;border-radius:var(--r);border:none;background:#25D366;color:#fff;font-size:12px;font-weight:700;cursor:pointer;font-family:'Syne',sans-serif;">📱 Send Details</button>
-      <button onclick="sendTeamWhatsApp()" style="flex:1;padding:11px;border-radius:var(--r);border:none;background:#075E54;color:#fff;font-size:12px;font-weight:700;cursor:pointer;font-family:'Syne',sans-serif;">👥 Notify Team</button>
+    <button id="modal-invoice-btn" onclick="sendInvoicePDF()" style="display:none;width:100%;margin-top:10px;padding:13px;border-radius:var(--r);border:none;background:var(--keer);color:#fff;font-size:14px;font-weight:700;cursor:pointer;font-family:'Syne',sans-serif;">📄 Send Invoice to Client</button>
+    <div style="display:flex;gap:8px;margin-top:8px;">
+      <button onclick="sendClientWhatsApp()" style="flex:1;padding:11px;border-radius:var(--r);border:none;background:#25D366;color:#fff;font-size:12px;font-weight:700;cursor:pointer;">📱 Details</button>
+      <button onclick="sendReminderWhatsApp()" style="flex:1;padding:11px;border-radius:var(--r);border:none;background:#075E54;color:#fff;font-size:12px;font-weight:700;cursor:pointer;">🔔 Remind</button>
+      <button onclick="sendTeamWhatsApp()" style="flex:1;padding:11px;border-radius:var(--r);border:none;background:var(--dark);color:#fff;font-size:12px;font-weight:700;cursor:pointer;">👥 Team</button>
     </div>
   </div>
 </div>
-<div class="copy-toast" id="copy-toast">Done!</div>
+
+<div class="toast" id="toast"></div>
 
 <script type="module">
 import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js';
-import { getFirestore, doc, onSnapshot, setDoc, getDoc } from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js';
+import { getFirestore, doc, onSnapshot, setDoc } from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js';
 
+// ── CONFIG ──
 const CFG = { apiKey:"AIzaSyAygqLP1vGN5P81joBQ9AQkWhEvqvBWspU", projectId:"magizh-studio", authDomain:"magizh-studio.firebaseapp.com" };
 const SID = "magizh-nerkundram";
+const HOURLY_RATE = 750;
+const ADMIN_PW = '2023';
+const STUDIO_LOC = "https://maps.app.goo.gl/vdCkBeZE7Vg1tJra8";
+const SHEETS_URL = "https://script.google.com/macros/s/AKfycbxqTIGogoUiQRI0aDRZZmmKa9KmN_CLWv6lZAfGDMw1KGdxRmiG9XZapNLNfeNjYyymrw/exec";
 
+// ── MUHURTHAM & GOVT ──
 const MUHURTHAM={1:[28],2:[6,8,13,15,16,20],3:[5,6,8,15,16,25],4:[6,12,13,16,20,23,30],5:[8,13,14,18,28,29],6:[4,7,17,18,24,25],7:[2,5,12],8:[23,30,31],9:[7,13,17],10:[25,30],11:[1,11,13,15,16,20,29],12:[4,6,10,13,14]};
 const GOVT={1:[1,15,16,17,26],2:[],3:[19,21,31],4:[2,10,14],5:[1,28],6:[26],7:[18],8:[15,26],9:[],10:[2,22,24],11:[8,15],12:[25]};
 const P=[{name:'Ari',role:'weekends + holidays',c:'a'},{name:'Raja',role:'work from home',c:'r'},{name:'Keerthi',role:'freelancer',c:'k'}];
@@ -460,137 +540,117 @@ const MONTHS=['January','February','March','April','May','June','July','August',
 const MS=['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
 const DS=['Sun','Mon','Tue','Wed','Thu','Fri','Sat'];
 const HOUR_LABELS=['9am','10am','11am','12pm','1pm','2pm','3pm','4pm','5pm','6pm','7pm','8pm','9pm'];
-const HOURLY_RATE = 750;
-let selStartH = null;
-let selDur = 2;
 
-function formatSlot(start, dur){
-  return HOUR_LABELS[start-9]+' – '+HOUR_LABELS[start-9+dur]+' ('+dur+'hr'+(dur>1?'s':'')+')';
-}
-
-function slotOverlaps(existingSlots, startH, dur){
-  const newEnd = startH + dur;
-  return existingSlots.some(s=>{
-    if(!s) return false;
-    let eS, eE;
-    if(s.indexOf('|') !== -1){
-      const parts = s.split('|');
-      eS = parseInt(parts[0]);
-      eE = eS + parseInt(parts[1]);
-    } else {
-      const match = s.match(/(\d+)(am|pm)\s*[–-]\s*(\d+)(am|pm)/i);
-      if(!match) return false;
-      const h2n = (h,p) => {
-        h = parseInt(h); p = p.toLowerCase();
-        if(p==='am' && h===12) return 0;
-        if(p==='pm' && h!==12) return h+12;
-        return h;
-      };
-      eS = h2n(match[1], match[2]);
-      eE = h2n(match[3], match[4]);
-    }
-    if(isNaN(eS) || isNaN(eE)) return false;
-    return startH < eE && newEnd > eS;
-  });
-}
-
-function recalcTotal(){
-  if(selStartH === null) return;
-  const total = selDur * HOURLY_RATE;
-  const disc = parseFloat(document.getElementById('f-discount').value)||0;
-  const afterDisc = Math.max(0, total - disc);
-  document.getElementById('f-total').value = total;
-  document.getElementById('f-after-discount').textContent = '₹'+afterDisc.toLocaleString('en-IN');
-  recalcBalance();
-}
-
-function recalcBalance(){
-  const total = selDur * HOURLY_RATE;
-  const disc = parseFloat(document.getElementById('f-discount')?document.getElementById('f-discount').value:0)||0;
-  const afterDisc = Math.max(0, total - disc);
-  const adv = parseFloat(document.getElementById('f-adv').value)||0;
-  const bal = Math.max(0, afterDisc - adv);
-  const balEl = document.getElementById('f-balance');
-  if(balEl){
-    balEl.textContent = '₹'+bal.toLocaleString('en-IN');
-    balEl.style.color = bal > 0 ? 'var(--raja)' : 'var(--keer)';
-  }
-}
-
-window.changeDur = function(delta){
-  if(selStartH === null) return;
-  selDur = Math.max(1, Math.min(21-selStartH, selDur+delta));
-  updateDurDisplay();
-  renderSlots();
-};
-
-function updateDurDisplay(){
-  if(selStartH === null) return;
-  const endH = selStartH + selDur;
-  document.getElementById('dur-display').textContent = selDur;
-  document.getElementById('dur-hrs-lbl').textContent = selDur===1?'hour':'hours';
-  const dayBookings = Object.values(bookings).filter(b=>b.date===selDate&&(b.studio||'photo')===selStudio);
-  const bookedRaw = dayBookings.map(b=>b.slotRaw||b.slot);
-  const conflict = slotOverlaps(bookedRaw, selStartH, selDur);
-  const sumEl = document.getElementById('slot-summary');
-  if(sumEl){
-    sumEl.textContent = conflict
-      ? '⚠️ Conflicts with existing booking — adjust hours'
-      : `✓ ${HOUR_LABELS[selStartH-9]} to ${HOUR_LABELS[endH-9]} · ₹${(selDur*HOURLY_RATE).toLocaleString('en-IN')}`;
-    sumEl.style.color = conflict ? '#991b1b' : 'var(--keer)';
-  }
-  recalcTotal();
-}
-
+// ── STATE ──
 let db, currentUser='', currentUserKey='';
-let sync='off';
 let swaps={}, logs={}, bookings={};
 let sYr=2026, sMo=new Date().getMonth();
 let step=0, selDay=null, selP=null, selG=null;
 let _cache={};
-let selDate='', selSlot='';
+let selDate='', selStudio='photo';
+let selStartH=null, selDur=2;
 let modalBookingId=null;
+let extendHrs=1;
+let adminUnlocked=false;
+let bookingFilter='today';
+const today=new Date();
 
+// ── HELPERS ──
 const isMuh=(y,m,d)=>{ if(y!==2026)return false; const l=MUHURTHAM[m+1]; return l?l.includes(d):false; };
 const isGov=(y,m,d)=>{ if(y!==2026)return false; const l=GOVT[m+1]; return l?l.includes(d):false; };
 const mk=()=>sYr+'-'+String(sMo).padStart(2,'0');
-const today=new Date();
+const todayStr=()=>today.toISOString().split('T')[0];
 
-function getSchedule(y,m){
-  const k=y+'-'+m; if(_cache[k])return _cache[k];
-  const dim=new Date(y,m+1,0).getDate(); const res={}; const free=[];
-  for(let d=1;d<=dim;d++){
-    const dow=new Date(y,m,d).getDay(); const wknd=dow===0||dow===6;
-    if(wknd||isGov(y,m,d)){res[d]=0;}
-    else if(isMuh(y,m,d)){res[d]=1;}
-    else{free.push(d);}
-  }
-  const total=free.length+Object.values(res).filter(v=>v===1).length;
-  const each=Math.round(total/2);
-  const muhCnt=Object.values(res).filter(v=>v===1).length;
-  const rajaFree=Math.max(0,each-muhCnt);
-  free.forEach((d,i)=>{res[d]=i<rajaFree?1:2;});
-  return _cache[k]=res;
+function showToast(msg,dur=3000){
+  const t=document.getElementById('toast');
+  if(!t)return;
+  t.textContent=msg;
+  t.classList.add('show');
+  setTimeout(()=>t.classList.remove('show'),dur);
 }
-function asgn(d){ const s=swaps[mk()]; return(s&&s[d]!==undefined)?s[d]:getSchedule(sYr,sMo)[d]??0; }
-const isSw=d=>{ const s=swaps[mk()]; return s&&s[d]!==undefined; };
 
-async function save(){ if(!db)return; try{ await setDoc(doc(db,'studios',SID),{swaps,logs,bookings}); }catch(e){console.error(e);} }
+function formatSlot(start,dur){
+  return HOUR_LABELS[start-9]+' – '+HOUR_LABELS[start-9+dur]+' ('+dur+'hr'+(dur>1?'s':'')+')';
+}
+
+function slotOverlaps(existingRaw,startH,dur){
+  const newEnd=startH+dur;
+  return existingRaw.some(s=>{
+    if(!s)return false;
+    if(s.includes('|')){
+      const p=s.split('|');
+      const eS=parseInt(p[0]),eE=eS+parseInt(p[1]);
+      if(isNaN(eS)||isNaN(eE))return false;
+      return startH<eE&&newEnd>eS;
+    }
+    return false;
+  });
+}
+
+function cleanPhone(p){ return p.replace(/\D/g,'').replace(/^0+/,'').replace(/^91/,''); }
+
+// ── FIREBASE ──
+async function save(){
+  if(!db)return;
+  try{ await setDoc(doc(db,'studios',SID),{swaps,logs,bookings}); }catch(e){console.error(e);}
+}
+
+function setSyncStatus(s){
+  ['b','s','a'].forEach(p=>{
+    const dot=document.getElementById(p+'-sync-dot');
+    const txt=document.getElementById(p+'-sync-txt');
+    if(!dot)return;
+    dot.className='live-dot'+(s==='live'?'':s==='err'?' err':' off');
+    txt.textContent=s==='live'?currentUser+' · live':s==='err'?'sync error':'connecting';
+  });
+}
+
+function initFirebase(){
+  try{
+    const app=initializeApp(CFG); db=getFirestore(app);
+    onSnapshot(doc(db,'studios',SID),snap=>{
+      if(snap.exists()){const d=snap.data();swaps=d.swaps||{};logs=d.logs||{};bookings=d.bookings||{};}
+      setSyncStatus('live');
+      renderSlots();
+      renderBookingList();
+      renderShift();
+      if(adminUnlocked)renderAnnual();
+    },err=>{console.error(err);setSyncStatus('err');});
+  }catch(e){console.error(e);setSyncStatus('err');}
+}
+
+// ── GOOGLE SHEETS SYNC ──
+async function syncToSheets(b){
+  try{
+    const dur=b.slotRaw?parseInt(b.slotRaw.split('|')[1]||1):1;
+    const adv=Number(b.advance)||0;
+    const total=Number(b.total)||(dur*HOURLY_RATE);
+    const disc=Number(b.discount)||0;
+    const bal=b.paid?0:Math.max(0,total-disc-adv);
+    const data={
+      bookingId:b.id,studio:b.studioName||'Photography Studio',
+      date:new Date(b.date).toLocaleDateString('en-IN',{day:'numeric',month:'short',year:'numeric'}),
+      name:b.name,phone:b.phone,type:b.type,slot:b.slot,hours:dur,
+      total,discount:disc,advance:adv,balance:bal,
+      status:b.paid?'Paid':adv>0?'Advance':'Pending',
+      bookedBy:b.createdBy||'',
+      timestamp:new Date().toLocaleString('en-IN')
+    };
+    const params=new URLSearchParams(Object.entries(data).map(([k,v])=>[k,String(v)]));
+    await fetch(SHEETS_URL+'?'+params.toString(),{method:'GET',mode:'no-cors'});
+  }catch(e){console.error('Sheets sync failed:',e);}
+}
 
 // ── LOGIN ──
 window.login=function(name,key){
   currentUser=name; currentUserKey=key;
   document.getElementById('login-screen').style.display='none';
-  document.getElementById('main-screen').style.display='flex';
-  ['b','s','a'].forEach(p=>{
-    const el = document.getElementById(p+'-user-chip');
-    if(el) el.textContent=name;
-  });
-  // Inba — booking only, hide Shift and Admin tabs
+  document.getElementById('main-screen').classList.add('active');
+  ['b','s','a'].forEach(p=>{const el=document.getElementById(p+'-user-chip');if(el)el.textContent=name;});
   if(key==='inba'){
     document.getElementById('tab-shift').style.display='none';
     document.getElementById('tab-annual').style.display='none';
-  } else {
+  }else{
     document.getElementById('tab-shift').style.display='flex';
     document.getElementById('tab-annual').style.display='flex';
   }
@@ -605,35 +665,55 @@ window.switchTab=function(tab){
     document.getElementById('page-'+t).classList.toggle('active',t===tab);
     document.getElementById('tab-'+t).classList.toggle('active',t===tab);
   });
+  if(tab==='annual'&&adminUnlocked)renderAnnual();
 };
 
-// ── SYNC STATUS ──
-function setSyncStatus(s){
-  sync=s;
-  ['b','s','a'].forEach(p=>{
-    const dot=document.getElementById(p+'-sync-dot');
-    const txt=document.getElementById(p+'-sync-txt');
-    if(!dot)return;
-    dot.className='live-dot'+(s==='live'?'':s==='err'?' err':' off');
-    txt.textContent=s==='live'?currentUser+' · live':s==='err'?'sync error':'connecting';
-  });
-}
+// ── STUDIO SELECTOR ──
+window.selectStudio=function(studio){
+  selStudio=studio;
+  selStartH=null; selDur=2;
+  const photo=document.getElementById('studio-photo');
+  const pod=document.getElementById('studio-pod');
+  if(studio==='photo'){
+    photo.style.background='var(--raja)';photo.style.borderColor='var(--raja)';
+    photo.querySelectorAll('div').forEach((el,i)=>{el.style.color=i===0?'#fff':'rgba(255,255,255,.7)';});
+    photo.querySelector('svg').querySelectorAll('*').forEach(el=>el.setAttribute('stroke','white'));
+    pod.style.background='var(--surface)';pod.style.borderColor='#e0dbd0';
+    pod.querySelectorAll('div').forEach((el,i)=>{el.style.color=i===0?'var(--dark)':'var(--light)';});
+    pod.querySelector('svg').querySelectorAll('*').forEach(el=>el.setAttribute('stroke','#1a1a1a'));
+  }else{
+    pod.style.background='#7C5CBF';pod.style.borderColor='#7C5CBF';
+    pod.querySelectorAll('div').forEach((el,i)=>{el.style.color=i===0?'#fff':'rgba(255,255,255,.7)';});
+    pod.querySelector('svg').querySelectorAll('*').forEach(el=>el.setAttribute('stroke','white'));
+    photo.style.background='var(--surface)';photo.style.borderColor='#e0dbd0';
+    photo.querySelectorAll('div').forEach((el,i)=>{el.style.color=i===0?'var(--dark)':'var(--light)';});
+    photo.querySelector('svg').querySelectorAll('*').forEach(el=>el.setAttribute('stroke','white'));
+  }
+  document.getElementById('dur-section').style.display='none';
+  document.getElementById('form-section').style.display='none';
+  renderSlots();
+  renderBookingList();
+};
 
-// ── BOOKING ──
+// ── DATE STRIP ──
 function initDateStrip(){
   const strip=document.getElementById('date-strip');
   strip.innerHTML='';
-  for(let i=0;i<14;i++){
-    const d=new Date(); d.setDate(d.getDate()+i);
-    const dateStr=d.toISOString().split('T')[0];
+  const ts=todayStr();
+  let todayEl=null;
+  for(let i=-30;i<60;i++){
+    const d=new Date();d.setDate(d.getDate()+i);
+    const ds=d.toISOString().split('T')[0];
     const div=document.createElement('div');
-    div.className='dc'+(i===0?' sel':'');
-    div.innerHTML=`<div>${d.getDate()}</div><div class="dc-day">${DS[d.getDay()].slice(0,3)}</div>`;
-    div.dataset.date = dateStr;
-    div.onclick=()=>selectDate(dateStr,div);
+    div.className='dc'+(ds===ts?' sel':'');
+    if(i<0)div.style.opacity='0.55';
+    div.dataset.date=ds;
+    div.innerHTML='<div>'+d.getDate()+'</div><div class="dc-day">'+DS[d.getDay()].slice(0,3)+'</div>';
+    div.onclick=()=>selectDate(ds,div);
     strip.appendChild(div);
-    if(i===0) selectDate(dateStr,div,true);
+    if(ds===ts){todayEl=div;selectDate(ds,div,true);}
   }
+  setTimeout(()=>{if(todayEl)todayEl.scrollIntoView({inline:'center',behavior:'auto'});},50);
 }
 
 function selectDate(dateStr,el,silent=false){
@@ -644,547 +724,451 @@ function selectDate(dateStr,el,silent=false){
   document.getElementById('dur-section').style.display='none';
   document.getElementById('form-section').style.display='none';
   renderSlots();
-  renderTodayBookings();
+  renderBookingList();
 }
 
+// ── SLOTS ──
 function renderSlots(){
-  const grid = document.getElementById('slot-grid');
-  const dayBookings = Object.values(bookings).filter(b=>b.date===selDate&&(b.studio||'photo')===selStudio);
-  const bookedRaw = dayBookings.map(b=>b.slotRaw||b.slot);
-  grid.innerHTML = HOUR_LABELS.slice(0,-1).map((lbl,i)=>{
-    const h = 9+i;
-    const isBooked = dayBookings.some(b=>{
-      const parts=(b.slotRaw||'').split('|');
-      const bS=parseInt(parts[0]), bE=bS+parseInt(parts[1]||1);
-      return h>=bS && h<bE;
+  const grid=document.getElementById('slot-grid');
+  if(!grid)return;
+  const dayBookings=Object.values(bookings).filter(b=>b.date===selDate&&(b.studio||'photo')===selStudio);
+  grid.innerHTML=HOUR_LABELS.slice(0,-1).map((lbl,i)=>{
+    const h=9+i;
+    const isBooked=dayBookings.some(b=>{
+      const p=(b.slotRaw||'').split('|');
+      const bS=parseInt(p[0]),bD=parseInt(p[1]||1);
+      return !isNaN(bS)&&h>=bS&&h<bS+bD;
     });
-    const isSel = selStartH===h;
-    const cls = isBooked?'booked':isSel?'sel':'free';
-    return `<div class="slot ${cls}" ${isBooked?'':`onclick="selectStart(${h})"`}>${lbl}</div>`;
+    const isSel=selStartH===h;
+    const cls=isBooked?'booked':isSel?'sel':'free';
+    return '<div class="slot '+cls+'" '+(isBooked?'':'onclick="selectStart('+h+')"')+'>'+lbl+'</div>';
   }).join('');
 }
 
-window.selectStart = function(h){
-  selStartH = h; selDur = 2;
+window.selectStart=function(h){
+  selStartH=h; selDur=2;
   document.getElementById('dur-section').style.display='block';
   document.getElementById('form-section').style.display='block';
-  if(document.getElementById('f-discount')) document.getElementById('f-discount').value='';
-  if(document.getElementById('f-adv')) document.getElementById('f-adv').value='';
+  if(document.getElementById('f-discount'))document.getElementById('f-discount').value='';
+  if(document.getElementById('f-adv'))document.getElementById('f-adv').value='';
   updateDurDisplay();
   renderSlots();
+  recalcPayment();
 };
 
+window.changeDur=function(delta){
+  if(selStartH===null)return;
+  selDur=Math.max(1,Math.min(21-selStartH,selDur+delta));
+  updateDurDisplay();
+  renderSlots();
+  recalcPayment();
+};
+
+function updateDurDisplay(){
+  if(selStartH===null)return;
+  document.getElementById('dur-display').textContent=selDur;
+  document.getElementById('dur-hrs-lbl').textContent=selDur===1?'hour':'hours';
+  const endH=selStartH+selDur;
+  const dayBookings=Object.values(bookings).filter(b=>b.date===selDate&&(b.studio||'photo')===selStudio);
+  const bookedRaw=dayBookings.map(b=>b.slotRaw||'');
+  const conflict=slotOverlaps(bookedRaw,selStartH,selDur);
+  const sumEl=document.getElementById('slot-summary');
+  if(sumEl){
+    sumEl.textContent=conflict
+      ?'⚠️ Conflicts with existing booking — adjust hours'
+      :'✓ '+HOUR_LABELS[selStartH-9]+' to '+HOUR_LABELS[endH-9]+' · ₹'+(selDur*HOURLY_RATE).toLocaleString('en-IN');
+    sumEl.style.color=conflict?'#991b1b':'var(--keer)';
+  }
+}
+
+window.recalcPayment=function(){
+  if(selStartH===null)return;
+  const total=selDur*HOURLY_RATE;
+  const disc=parseFloat(document.getElementById('f-discount').value)||0;
+  const afterDisc=Math.max(0,total-disc);
+  const adv=parseFloat(document.getElementById('f-adv').value)||0;
+  const bal=Math.max(0,afterDisc-adv);
+  document.getElementById('f-total-display').textContent='₹'+total.toLocaleString('en-IN');
+  document.getElementById('f-after-discount').textContent='₹'+afterDisc.toLocaleString('en-IN');
+  document.getElementById('f-balance').textContent='₹'+bal.toLocaleString('en-IN');
+  document.getElementById('f-balance').style.color=bal>0?'var(--raja)':'var(--keer)';
+};
+
+// ── CONFIRM BOOKING ──
 window.confirmBooking=async function(){
-  const name = document.getElementById('f-name').value.trim();
-  const phone = document.getElementById('f-phone').value.trim();
-  const type = document.getElementById('f-type').value;
-  const adv = parseFloat(document.getElementById('f-adv').value)||0;
-  const disc = parseFloat(document.getElementById('f-discount').value)||0;
-  if(!name||!phone||!type||!selStartH){ alert('Please fill all fields and select a start time'); return; }
-  // Check conflict one more time
-  const dayBookings = Object.values(bookings).filter(b=>b.date===selDate&&(b.studio||'photo')===selStudio);
-  const bookedRaw = dayBookings.map(b=>b.slotRaw||b.slot);
-  if(slotOverlaps(bookedRaw, selStartH, selDur)){ alert('This slot conflicts with an existing booking!'); return; }
-  const slotRaw = selStartH+'|'+selDur;
-  const slotLabel = formatSlot(selStartH, selDur);
-  const total = selDur * HOURLY_RATE;
-  const afterDisc = Math.max(0, total - disc);
-  const balance = Math.max(0, afterDisc - adv);
-  const studioName = selStudio==='photo' ? 'Photography Studio' : 'Podcast Studio';
-  const id = 'bk-'+Date.now();
-  bookings[id] = {id,name,phone,type,date:selDate,slot:slotLabel,slotRaw,studio:selStudio,studioName,total,discount:disc,advance:adv,balance,paid:false,createdBy:currentUser,createdAt:Date.now()};
+  const name=document.getElementById('f-name').value.trim();
+  const phone=document.getElementById('f-phone').value.trim();
+  const type=document.getElementById('f-type').value;
+  if(!name||!phone||!type||!selStartH){showToast('Please fill all fields and select a start time');return;}
+  const dayBookings=Object.values(bookings).filter(b=>b.date===selDate&&(b.studio||'photo')===selStudio);
+  const bookedRaw=dayBookings.map(b=>b.slotRaw||'');
+  if(slotOverlaps(bookedRaw,selStartH,selDur)){showToast('Slot conflicts with existing booking!');return;}
+  const slotRaw=selStartH+'|'+selDur;
+  const slotLabel=formatSlot(selStartH,selDur);
+  const total=selDur*HOURLY_RATE;
+  const disc=parseFloat(document.getElementById('f-discount').value)||0;
+  const adv=parseFloat(document.getElementById('f-adv').value)||0;
+  const balance=Math.max(0,total-disc-adv);
+  const studioName=selStudio==='photo'?'Photography Studio':'Podcast Studio';
+  const id='bk-'+Date.now();
+  bookings[id]={id,name,phone,type,date:selDate,slot:slotLabel,slotRaw,studio:selStudio,studioName,total,discount:disc,advance:adv,balance,paid:false,createdBy:currentUser,createdAt:Date.now()};
   await save();
   syncToSheets(bookings[id]);
-  // Reset form
   document.getElementById('f-name').value='';
   document.getElementById('f-phone').value='';
   document.getElementById('f-type').value='';
-  document.getElementById('f-adv').value='';
   document.getElementById('f-discount').value='';
-  document.getElementById('f-balance').textContent='₹0';
+  document.getElementById('f-adv').value='';
+  document.getElementById('f-total-display').textContent='₹0';
   document.getElementById('f-after-discount').textContent='₹0';
+  document.getElementById('f-balance').textContent='₹0';
   selStartH=null; selDur=2;
   document.getElementById('dur-section').style.display='none';
   document.getElementById('form-section').style.display='none';
   renderSlots();
-  renderTodayBookings();
-  showToast(name+' booked ✓ '+slotLabel, 3000);
+  renderBookingList();
+  showToast(name+' booked ✓ '+slotLabel,3000);
 };
 
-function renderTodayBookings(){
-  const list=document.getElementById('booking-list');
-  const todayStr=selDate||today.toISOString().split('T')[0];
-  const dayBookings=Object.values(bookings).filter(b=>b.date===todayStr&&(b.studio||'photo')===selStudio).sort((a,b)=>{
-    const aS=parseInt((a.slotRaw||'0|2').split('|')[0]);
-    const bS=parseInt((b.slotRaw||'0|2').split('|')[0]);
-    return aS-bS;
+// ── BOOKING LIST ──
+window.setFilter=function(f){
+  bookingFilter=f;
+  ['today','all','past'].forEach(k=>{
+    const btn=document.getElementById('bf-'+k);
+    if(!btn)return;
+    if(k===f){btn.style.background='var(--raja)';btn.style.color='#fff';btn.style.border='none';}
+    else{btn.style.background='transparent';btn.style.color='var(--mid)';btn.style.border='0.5px solid #e0dbd0';}
   });
-  if(!dayBookings.length){list.innerHTML='<div class="bl-empty">No bookings for this day</div>';return;}
-  list.innerHTML=dayBookings.map(b=>`<div class="bitem" onclick="openModal('${b.id}')">
-    <div class="bitem-info"><div class="bitem-name">${b.name}</div><div class="bitem-meta">${b.slot} · ${b.type}</div></div>
-    <span class="badge ${b.paid?'badge-paid':b.advance>0?'badge-adv':'badge-pend'}">${b.paid?'Paid':b.advance>0?'Advance':'Pending'}</span>
-  </div>`).join('');
+  renderBookingList();
+};
+
+function renderBookingList(){
+  const list=document.getElementById('booking-list');
+  const studioLabel=selStudio==='photo'?'📸 Photography':'🎙️ Podcast';
+  const lbl=document.getElementById('booking-list-label');
+  if(lbl)lbl.textContent=studioLabel+' · '+(bookingFilter==='today'?"Today's":bookingFilter==='past'?'Past':'All')+' Bookings';
+  const ts=todayStr();
+  let items=Object.values(bookings).filter(b=>(b.studio||'photo')===selStudio);
+  if(bookingFilter==='today')items=items.filter(b=>b.date===ts);
+  else if(bookingFilter==='past')items=items.filter(b=>b.date<ts);
+  items.sort((a,b)=>{
+    if(a.date!==b.date)return bookingFilter==='past'?b.date.localeCompare(a.date):a.date.localeCompare(b.date);
+    return parseInt((a.slotRaw||'0|1').split('|')[0])-parseInt((b.slotRaw||'0|1').split('|')[0]);
+  });
+  if(!items.length){list.innerHTML='<div class="bl-empty">No bookings found</div>';return;}
+  list.innerHTML=items.map(b=>{
+    const dt=b.date===ts?'Today':new Date(b.date).toLocaleDateString('en-IN',{day:'numeric',month:'short',weekday:'short'});
+    const reminderBtn=b.date===ts?'<button class="btn-reminder" onclick="event.stopPropagation();openModal(\''+b.id+'\')" style="background:#25D366;border:none;border-radius:6px;padding:4px 8px;font-size:10px;color:#fff;cursor:pointer;">Invoice</button>':'';
+    return '<div class="bitem" onclick="openModal(\''+b.id+'\')">'
+      +'<div class="bitem-info">'
+      +'<div class="bitem-name">'+b.name+'</div>'
+      +'<div class="bitem-meta"><span style="color:var(--raja);font-weight:600;">'+dt+'</span> · '+b.slot+' · '+b.type+'</div>'
+      +'</div>'
+      +'<div style="display:flex;align-items:center;gap:6px;">'
+      +reminderBtn
+      +'<span class="badge '+(b.paid?'badge-paid':b.advance>0?'badge-adv':'badge-pend')+'">'+(b.paid?'Paid':b.advance>0?'Advance':'Pending')+'</span>'
+      +'</div>'
+      +'</div>';
+  }).join('');
 }
 
-// ── PAYMENT MODAL ──
+// ── MODAL ──
 window.openModal=function(id){
   const b=bookings[id]; if(!b)return;
   modalBookingId=id;
+  const dur=b.slotRaw?parseInt(b.slotRaw.split('|')[1]||1):1;
+  const total=Number(b.total)||(dur*HOURLY_RATE);
+  const disc=Number(b.discount)||0;
+  const adv=Number(b.advance)||0;
+  const bal=b.paid?0:Math.max(0,total-disc-adv);
   document.getElementById('modal-client-name').textContent=b.name;
-  document.getElementById('modal-meta').textContent=b.slot+' · '+new Date(b.date).toLocaleDateString('en-IN',{day:'numeric',month:'short'});
+  document.getElementById('modal-meta').textContent=(b.studioName||'Studio')+' · '+new Date(b.date).toLocaleDateString('en-IN',{day:'numeric',month:'short',year:'numeric'});
   document.getElementById('modal-type').textContent=b.type;
-  const bAdv = Number(b.advance)||0;
-  const bTotal = Number(b.total)||(b.slotRaw?parseInt(b.slotRaw.split('|')[1]||2)*750:0);
-  const bDisc = Number(b.discount)||0;
-  const bBal = b.paid ? 0 : Math.max(0,(bTotal-bDisc)-bAdv);
-  document.getElementById('modal-adv').textContent='₹'+bAdv.toLocaleString('en-IN')+(bDisc>0?' (Disc: ₹'+bDisc.toLocaleString('en-IN')+')':'');
-  document.getElementById('modal-balance').textContent=b.paid?'₹0 (Cleared)':'₹'+bBal.toLocaleString('en-IN');
-  document.getElementById('modal-status').textContent=b.paid?'Fully Paid':bAdv>0?'Advance Paid':'Pending';
+  document.getElementById('modal-slot').textContent=b.slot;
+  document.getElementById('modal-total').textContent='₹'+total.toLocaleString('en-IN');
+  document.getElementById('modal-discount').textContent=disc>0?'₹'+disc.toLocaleString('en-IN'):'—';
+  document.getElementById('modal-adv').textContent='₹'+adv.toLocaleString('en-IN');
+  document.getElementById('modal-balance').textContent='₹'+bal.toLocaleString('en-IN');
+  document.getElementById('modal-status').textContent=b.paid?'✅ Fully Paid':adv>0?'Advance Paid':'Pending';
   document.getElementById('modal-pay-btn').style.display=b.paid?'none':'block';
-  const invBtn = document.getElementById('modal-invoice-btn');
-  if(invBtn) invBtn.style.display = b.paid ? 'flex' : 'none';
+  document.getElementById('modal-invoice-btn').style.display=b.paid?'block':'none';
+  extendHrs=1;
+  document.getElementById('extend-hrs').textContent=1;
   document.getElementById('payment-modal').classList.add('open');
 };
-window.closeModal=function(){ document.getElementById('payment-modal').classList.remove('open'); };
+
+window.closeModal=function(){document.getElementById('payment-modal').classList.remove('open');};
+
 window.markFullPayment=async function(){
   if(!modalBookingId)return;
   bookings[modalBookingId].paid=true;
+  bookings[modalBookingId].balance=0;
   await save();
-  syncToSheets({...bookings[modalBookingId], paid:true});
-  // DON'T close modal — keep open so user can send invoice
-  // Just update the modal UI to reflect paid status
-  const b = bookings[modalBookingId];
-  document.getElementById('modal-status').textContent = 'Fully Paid ✓';
-  document.getElementById('modal-status').style.color = 'var(--keer)';
-  document.getElementById('modal-balance').textContent = '₹0 (Cleared)';
-  document.getElementById('modal-pay-btn').style.display = 'none';
-  // Show invoice button prominently
-  const invoiceBtn = document.getElementById('modal-invoice-btn');
-  if(invoiceBtn) invoiceBtn.style.display = 'flex';
-  showToast('Payment marked as complete ✓ Now send invoice to client!', 4000);
-  renderTodayBookings();
+  syncToSheets(bookings[modalBookingId]);
+  // Update modal in-place (don't close — let user send invoice)
+  document.getElementById('modal-balance').textContent='₹0';
+  document.getElementById('modal-status').textContent='✅ Fully Paid';
+  document.getElementById('modal-status').style.color='var(--keer)';
+  document.getElementById('modal-pay-btn').style.display='none';
+  document.getElementById('modal-invoice-btn').style.display='block';
+  showToast('Payment marked ✓ Now send the invoice!',3500);
+  renderBookingList();
+};
+
+// ── EXTEND ──
+window.changeExtend=function(d){extendHrs=Math.max(1,Math.min(8,extendHrs+d));document.getElementById('extend-hrs').textContent=extendHrs;};
+
+window.applyExtension=async function(isAdd){
+  const b=bookings[modalBookingId];if(!b)return;
+  const parts=(b.slotRaw||'9|2').split('|');
+  const startH=parseInt(parts[0]),oldDur=parseInt(parts[1]);
+  const newDur=isAdd?oldDur+extendHrs:Math.max(1,oldDur-extendHrs);
+  if(startH+newDur>21){showToast('Cannot go past 9pm!');return;}
+  if(isAdd){
+    const dayBookings=Object.values(bookings).filter(bk=>bk.date===b.date&&(bk.studio||'photo')===(b.studio||'photo')&&bk.id!==b.id);
+    if(slotOverlaps(dayBookings.map(bk=>bk.slotRaw||''),startH+oldDur,extendHrs)){showToast('Conflicts with another booking!');return;}
+  }
+  bookings[modalBookingId].slotRaw=startH+'|'+newDur;
+  bookings[modalBookingId].slot=formatSlot(startH,newDur);
+  bookings[modalBookingId].total=newDur*HOURLY_RATE;
+  const adv=Number(b.advance)||0,disc=Number(b.discount)||0;
+  bookings[modalBookingId].balance=b.paid?0:Math.max(0,newDur*HOURLY_RATE-disc-adv);
+  await save();
+  syncToSheets(bookings[modalBookingId]);
+  document.getElementById('modal-slot').textContent=bookings[modalBookingId].slot;
+  document.getElementById('modal-total').textContent='₹'+(newDur*HOURLY_RATE).toLocaleString('en-IN');
+  showToast((isAdd?'Extended':'Reduced')+' to '+bookings[modalBookingId].slot+' ✓',3000);
+  renderBookingList();
+  renderSlots();
+};
+
+// ── WHATSAPP ──
+window.sendClientWhatsApp=function(){
+  const b=bookings[modalBookingId];if(!b)return;
+  const phone=cleanPhone(b.phone);
+  const dateStr=new Date(b.date).toLocaleDateString('en-IN',{weekday:'long',day:'numeric',month:'long',year:'numeric'});
+  const msg='Hi '+b.name+'! 👋\n\nYour shoot at *Magizh Rental Photo Studio* is confirmed ✅\n\n📅 *Date:* '+dateStr+'\n⏰ *Slot:* '+b.slot+'\n📸 *Shoot type:* '+b.type+'\n💰 *Advance paid:* ₹'+Number(b.advance).toLocaleString('en-IN')+'\n\n📍 *Location:* '+STUDIO_LOC+'\n\nPlease arrive 10 minutes early!\n— Magizh Studio Team';
+  window.open('https://wa.me/91'+phone+'?text='+encodeURIComponent(msg),'_blank');
+};
+
+window.sendTeamWhatsApp=function(){
+  const b=bookings[modalBookingId];if(!b)return;
+  const dateStr=new Date(b.date).toLocaleDateString('en-IN',{weekday:'short',day:'numeric',month:'short'});
+  const msg='🆕 *New Booking — Magizh Studio*\n\n👤 '+b.name+'\n📞 '+b.phone+'\n📅 '+dateStr+'\n⏰ '+b.slot+'\n📸 '+b.type+'\n💰 Advance: ₹'+Number(b.advance).toLocaleString('en-IN')+'\n🏢 '+b.studioName+'\n🔖 Booked by: '+currentUser;
+  window.open('https://wa.me/919876543210?text='+encodeURIComponent(msg),'_blank');
+};
+
+window.sendReminderWhatsApp=function(){
+  const b=bookings[modalBookingId];if(!b)return;
+  const phone=cleanPhone(b.phone);
+  const dateStr=new Date(b.date).toLocaleDateString('en-IN',{weekday:'long',day:'numeric',month:'long'});
+  const msg='Hi '+b.name+'! 👋\n\nReminder for your shoot *tomorrow* at Magizh Studio 📸\n\n📅 *Date:* '+dateStr+'\n⏰ *Slot:* '+b.slot+'\n📍 *Location:* '+STUDIO_LOC+'\n\nPlease arrive 10 minutes early!\n— Magizh Studio';
+  window.open('https://wa.me/91'+phone+'?text='+encodeURIComponent(msg),'_blank');
+};
+
+// ── PDF INVOICE ──
+window.sendInvoicePDF=function(){
+  const b=bookings[modalBookingId];if(!b)return;
+  if(typeof window.jspdf==='undefined'){showToast('PDF loading, try again...');return;}
+  try{
+    const {jsPDF}=window.jspdf;
+    const doc=new jsPDF({unit:'mm',format:'a4'});
+    const dur=b.slotRaw?parseInt(b.slotRaw.split('|')[1]||1):1;
+    const total=Number(b.total)||(dur*HOURLY_RATE);
+    const disc=Number(b.discount)||0;
+    const adv=Number(b.advance)||0;
+    const bal=b.paid?0:Math.max(0,total-disc-adv);
+    const invNo='MZ-'+b.id.slice(-6).toUpperCase();
+    const dateStr=new Date(b.date).toLocaleDateString('en-IN',{day:'numeric',month:'long',year:'numeric'});
+    const now=new Date().toLocaleString('en-IN',{day:'numeric',month:'short',year:'numeric',hour:'2-digit',minute:'2-digit'});
+    // Header
+    doc.setFillColor(232,96,26);doc.rect(0,0,210,40,'F');
+    doc.setTextColor(255,255,255);doc.setFont('helvetica','bold');doc.setFontSize(22);doc.text('MAGIZH STUDIO',15,16);
+    doc.setFont('helvetica','normal');doc.setFontSize(9);doc.text('Rental Photo Studio, Nerkundram, Chennai',15,23);doc.text('+91 8072 659 679  |  @magizh_studio_',15,29);
+    doc.setFont('helvetica','bold');doc.setFontSize(20);doc.text('INVOICE',195,16,{align:'right'});
+    doc.setFont('helvetica','normal');doc.setFontSize(9);doc.text('#'+invNo,195,23,{align:'right'});doc.text(now,195,29,{align:'right'});
+    // Bill to
+    doc.setTextColor(130,130,130);doc.setFont('helvetica','bold');doc.setFontSize(9);doc.text('BILL TO',15,52);
+    doc.setTextColor(20,20,20);doc.setFontSize(13);doc.text(b.name,15,59);
+    doc.setFont('helvetica','normal');doc.setFontSize(10);doc.text('Phone: '+b.phone,15,65);
+    doc.setTextColor(130,130,130);doc.setFont('helvetica','bold');doc.setFontSize(9);doc.text('BOOKING DATE',195,52,{align:'right'});
+    doc.setTextColor(20,20,20);doc.setFont('helvetica','normal');doc.setFontSize(11);doc.text(dateStr,195,59,{align:'right'});
+    doc.setFontSize(10);doc.text(b.studioName||'Photography Studio',195,65,{align:'right'});
+    // Table
+    doc.setFillColor(26,26,26);doc.rect(15,78,180,10,'F');
+    doc.setTextColor(255,255,255);doc.setFont('helvetica','bold');doc.setFontSize(10);
+    doc.text('DESCRIPTION',20,84);doc.text('SLOT',100,84);doc.text('HRS',145,84,{align:'center'});doc.text('AMOUNT',190,84,{align:'right'});
+    doc.setTextColor(20,20,20);doc.setFont('helvetica','normal');doc.setFontSize(10);
+    doc.text(b.type,20,96);doc.text(b.slot,100,96);doc.text(String(dur),145,96,{align:'center'});doc.text('Rs.'+total.toLocaleString('en-IN'),190,96,{align:'right'});
+    doc.setDrawColor(230,230,230);doc.line(15,100,195,100);
+    // Totals
+    doc.setTextColor(100,100,100);doc.setFontSize(10);
+    if(disc>0){doc.text('Discount',130,108);doc.setTextColor(153,27,27);doc.text('- Rs.'+disc.toLocaleString('en-IN'),190,108,{align:'right'});}
+    doc.setTextColor(100,100,100);doc.text('Advance Paid',130,disc>0?116:108);
+    doc.setTextColor(26,122,74);doc.text('- Rs.'+adv.toLocaleString('en-IN'),190,disc>0?116:108,{align:'right'});
+    const balY=disc>0?124:116;
+    doc.setFillColor(b.paid?220:252,b.paid?252:235,b.paid?231:235);doc.rect(130,balY+2,65,14,'F');
+    doc.setFont('helvetica','bold');doc.setFontSize(12);doc.setTextColor(b.paid?22:153,b.paid?101:45,b.paid?52:45);
+    doc.text(b.paid?'FULLY PAID':'BALANCE DUE',135,balY+11);
+    doc.text('Rs.'+bal.toLocaleString('en-IN'),190,balY+11,{align:'right'});
+    // Footer
+    doc.setFont('helvetica','italic');doc.setFontSize(11);doc.setTextColor(80,80,80);doc.text('Thank you for choosing Magizh Studio!',15,160);
+    doc.setFont('helvetica','normal');doc.setFontSize(9);doc.setTextColor(130,130,130);doc.text('Tag us @magizh_studio_ on Instagram 📸',15,166);
+    doc.setDrawColor(230,230,230);doc.line(15,270,195,270);
+    doc.setFontSize(8);doc.setTextColor(150,150,150);doc.text('Magizh Rental Photo Studio  |  +91 8072 659 679  |  @magizh_studio_',105,277,{align:'center'});
+    const fileName='Invoice_'+b.name.replace(/\s+/g,'_')+'_'+b.date+'.pdf';
+    doc.save(fileName);
+    setTimeout(()=>{
+      const phone=cleanPhone(b.phone);
+      const msg='Hi '+b.name+'! 🙏\n\nYour invoice from *Magizh Studio* is ready 📄\n\n*'+b.type+'* on '+dateStr+'\n*Total:* Rs.'+total.toLocaleString('en-IN')+'\n*Status:* '+(b.paid?'✅ Fully Paid':'Balance pending')+'\n\nPDF downloaded — please attach it here. Thank you!';
+      window.open('https://wa.me/91'+phone+'?text='+encodeURIComponent(msg),'_blank');
+      showToast('PDF saved! Attach it in WhatsApp.',5000);
+    },800);
+  }catch(e){showToast('PDF error: '+e.message,4000);}
+};
+
+// ── ADMIN ──
+const ADMIN_PASS='2023';let adminUnlocked=false;
+window.checkAdminPw=function(){
+  const v=document.getElementById('admin-pw').value;
+  if(v===ADMIN_PASS){
+    adminUnlocked=true;
+    document.getElementById('admin-gate').style.display='none';
+    document.getElementById('admin-panel').style.display='block';
+    renderAnnual();
+  }else{
+    document.getElementById('admin-err').style.display='block';
+    document.getElementById('admin-pw').value='';
+  }
+};
+window.lockAdmin=function(){
+  adminUnlocked=false;
+  document.getElementById('admin-gate').style.display='block';
+  document.getElementById('admin-panel').style.display='none';
+  document.getElementById('admin-pw').value='';
+  document.getElementById('admin-err').style.display='none';
+};
+window.resetAllBookings=async function(){
+  if(!confirm('Delete ALL bookings permanently?'))return;
+  if(!confirm('Last chance — are you sure?'))return;
+  bookings={};await save();renderBookingList();showToast('All bookings deleted',3000);
+};
+window.resetAllSwaps=async function(){
+  if(!confirm('Clear all swaps?'))return;
+  swaps={};logs={};await save();renderShift();showToast('Swaps cleared',3000);
+};
+window.factoryReset=async function(){
+  if(!confirm('Factory reset? Deletes EVERYTHING!'))return;
+  if(!confirm('Last chance!'))return;
+  bookings={};swaps={};logs={};await save();renderBookingList();renderShift();showToast('Factory reset done',3000);
 };
 
 // ── SHIFT ──
+function getSchedule(y,m){
+  const k=y+'-'+m;if(_cache[k])return _cache[k];
+  const dim=new Date(y,m+1,0).getDate();const res={};const free=[];
+  for(let d=1;d<=dim;d++){
+    const dow=new Date(y,m,d).getDay();const wknd=dow===0||dow===6;
+    if(wknd||isGov(y,m,d)){res[d]=0;}
+    else if(isMuh(y,m,d)){res[d]=1;}
+    else{free.push(d);}
+  }
+  const muhCnt=Object.values(res).filter(v=>v===1).length;
+  const total=free.length+muhCnt,each=Math.round(total/2);
+  const rajaFree=Math.max(0,each-muhCnt);
+  free.forEach((d,i)=>{res[d]=i<rajaFree?1:2;});
+  return _cache[k]=res;
+}
+function asgn(d){const s=swaps[mk()];return(s&&s[d]!==undefined)?s[d]:getSchedule(sYr,sMo)[d]??0;}
+const isSw=d=>{const s=swaps[mk()];return s&&s[d]!==undefined;};
+
 function renderShift(){
   document.getElementById('shift-hero-title').textContent=MONTHS[sMo]+' '+sYr;
   document.getElementById('shift-month-label').textContent=MONTHS[sMo]+' '+sYr;
-  const dim=new Date(sYr,sMo+1,0).getDate();
-  const fd=new Date(sYr,sMo,1).getDay();
-  const cnt=[0,0,0];
-  for(let d=1;d<=dim;d++) cnt[asgn(d)]++;
-
-  // partner cards
-  document.getElementById('shift-pcards').innerHTML=P.map((p,i)=>`
-    <div class="pc pc-${p.c}"><div class="pc-name">${p.name}</div><div class="pc-days">${cnt[i]}</div><div class="pc-role">${p.role}</div></div>
-  `).join('');
-
-  // calendar
+  const dim=new Date(sYr,sMo+1,0).getDate();const fd=new Date(sYr,sMo,1).getDay();
+  const cnt=[0,0,0];for(let d=1;d<=dim;d++)cnt[asgn(d)]++;
+  document.getElementById('shift-pcards').innerHTML=P.map((p,i)=>'<div class="pc pc-'+p.c+'"><div class="pc-name">'+p.name+'</div><div class="pc-days">'+cnt[i]+'</div><div class="pc-role">'+p.role+'</div></div>').join('');
   let html='';
-  for(let i=0;i<fd;i++) html+='<div class="cday empty"></div>';
+  for(let i=0;i<fd;i++)html+='<div class="cday empty"></div>';
   for(let d=1;d<=dim;d++){
     const pi=asgn(d);
     const isT=today.getDate()===d&&today.getMonth()===sMo&&today.getFullYear()===sYr;
-    const sw=isSw(d), sel=selDay===d;
-    const muh=isMuh(sYr,sMo,d), gov=isGov(sYr,sMo,d);
+    const sw=isSw(d),sel=selDay===d;
+    const muh=isMuh(sYr,sMo,d),gov=isGov(sYr,sMo,d);
     const icon=muh?'*':gov?'#':'';
     let ex='';
-    if(step===3&&selP!==null){ ex=(asgn(d)===selP&&d!==selDay)?' ghi':(d!==selDay?' gdim':''); }
-    html+=`<div class="cday p-${P[pi].c}${isT?' today':''}${sw?' swapped':''}${sel?' sel':''}${ex}" onclick="tapCal(${d})">
-      <span class="cdn">${d}${icon}</span><span class="cdb">${P[pi].name}</span>
-    </div>`;
+    if(step===3&&selP!==null){ex=(asgn(d)===selP&&d!==selDay)?' ghi':(d!==selDay?' gdim':'');}
+    html+='<div class="cday p-'+P[pi].c+(isT?' today':'')+(sw?' swapped':'')+(sel?' sel':'')+ex+'" onclick="tapCal('+d+')">'+'<span class="cdn">'+d+icon+'</span><span class="cdb">'+P[pi].name+'</span></div>';
   }
   document.getElementById('cal-grid').innerHTML=html;
-
-  // info panel
   const muhDays=[],govDays=[];
-  for(let d=1;d<=dim;d++){ if(isMuh(sYr,sMo,d))muhDays.push(d); if(isGov(sYr,sMo,d))govDays.push(d); }
+  for(let d=1;d<=dim;d++){if(isMuh(sYr,sMo,d))muhDays.push(d);if(isGov(sYr,sMo,d))govDays.push(d);}
   const diff=cnt[1]-cnt[2];
-  const balTxt=diff===0?'<span style="color:var(--keer);font-weight:600;">Perfectly balanced ✓</span>':diff>0?`Keerthi owes Raja <strong>${diff} day${diff>1?'s':''}</strong> next month`:`Raja owes Keerthi <strong>${Math.abs(diff)} day${Math.abs(diff)>1?'s':''}</strong> next month`;
-  document.getElementById('shift-info').innerHTML=`<div class="shift-info-row">
-    ${muhDays.length?`* Muhurtham (Keerthi off): <strong>${muhDays.map(d=>d+' '+MS[sMo]).join(', ')}</strong><br>`:''}
-    ${govDays.length?`# Govt holiday (Ari covers): <strong>${govDays.map(d=>d+' '+MS[sMo]).join(', ')}</strong><br>`:''}
-    ${balTxt}
-  </div>`;
-
-  // swap logs
+  const balTxt=diff===0?'<span style="color:var(--keer);font-weight:600;">Perfectly balanced ✓</span>':diff>0?'Keerthi owes Raja <strong>'+diff+' day'+(diff>1?'s':'')+'</strong> next month':'Raja owes Keerthi <strong>'+Math.abs(diff)+' day'+(Math.abs(diff)>1?'s':'')+'</strong> next month';
+  document.getElementById('shift-info').innerHTML='<div class="shift-info-row">'+(muhDays.length?'* Muhurtham (Keerthi off): <strong>'+muhDays.map(d=>d+' '+MS[sMo]).join(', ')+'</strong><br>':'')+(govDays.length?'# Govt holiday (Ari covers): <strong>'+govDays.map(d=>d+' '+MS[sMo]).join(', ')+'</strong><br>':'')+balTxt+'</div>';
   const ml=logs[mk()]||[];
-  if(ml.length){
-    document.getElementById('swap-logs').innerHTML=`<div class="log-head">Swap history</div>`+ml.map(e=>`<div class="log-item"><span class="log-txt">${e.text}</span><button class="log-undo" onclick="undoSwap(${e.id})">undo</button></div>`).join('');
-  } else { document.getElementById('swap-logs').innerHTML=''; }
-
-  // swap panel
+  document.getElementById('swap-logs').innerHTML=ml.length?'<div class="log-head">Swap history</div>'+ml.map(e=>'<div class="log-item"><span class="log-txt">'+e.text+'</span><button class="log-undo" onclick="undoSwap('+e.id+')">undo</button></div>').join(''):'';
   renderSwapPanel();
 }
 
 function renderSwapPanel(){
   const panel=document.getElementById('swap-panel');
-  if(step===0){ panel.style.display='none'; return; }
+  if(step===0){panel.style.display='none';return;}
   panel.style.display='block';
   const dowStr=d=>DS[new Date(sYr,sMo,d).getDay()];
   if(step===1){
-    const items=P.map((p,i)=>{
-      const cur=i===asgn(selDay);
-      return`<div class="ssp-opt p-${p.c}${cur?' cur':''}" onclick="pickP(${i})">
-        <div><div class="ssp-opt-name">${p.name}${cur?' ✓':''}</div><div class="ssp-opt-role">${p.role}</div></div>
-      </div>`;
-    }).join('');
-    panel.innerHTML=`<div class="shift-swap-panel">
-      <div class="ssp-head"><div class="ssp-title">${dowStr(selDay)} ${selDay} ${MS[sMo]} — who takes it?</div>
-        <button class="ssp-close" onclick="resetSwap()"><svg width="10" height="10" viewBox="0 0 12 12" fill="none"><path d="M1 1l10 10M11 1L1 11" stroke="white" stroke-width="2" stroke-linecap="round"/></svg></button>
-      </div>
-      <div class="ssp-steps"><div class="ssp-seg act"></div><div class="ssp-seg"></div><div class="ssp-seg"></div></div>
-      <div class="ssp-opts">${items}</div>
-    </div>`;
-  } else if(step===2){
-    panel.innerHTML=`<div class="shift-swap-panel">
-      <div class="ssp-head"><div class="ssp-title">${P[selP].name} takes ${dowStr(selDay)} ${selDay}</div>
-        <button class="ssp-close" onclick="resetSwap()"><svg width="10" height="10" viewBox="0 0 12 12" fill="none"><path d="M1 1l10 10M11 1L1 11" stroke="white" stroke-width="2" stroke-linecap="round"/></svg></button>
-      </div>
-      <div class="ssp-steps"><div class="ssp-seg done"></div><div class="ssp-seg act"></div><div class="ssp-seg"></div></div>
-      <div class="ssp-hint">Which of your days will you give ${P[selP].name} in return?</div>
-      <div class="ssp-opts"><div class="ssp-opt p-${P[selP].c}" onclick="goPickGive()" style="justify-content:center;"><div class="ssp-opt-name">Pick a day to give →</div></div></div>
-      <button class="ssp-back" onclick="resetSwap()">✕ Cancel</button>
-    </div>`;
-  } else if(step===3){
-    panel.innerHTML=`<div class="shift-swap-panel">
-      <div class="ssp-head"><div class="ssp-title">Tap a highlighted day to give</div>
-        <button class="ssp-close" onclick="resetSwap()"><svg width="10" height="10" viewBox="0 0 12 12" fill="none"><path d="M1 1l10 10M11 1L1 11" stroke="white" stroke-width="2" stroke-linecap="round"/></svg></button>
-      </div>
-      <div class="ssp-steps"><div class="ssp-seg done"></div><div class="ssp-seg done"></div><div class="ssp-seg act"></div></div>
-      <div class="ssp-hint">${P[selP].name}'s days are highlighted in yellow on the calendar</div>
-      <button class="ssp-back" onclick="stepBack()">← Back</button>
-    </div>`;
-  } else if(step===4){
+    panel.innerHTML='<div class="shift-swap-panel"><div class="ssp-head"><div class="ssp-title">'+dowStr(selDay)+' '+selDay+' '+MS[sMo]+' — who takes it?</div><button class="ssp-close" onclick="resetSwap()"><svg width="10" height="10" viewBox="0 0 12 12" fill="none"><path d="M1 1l10 10M11 1L1 11" stroke="white" stroke-width="2" stroke-linecap="round"/></svg></button></div><div class="ssp-steps"><div class="ssp-seg act"></div><div class="ssp-seg"></div><div class="ssp-seg"></div></div><div class="ssp-opts">'+P.map((p,i)=>'<div class="ssp-opt p-'+p.c+(i===asgn(selDay)?' cur':'')+ '" onclick="pickP('+i+')"><div><div class="ssp-opt-name">'+p.name+(i===asgn(selDay)?' ✓':'')+'</div><div class="ssp-opt-role">'+p.role+'</div></div></div>').join('')+'</div></div>';
+  }else if(step===2){
+    panel.innerHTML='<div class="shift-swap-panel"><div class="ssp-head"><div class="ssp-title">'+P[selP].name+' takes '+dowStr(selDay)+' '+selDay+'</div><button class="ssp-close" onclick="resetSwap()"><svg width="10" height="10" viewBox="0 0 12 12" fill="none"><path d="M1 1l10 10M11 1L1 11" stroke="white" stroke-width="2" stroke-linecap="round"/></svg></button></div><div class="ssp-steps"><div class="ssp-seg done"></div><div class="ssp-seg act"></div><div class="ssp-seg"></div></div><div class="ssp-hint">Which of your days will you give '+P[selP].name+' in return?</div><div class="ssp-opts"><div class="ssp-opt p-'+P[selP].c+'" onclick="goPickGive()" style="justify-content:center;"><div class="ssp-opt-name">Pick a day to give →</div></div></div><button class="ssp-back" onclick="resetSwap()">✕ Cancel</button></div>';
+  }else if(step===3){
+    panel.innerHTML='<div class="shift-swap-panel"><div class="ssp-head"><div class="ssp-title">Tap a highlighted day to give</div><button class="ssp-close" onclick="resetSwap()"><svg width="10" height="10" viewBox="0 0 12 12" fill="none"><path d="M1 1l10 10M11 1L1 11" stroke="white" stroke-width="2" stroke-linecap="round"/></svg></button></div><div class="ssp-steps"><div class="ssp-seg done"></div><div class="ssp-seg done"></div><div class="ssp-seg act"></div></div><div class="ssp-hint">'+P[selP].name+'\'s days highlighted in yellow</div><button class="ssp-back" onclick="stepBack()">← Back</button></div>';
+  }else if(step===4){
     const pA=asgn(selDay),pB=asgn(selG);
-    panel.innerHTML=`<div class="shift-swap-panel">
-      <div class="ssp-head"><div class="ssp-title">Confirm swap</div>
-        <button class="ssp-close" onclick="resetSwap()"><svg width="10" height="10" viewBox="0 0 12 12" fill="none"><path d="M1 1l10 10M11 1L1 11" stroke="white" stroke-width="2" stroke-linecap="round"/></svg></button>
-      </div>
-      <div class="ssp-steps"><div class="ssp-seg done"></div><div class="ssp-seg done"></div><div class="ssp-seg done"></div></div>
-      <div class="shift-confirm-rows">
-        <div class="scr-row"><span class="scr-day">${dowStr(selDay)} ${selDay} ${MS[sMo]}</span><span class="scr-arrow">→</span><span class="scr-badge p-${P[pB].c}">${P[pB].name}</span></div>
-        <div class="scr-row"><span class="scr-day">${dowStr(selG)} ${selG} ${MS[sMo]}</span><span class="scr-arrow">→</span><span class="scr-badge p-${P[pA].c}">${P[pA].name}</span></div>
-      </div>
-      <div class="ssp-opts">
-        <div class="ssp-opt" style="background:var(--dark);justify-content:center;" onclick="confirmSwap()"><div class="ssp-opt-name">Confirm swap</div></div>
-      </div>
-      <button class="ssp-back" onclick="resetSwap()">✕ Cancel</button>
-    </div>`;
+    panel.innerHTML='<div class="shift-swap-panel"><div class="ssp-head"><div class="ssp-title">Confirm swap</div><button class="ssp-close" onclick="resetSwap()"><svg width="10" height="10" viewBox="0 0 12 12" fill="none"><path d="M1 1l10 10M11 1L1 11" stroke="white" stroke-width="2" stroke-linecap="round"/></svg></button></div><div class="ssp-steps"><div class="ssp-seg done"></div><div class="ssp-seg done"></div><div class="ssp-seg done"></div></div><div class="shift-confirm-rows"><div class="scr-row"><span class="scr-day">'+dowStr(selDay)+' '+selDay+' '+MS[sMo]+'</span><span class="scr-arrow">→</span><span class="scr-badge p-'+P[pB].c+'">'+P[pB].name+'</span></div><div class="scr-row"><span class="scr-day">'+dowStr(selG)+' '+selG+' '+MS[sMo]+'</span><span class="scr-arrow">→</span><span class="scr-badge p-'+P[pA].c+'">'+P[pA].name+'</span></div></div><div class="ssp-opts"><div class="ssp-opt" style="background:var(--dark);justify-content:center;" onclick="confirmSwap()"><div class="ssp-opt-name">Confirm swap</div></div></div><button class="ssp-back" onclick="resetSwap()">✕ Cancel</button></div>';
   }
 }
 
-window.tapCal=function(d){
-  if(step===0){selDay=d;step=1;renderShift();}
-  else if(step===3){if(d===selDay||asgn(d)!==selP)return;selG=d;step=4;renderShift();}
-};
+window.tapCal=function(d){if(step===0){selDay=d;step=1;renderShift();}else if(step===3){if(d===selDay||asgn(d)!==selP)return;selG=d;step=4;renderShift();}};
 window.pickP=function(p){if(p===asgn(selDay)){resetSwap();return;}selP=p;step=2;renderShift();};
 window.goPickGive=function(){step=3;renderShift();};
 window.stepBack=function(){step=2;renderShift();};
 window.resetSwap=function(){step=0;selDay=null;selP=null;selG=null;renderShift();};
 window.confirmSwap=async function(){
-  const k=mk(); if(!swaps[k])swaps[k]={}; if(!logs[k])logs[k]=[];
+  const k=mk();if(!swaps[k])swaps[k]={};if(!logs[k])logs[k]=[];
   const pA=asgn(selDay),pB=asgn(selG);
-  swaps[k][selDay]=pB; swaps[k][selG]=pA;
-  logs[k].unshift({id:Date.now(),text:`${DS[new Date(sYr,sMo,selDay).getDay()]} ${selDay} ${MS[sMo]} → ${P[pB].name}   ·   ${DS[new Date(sYr,sMo,selG).getDay()]} ${selG} ${MS[sMo]} → ${P[pA].name}`,dayA:selDay,dayB:selG});
-  await save(); window.resetSwap();
+  swaps[k][selDay]=pB;swaps[k][selG]=pA;
+  logs[k].unshift({id:Date.now(),text:DS[new Date(sYr,sMo,selDay).getDay()]+' '+selDay+' '+MS[sMo]+' → '+P[pB].name+'   ·   '+DS[new Date(sYr,sMo,selG).getDay()]+' '+selG+' '+MS[sMo]+' → '+P[pA].name,dayA:selDay,dayB:selG});
+  await save();window.resetSwap();
 };
 window.undoSwap=async function(id){
-  const l=logs[mk()],e=l?l.find(x=>x.id===id):null; if(!e)return;
-  const s=swaps[mk()]; if(s){delete s[e.dayA];delete s[e.dayB];}
-  logs[mk()]=l.filter(x=>x.id!==id); await save(); renderShift();
+  const l=logs[mk()],e=l?l.find(x=>x.id===id):null;if(!e)return;
+  const s=swaps[mk()];if(s){delete s[e.dayA];delete s[e.dayB];}
+  logs[mk()]=l.filter(x=>x.id!==id);await save();renderShift();
 };
-
 document.getElementById('shift-prev').onclick=()=>{_cache={};window.resetSwap();sMo--;if(sMo<0){sMo=11;sYr--;}renderShift();};
 document.getElementById('shift-next').onclick=()=>{_cache={};window.resetSwap();sMo++;if(sMo>11){sMo=0;sYr++;}renderShift();};
 document.getElementById('reset-swaps-btn').onclick=async()=>{delete swaps[mk()];delete logs[mk()];await save();_cache={};window.resetSwap();};
 
 // ── ANNUAL ──
 function renderAnnual(){
+  if(!adminUnlocked)return;
   function calcMonth(m){
-    const dim=new Date(2026,m,0).getDate();
-    let ari=0,muhCnt=0,govCnt=0; const free=[];
+    const dim=new Date(2026,m,0).getDate();let ari=0,muhCnt=0,govCnt=0;const free=[];
     for(let d=1;d<=dim;d++){
       const dow=new Date(2026,m-1,d).getDay();
-      if(dow===0||dow===6){ari++;}
-      else if(isGov(2026,m-1,d)){ari++;govCnt++;}
-      else if(isMuh(2026,m-1,d)){muhCnt++;}
-      else{free.push(d);}
+      if(dow===0||dow===6){ari++;}else if(isGov(2026,m-1,d)){ari++;govCnt++;}else if(isMuh(2026,m-1,d)){muhCnt++;}else{free.push(d);}
     }
-    const total=free.length+muhCnt,each=Math.round(total/2);
-    const rajaFree=Math.max(0,each-muhCnt);
+    const total=free.length+muhCnt,each=Math.round(total/2),rajaFree=Math.max(0,each-muhCnt);
     return{ari,raja:muhCnt+rajaFree,keer:free.length-rajaFree,muh:muhCnt,gov:govCnt,total:dim};
   }
-  const yearData=[]; let tA=0,tR=0,tK=0,tM=0,tG=0,tD=0;
+  const yearData=[];let tA=0,tR=0,tK=0,tM=0,tG=0,tD=0;
   for(let m=1;m<=12;m++){const d=calcMonth(m);yearData.push({...d,month:m});tA+=d.ari;tR+=d.raja;tK+=d.keer;tM+=d.muh;tG+=d.gov;tD+=d.total;}
-  const totalBookings=Object.keys(bookings).length;
-  const totalRevenue=Object.values(bookings).reduce((s,b)=>s+(b.paid?9999:b.advance),0);
-
-  document.getElementById('ann-stats').innerHTML=`
-    <div class="astat"><div class="astat-lbl">Muhurtham days</div><div class="astat-val">${tM}</div><div class="astat-sub">Keerthi off, Raja covers</div></div>
-    <div class="astat"><div class="astat-lbl">Govt holidays</div><div class="astat-val">${tG}</div><div class="astat-sub">Ari covers all</div></div>
-    <div class="astat"><div class="astat-lbl">Total bookings</div><div class="astat-val">${totalBookings}</div><div class="astat-sub">All time</div></div>
-    <div class="astat"><div class="astat-lbl">Advance collected</div><div class="astat-val">₹${Object.values(bookings).reduce((s,b)=>s+b.advance,0).toLocaleString('en-IN')}</div><div class="astat-sub">From bookings</div></div>`;
-
+  document.getElementById('ann-stats').innerHTML='<div class="astat"><div class="astat-lbl">Muhurtham days</div><div class="astat-val">'+tM+'</div><div class="astat-sub">Keerthi off, Raja covers</div></div><div class="astat"><div class="astat-lbl">Govt holidays</div><div class="astat-val">'+tG+'</div><div class="astat-sub">Ari covers all</div></div><div class="astat"><div class="astat-lbl">Total bookings</div><div class="astat-val">'+Object.keys(bookings).length+'</div><div class="astat-sub">All time</div></div><div class="astat"><div class="astat-lbl">Advance collected</div><div class="astat-val">₹'+Object.values(bookings).reduce((s,b)=>s+(Number(b.advance)||0),0).toLocaleString('en-IN')+'</div><div class="astat-sub">From bookings</div></div>';
   const grand=tA+tR+tK,pA=Math.round(tA/grand*100),pR=Math.round(tR/grand*100),pK=100-pA-pR;
-  document.getElementById('bal-section').innerHTML=`<div class="bal-card">
-    <div class="bal-lbl">Workload share — 2026</div>
-    <div class="bal-row"><div class="bal-name" style="color:var(--ari);">Ari</div><div class="bal-track"><div class="bal-fill" style="width:${pA}%;background:var(--ari);"></div></div><div class="bal-pct">${pA}%</div></div>
-    <div class="bal-row"><div class="bal-name" style="color:var(--raja);">Raja</div><div class="bal-track"><div class="bal-fill" style="width:${pR}%;background:var(--raja);"></div></div><div class="bal-pct">${pR}%</div></div>
-    <div class="bal-row"><div class="bal-name" style="color:var(--keer);">Keerthi</div><div class="bal-track"><div class="bal-fill" style="width:${pK}%;background:var(--keer);"></div></div><div class="bal-pct">${pK}%</div></div>
-  </div>`;
-
+  document.getElementById('bal-section').innerHTML='<div class="bal-card"><div class="bal-lbl">Workload share — 2026</div><div class="bal-row"><div class="bal-name" style="color:var(--ari);">Ari</div><div class="bal-track"><div class="bal-fill" style="width:'+pA+'%;background:var(--ari);"></div></div><div class="bal-pct">'+pA+'%</div></div><div class="bal-row"><div class="bal-name" style="color:var(--raja);">Raja</div><div class="bal-track"><div class="bal-fill" style="width:'+pR+'%;background:var(--raja);"></div></div><div class="bal-pct">'+pR+'%</div></div><div class="bal-row"><div class="bal-name" style="color:var(--keer);">Keerthi</div><div class="bal-track"><div class="bal-fill" style="width:'+pK+'%;background:var(--keer);"></div></div><div class="bal-pct">'+pK+'%</div></div></div>';
   const maxD=Math.max(...yearData.map(d=>Math.max(d.ari,d.raja,d.keer)));
-  const rows=yearData.map(d=>{
-    const diff=d.raja-d.keer,eq=Math.abs(diff)<=1;
-    return`<div class="month-row">
-      <div class="mrow-month">${MS[d.month-1]}</div>
-      <div class="mrow-cell"><div class="mbar-wrap"><div class="mbar" style="width:${Math.round(d.ari/maxD*100)}%;background:var(--ari);"></div></div><div class="mnum a">${d.ari}</div></div>
-      <div class="mrow-cell"><div class="mbar-wrap"><div class="mbar" style="width:${Math.round(d.raja/maxD*100)}%;background:var(--raja);"></div></div><div class="mnum r">${d.raja}</div></div>
-      <div class="mrow-cell"><div class="mbar-wrap"><div class="mbar" style="width:${Math.round(d.keer/maxD*100)}%;background:var(--keer);"></div></div><div class="mnum k">${d.keer}</div></div>
-      <div class="meq ${eq?'ok':'off'}">${diff===0?'=':`${diff>0?'R':'K'}+${Math.abs(diff)}`}</div>
-    </div>`;
-  }).join('');
-  document.getElementById('month-section').innerHTML=`
-    <div class="month-sec-lbl">Month-by-month</div>
-    <div class="month-hdr"><div class="mhdr-txt">Month</div><div class="mhdr-txt" style="color:var(--ari);">Ari</div><div class="mhdr-txt" style="color:var(--raja);">Raja</div><div class="mhdr-txt" style="color:var(--keer);">Keerthi</div><div class="mhdr-txt">Split</div></div>
-    ${rows}`;
-}
-
-// ── DATE STRIP INDICATORS ──
-function updateDateStripIndicators(){
-  const strips = document.querySelectorAll('.dc');
-  strips.forEach(el => {
-    const dateStr = el.dataset.date;
-    if(!dateStr) return;
-    const hasBooking = Object.values(bookings).some(b =>
-      b.date === dateStr && (b.studio||'photo') === selStudio
-    );
-    el.classList.toggle('has-booking', hasBooking);
-  });
-}
-
-// ── STUDIO CONSTANTS ──
-const SHEETS_URL = "https://script.google.com/macros/s/AKfycbxqTIGogoUiQRI0aDRZZmmKa9KmN_CLWv6lZAfGDMw1KGdxRmiG9XZapNLNfeNjYyymrw/exec";
-const STUDIO_LOC = "https://maps.app.goo.gl/vdCkBeZE7Vg1tJra8";
-
-async function syncToSheets(booking) {
-  try {
-    const dur = booking.slotRaw ? parseInt(booking.slotRaw.split('|')[1]||1) : 1;
-    const adv = Number(booking.advance)||0;
-    const total = Number(booking.total)||(dur*750);
-    const bal = booking.paid ? 0 : Math.max(0, total - adv);
-    const data = {
-      bookingId: booking.id,
-      studio: booking.studioName || 'Photography Studio',
-      date: new Date(booking.date).toLocaleDateString('en-IN',{day:'numeric',month:'short',year:'numeric'}),
-      name: booking.name, phone: booking.phone, type: booking.type,
-      slot: booking.slot, hours: dur, total, advance: adv, balance: bal,
-      status: booking.paid ? 'Paid' : adv > 0 ? 'Advance' : 'Pending',
-      bookedBy: booking.createdBy || '',
-      timestamp: new Date().toLocaleString('en-IN')
-    };
-    const params = new URLSearchParams(Object.entries(data).map(([k,v])=>[k,String(v)]));
-    await fetch(SHEETS_URL + '?' + params.toString(), {method:'GET', mode:'no-cors'});
-    showToast('Synced to Sheets ✓', 2000);
-  } catch(e) { console.error('Sheets sync failed:', e); }
-}
-
-function showToast(msg, dur=3000){
-  const t = document.getElementById('copy-toast');
-  if(!t) return;
-  t.textContent = msg;
-  t.classList.add('show');
-  setTimeout(()=>t.classList.remove('show'), dur);
-}
-
-function cleanPhone(phone){ return phone.replace(/[^0-9]/g,'').replace(/^0+/,'').replace(/^91/,''); }
-
-window.sendClientWhatsApp = function(){
-  const b = bookings[modalBookingId]; if(!b) return;
-  const phone = cleanPhone(b.phone);
-  const dateStr = new Date(b.date).toLocaleDateString('en-IN',{weekday:'long',day:'numeric',month:'long',year:'numeric'});
-  const msg = `Hi ${b.name}! 👋
-
-Your shoot at *Magizh Rental Photo Studio* is confirmed ✅
-
-📅 *Date:* ${dateStr}
-⏰ *Slot:* ${b.slot}
-📸 *Shoot type:* ${b.type}
-💰 *Advance paid:* ₹${(b.advance||0).toLocaleString('en-IN')}
-
-📍 *Location:* ${STUDIO_LOC}
-
-Please arrive 10 minutes early!
-— Magizh Studio Team`;
-  window.open(`https://wa.me/91${phone}?text=${encodeURIComponent(msg)}`, '_blank');
-};
-
-window.sendTeamWhatsApp = function(){
-  const b = bookings[modalBookingId]; if(!b) return;
-  const dateStr = new Date(b.date).toLocaleDateString('en-IN',{weekday:'short',day:'numeric',month:'short'});
-  const msg = `🆕 *New Booking — Magizh Studio*
-
-👤 *Client:* ${b.name}
-📞 *Phone:* ${b.phone}
-📅 *Date:* ${dateStr}
-⏰ *Slot:* ${b.slot}
-📸 *Type:* ${b.type}
-💰 *Advance:* ₹${(b.advance||0).toLocaleString('en-IN')}
-🔖 *Booked by:* ${currentUser}`;
-  window.open(`https://wa.me/919876543210?text=${encodeURIComponent(msg)}`, '_blank');
-};
-
-window.sendInvoiceWhatsApp = function(){
-  const b = bookings[modalBookingId]; if(!b) return;
-  if(typeof window.jspdf === 'undefined'){ showToast('PDF library loading, try again...', 3000); return; }
-  try {
-    const { jsPDF } = window.jspdf;
-    const doc = new jsPDF({unit:'mm',format:'a4'});
-    const dur = b.slotRaw ? parseInt(b.slotRaw.split('|')[1]||1) : 1;
-    const total = Number(b.total)||(dur*750);
-    const adv = Number(b.advance)||0;
-    const bal = b.paid ? 0 : Math.max(0, total - adv);
-    const invNo = 'MZ-' + b.id.slice(-6).toUpperCase();
-    const dateStr = new Date(b.date).toLocaleDateString('en-IN',{day:'numeric',month:'long',year:'numeric'});
-    const now = new Date().toLocaleString('en-IN',{day:'numeric',month:'short',year:'numeric',hour:'2-digit',minute:'2-digit'});
-
-    doc.setFillColor(232, 96, 26);
-    doc.rect(0,0,210,40,'F');
-    doc.setTextColor(255,255,255);
-    doc.setFont('helvetica','bold');
-    doc.setFontSize(22);
-    doc.text('MAGIZH STUDIO', 15, 16);
-    doc.setFont('helvetica','normal');
-    doc.setFontSize(9);
-    doc.text('Rental Photo Studio, Nerkundram, Chennai', 15, 23);
-    doc.text('+91 8072 659 679  |  @magizh_studio_', 15, 29);
-    doc.setFont('helvetica','bold');
-    doc.setFontSize(20);
-    doc.text('INVOICE', 195, 16, {align:'right'});
-    doc.setFont('helvetica','normal');
-    doc.setFontSize(9);
-    doc.text('#'+invNo, 195, 23, {align:'right'});
-    doc.text(now, 195, 29, {align:'right'});
-
-    doc.setTextColor(130,130,130);
-    doc.setFontSize(9);
-    doc.setFont('helvetica','bold');
-    doc.text('BILL TO', 15, 52);
-    doc.setTextColor(20,20,20);
-    doc.setFontSize(13);
-    doc.text(b.name, 15, 59);
-    doc.setFont('helvetica','normal');
-    doc.setFontSize(10);
-    doc.text('Phone: '+b.phone, 15, 65);
-
-    doc.setTextColor(130,130,130);
-    doc.setFont('helvetica','bold');
-    doc.setFontSize(9);
-    doc.text('BOOKING DATE', 195, 52, {align:'right'});
-    doc.setTextColor(20,20,20);
-    doc.setFont('helvetica','normal');
-    doc.setFontSize(11);
-    doc.text(dateStr, 195, 59, {align:'right'});
-    doc.setFontSize(10);
-    doc.text(b.studioName||'Photography Studio', 195, 65, {align:'right'});
-
-    doc.setFillColor(26,26,26);
-    doc.rect(15,78,180,10,'F');
-    doc.setTextColor(255,255,255);
-    doc.setFont('helvetica','bold');
-    doc.setFontSize(10);
-    doc.text('DESCRIPTION', 20, 84);
-    doc.text('SLOT', 100, 84);
-    doc.text('HRS', 145, 84, {align:'center'});
-    doc.text('AMOUNT', 190, 84, {align:'right'});
-
-    doc.setTextColor(20,20,20);
-    doc.setFont('helvetica','normal');
-    doc.setFontSize(10);
-    doc.text(b.type, 20, 96);
-    doc.text(b.slot, 100, 96);
-    doc.text(String(dur), 145, 96, {align:'center'});
-    doc.text('Rs.'+total.toLocaleString('en-IN'), 190, 96, {align:'right'});
-
-    doc.setDrawColor(230,230,230);
-    doc.line(15,100,195,100);
-
-    doc.setTextColor(100,100,100);
-    doc.setFontSize(10);
-    doc.text('Advance Paid', 130, 110);
-    doc.setTextColor(26,122,74);
-    doc.text('- Rs.'+adv.toLocaleString('en-IN'), 190, 110, {align:'right'});
-
-    doc.setFillColor(b.paid?220:252, b.paid?252:235, b.paid?231:235);
-    doc.rect(130,115,65,14,'F');
-    doc.setFont('helvetica','bold');
-    doc.setFontSize(12);
-    doc.setTextColor(b.paid?22:153, b.paid?101:45, b.paid?52:45);
-    doc.text(b.paid?'FULLY PAID':'BALANCE DUE', 135, 124);
-    doc.text('Rs.'+bal.toLocaleString('en-IN'), 190, 124, {align:'right'});
-
-    doc.setFont('helvetica','italic');
-    doc.setFontSize(11);
-    doc.setTextColor(80,80,80);
-    doc.text('Thank you for choosing Magizh Studio!', 15, 150);
-    doc.setFont('helvetica','normal');
-    doc.setFontSize(9);
-    doc.setTextColor(130,130,130);
-    doc.text('Tag us @magizh_studio_ on Instagram!', 15, 156);
-
-    doc.setDrawColor(230,230,230);
-    doc.line(15,270,195,270);
-    doc.setFontSize(8);
-    doc.setTextColor(150,150,150);
-    doc.text('Magizh Rental Photo Studio  |  +91 8072 659 679  |  @magizh_studio_', 105, 277, {align:'center'});
-
-    const fileName = 'Invoice_'+b.name.replace(/\s+/g,'_')+'_'+b.date+'.pdf';
-    doc.save(fileName);
-
-    setTimeout(()=>{
-      const phone = cleanPhone(b.phone);
-      const msg = `Hi ${b.name}! 🙏
-
-Here is your invoice from *Magizh Studio* for ${b.type} on ${dateStr}.
-
-*Total:* Rs.${total.toLocaleString('en-IN')}
-*Status:* ${b.paid?'✅ Fully Paid':'Balance pending'}
-
-PDF invoice downloaded — please attach it to this chat. Thank you! 📸`;
-      window.open(`https://wa.me/91${phone}?text=${encodeURIComponent(msg)}`, '_blank');
-      showToast('PDF downloaded! Attach in WhatsApp.', 5000);
-    }, 800);
-  } catch(e){ showToast('PDF error: '+e.message, 4000); }
-};
-
-window.sendReminderWhatsApp = function(bookingId){
-  const b = bookings[bookingId]; if(!b) return;
-  const phone = cleanPhone(b.phone);
-  const dateStr = new Date(b.date).toLocaleDateString('en-IN',{weekday:'long',day:'numeric',month:'long'});
-  const msg = `Hi ${b.name}! 👋
-
-Reminder for your shoot *tomorrow* at Magizh Studio 📸
-
-📅 *Date:* ${dateStr}
-⏰ *Slot:* ${b.slot}
-📍 *Location:* ${STUDIO_LOC}
-
-Please arrive 10 minutes early!
-— Magizh Studio`;
-  window.open(`https://wa.me/91${phone}?text=${encodeURIComponent(msg)}`, '_blank');
-};
-
-// ── FIREBASE ──
-function initFirebase(){
-  try{
-    const app=initializeApp(CFG); db=getFirestore(app);
-    onSnapshot(doc(db,'studios',SID),snap=>{
-      if(snap.exists()){const d=snap.data();swaps=d.swaps||{};logs=d.logs||{};bookings=d.bookings||{};}
-      setSyncStatus('live');
-      renderShift(); renderTodayBookings(); renderAnnual();
-    },err=>{console.error(err);setSyncStatus('err');});
-  }catch(e){console.error(e);setSyncStatus('err');}
+  const rows=yearData.map(d=>{const diff=d.raja-d.keer,eq=Math.abs(diff)<=1;return'<div class="month-row"><div class="mrow-month">'+MS[d.month-1]+'</div><div class="mrow-cell"><div class="mbar-wrap"><div class="mbar" style="width:'+Math.round(d.ari/maxD*100)+'%;background:var(--ari);"></div></div><div class="mnum a">'+d.ari+'</div></div><div class="mrow-cell"><div class="mbar-wrap"><div class="mbar" style="width:'+Math.round(d.raja/maxD*100)+'%;background:var(--raja);"></div></div><div class="mnum r">'+d.raja+'</div></div><div class="mrow-cell"><div class="mbar-wrap"><div class="mbar" style="width:'+Math.round(d.keer/maxD*100)+'%;background:var(--keer);"></div></div><div class="mnum k">'+d.keer+'</div></div><div class="meq '+(eq?'ok':'off')+'">'+(diff===0?'=':(diff>0?'R':'K')+'+'+Math.abs(diff))+'</div></div>';}).join('');
+  document.getElementById('month-section').innerHTML='<div class="month-sec-lbl">Month-by-month</div><div class="month-hdr"><div class="mhdr-txt">Month</div><div class="mhdr-txt" style="color:var(--ari);">Ari</div><div class="mhdr-txt" style="color:var(--raja);">Raja</div><div class="mhdr-txt" style="color:var(--keer);">Keerthi</div><div class="mhdr-txt">Split</div></div>'+rows;
 }
 
 renderShift();
