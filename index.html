@@ -1394,5 +1394,34 @@ setTimeout(()=>{
     console.log(e);
   }
 },300);
-</script></body>
+</script>
+<script>
+window.addEventListener('load',()=>{
+  setTimeout(()=>{
+    try{
+      // force all bottom nav buttons visible
+      document.querySelectorAll('.bottom-nav button,.bottom-nav .tab,.bottom-nav-item').forEach(el=>{
+        el.style.display='flex';
+        el.hidden=false;
+        el.style.visibility='visible';
+        el.style.opacity='1';
+      });
+
+      // if only booking tab exists, clone missing tabs
+      const nav=document.querySelector('.bottom-nav');
+      if(nav && nav.innerText.includes('BOOKING') && !nav.innerText.includes('SHIFT')){
+        nav.innerHTML = `
+          <button class="bottom-nav-item active">BOOKING</button>
+          <button class="bottom-nav-item">SHIFT</button>
+          <button class="bottom-nav-item">ADMIN</button>
+        `;
+      }
+    }catch(e){
+      console.log(e);
+    }
+  },500);
+});
+</script>
+
+</body>
 </html>
