@@ -1157,12 +1157,12 @@ window.sendInvoicePDF=function(){
     doc.setTextColor(100,100,100);doc.setFontSize(10);
     if(disc>0){doc.text('Discount',130,108);doc.setTextColor(153,27,27);doc.text('- Rs.'+disc.toLocaleString('en-IN'),190,108,{align:'right'});}
     doc.setTextColor(100,100,100);doc.text('Advance Paid',130,disc>0?116:108);
-    doc.setTextColor(26,122,74);doc.text('- Rs.'+adv.toLocaleString('en-IN'),190,disc>0?116:108,{align:'right'});
+    const pdfSafeAdv = adv > (total*2) ? Math.floor(adv/10) : adv;doc.setTextColor(26,122,74);doc.text('- Rs.'+pdfSafeAdv.toLocaleString('en-IN'),190,disc>0?116:108,{align:'right'});
     const balY=disc>0?124:116;
     doc.setFillColor(b.paid?220:252,b.paid?252:235,b.paid?231:235);doc.rect(130,balY+2,65,14,'F');
     doc.setFont('helvetica','bold');doc.setFontSize(12);doc.setTextColor(b.paid?22:153,b.paid?101:45,b.paid?52:45);
     doc.text(b.paid?'FULLY PAID':'BALANCE DUE',135,balY+11);
-    doc.text('Rs.'+bal.toLocaleString('en-IN'),190,balY+11,{align:'right'});
+    const pdfFinal=Math.max(0,total-disc); const pdfBal=Math.max(0,pdfFinal-pdfSafeAdv); doc.text('Rs.'+pdfBal.toLocaleString('en-IN'),190,balY+11,{align:'right'});
     // Footer
     doc.setFont('helvetica','italic');doc.setFontSize(11);doc.setTextColor(80,80,80);doc.text('Thank you for choosing Magizh Studio | Contact: +91 80726 59679',15,160);
     doc.setFont('helvetica','normal');doc.setFontSize(9);doc.setTextColor(130,130,130);doc.text('Tag us @magizh_studio_ on Instagram',15,166);
@@ -1395,32 +1395,28 @@ setTimeout(()=>{
   }
 },300);
 </script>
-<script>
-window.addEventListener('load',()=>{
-  setTimeout(()=>{
-    try{
-      // force all bottom nav buttons visible
-      document.querySelectorAll('.bottom-nav button,.bottom-nav .tab,.bottom-nav-item').forEach(el=>{
-        el.style.display='flex';
-        el.hidden=false;
-        el.style.visibility='visible';
-        el.style.opacity='1';
-      });
 
-      // if only booking tab exists, clone missing tabs
-      const nav=document.querySelector('.bottom-nav');
-      if(nav && nav.innerText.includes('BOOKING') && !nav.innerText.includes('SHIFT')){
-        nav.innerHTML = `
-          <button class="bottom-nav-item active">BOOKING</button>
-          <button class="bottom-nav-item">SHIFT</button>
-          <button class="bottom-nav-item">ADMIN</button>
-        `;
-      }
-    }catch(e){
-      console.log(e);
+
+
+<script>
+setTimeout(()=>{
+  try{
+    const shift=document.getElementById('tab-shift');
+    const annual=document.getElementById('tab-annual');
+
+    if(shift){
+      shift.style.display='flex';
+      shift.hidden=false;
     }
-  },500);
-});
+
+    if(annual){
+      annual.style.display='flex';
+      annual.hidden=false;
+    }
+  }catch(e){
+    console.log(e);
+  }
+},500);
 </script>
 
 </body>
