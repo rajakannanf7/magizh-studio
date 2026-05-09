@@ -675,7 +675,7 @@ function initFirebase(){
 async function syncToSheets(b){
   try{
     const dur=b.slotRaw?parseInt(b.slotRaw.split('|')[1]||1):1;
-    const adv=Number(b.advance)||0;
+    const adv=Math.min(Number(b.advance)||0, Number(total)||0);
     const total=Number(b.total)||(dur*HOURLY_RATE);
     const disc=Number(b.discount)||0;
     const bal=b.paid?0:Math.max(0,total-disc-adv);
@@ -964,6 +964,38 @@ function renderUpcomingBookings(){
   }).join('');
 }
 
+
+window.updateModalPayment=function(){
+  if(!modalBookingId || !bookings[modalBookingId]) return;
+
+  const b = bookings[modalBookingId];
+
+  const total = Number(b.total)||0;
+  const discount = Number(document.getElementById('modal-discount-input').value)||0;
+
+  let advance = Number(document.getElementById('modal-adv-input').value)||0;
+
+  const finalAmount = Math.max(0,total-discount);
+
+  if(advance > finalAmount){
+    advance = finalAmount;
+    document.getElementById('modal-adv-input').value = advance;
+  }
+
+  const balance = Math.max(0,finalAmount-advance);
+
+  b.discount = discount;
+  b.advance = advance;
+  b.balance = balance;
+  b.paid = balance===0;
+
+  document.getElementById('modal-balance').textContent='₹'+balance.toLocaleString('en-IN');
+  document.getElementById('modal-status').textContent=b.paid?'✅ Fully Paid':'Pending';
+
+  backupBookings();
+  save();
+}
+
 // ── MODAL ──
 
 window.openModal=function(id){
@@ -972,15 +1004,15 @@ window.openModal=function(id){
   const dur=b.slotRaw?parseInt(b.slotRaw.split('|')[1]||1):1;
   const total=Number(b.total)||(dur*HOURLY_RATE);
   const disc=Number(b.discount)||0;
-  const adv=Number(b.advance)||0;
+  const adv=Math.min(Number(b.advance)||0, Number(total)||0);
   const bal=b.paid?0:Math.max(0,total-disc-adv);
   document.getElementById('modal-client-name').textContent=b.name;
   document.getElementById('modal-meta').textContent=(b.studioName||'Studio')+' · '+new Date(b.date).toLocaleDateString('en-IN',{day:'numeric',month:'short',year:'numeric'});
   document.getElementById('modal-type').textContent=b.type;
   document.getElementById('modal-slot').textContent=b.slot;
   document.getElementById('modal-total').textContent='₹'+total.toLocaleString('en-IN');
-  document.getElementById('modal-discount').textContent=disc>0?'₹'+disc.toLocaleString('en-IN'):'—';
-  document.getElementById('modal-adv').textContent='₹'+adv.toLocaleString('en-IN');
+  document.getElementById('modal-discount-input').value=disc;
+  document.getElementById('modal-adv-input').value=adv;
   document.getElementById('modal-balance').textContent='₹'+bal.toLocaleString('en-IN');
   document.getElementById('modal-status').textContent=b.paid?'✅ Fully Paid':adv>0?'Advance Paid':'Pending';
   document.getElementById('modal-pay-btn').style.display=b.paid?'none':'block';
@@ -1071,7 +1103,7 @@ window.sendInvoicePDF=function(){
     const dur=b.slotRaw?parseInt(b.slotRaw.split('|')[1]||1):1;
     const total=Number(b.total)||(dur*HOURLY_RATE);
     const disc=Number(b.discount)||0;
-    const adv=Number(b.advance)||0;
+    const adv=Math.min(Number(b.advance)||0, Number(total)||0);
     const bal=b.paid?0:Math.max(0,total-disc-adv);
     const invNo='MZ-'+b.id.slice(-6).toUpperCase();
     const dateStr=new Date(b.date).toLocaleDateString('en-IN',{day:'numeric',month:'long',year:'numeric'});
