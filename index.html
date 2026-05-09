@@ -974,6 +974,7 @@ function renderUpcomingBookings(){
 
 
 
+
 window.updateDiscount=function(){
   try{
     if(!modalBookingId || !bookings[modalBookingId]) return;
@@ -987,11 +988,13 @@ window.updateDiscount=function(){
     const total = Number(b.total)||0;
     const advance = Number(b.advance)||0;
 
-    const balance = Math.max(0,(total-discount)-advance);
+    const finalAmount = Math.max(0,total-discount);
+    const balance = Math.max(0,finalAmount-advance);
 
     b.discount = discount;
+    b.finalAmount = finalAmount;
     b.balance = balance;
-    b.paid = balance===0;
+    b.paid = balance<=0;
 
     const balEl=document.getElementById('modal-balance');
     if(balEl){
@@ -1013,6 +1016,7 @@ window.updateDiscount=function(){
     console.error('Discount update failed',err);
   }
 }
+
 
 
 // ── MODAL ──
@@ -1160,7 +1164,7 @@ window.sendInvoicePDF=function(){
     doc.text(b.paid?'FULLY PAID':'BALANCE DUE',135,balY+11);
     doc.text('Rs.'+bal.toLocaleString('en-IN'),190,balY+11,{align:'right'});
     // Footer
-    doc.setFont('helvetica','italic');doc.setFontSize(11);doc.setTextColor(80,80,80);doc.text('Thank you for choosing Magizh Studio!',15,160);
+    doc.setFont('helvetica','italic');doc.setFontSize(11);doc.setTextColor(80,80,80);doc.text('Thank you for choosing Magizh Studio!<br><span style='font-size:10px;color:#999;'>For bookings & support: +91 80726 59679</span>',15,160);
     doc.setFont('helvetica','normal');doc.setFontSize(9);doc.setTextColor(130,130,130);doc.text('Tag us @magizh_studio_ on Instagram 📸',15,166);
     doc.setDrawColor(230,230,230);doc.line(15,270,195,270);
     doc.setFontSize(8);doc.setTextColor(150,150,150);doc.text('Magizh Rental Photo Studio  |  +91 8072 659 679  |  @magizh_studio_',105,277,{align:'center'});
@@ -1168,7 +1172,7 @@ window.sendInvoicePDF=function(){
     doc.save(fileName);
     setTimeout(()=>{
       const phone=cleanPhone(b.phone);
-      const msg='Hi '+b.name+'! 🙏\n\nYour invoice from *Magizh Studio* is ready 📄\n\n*'+b.type+'* on '+dateStr+'\n*Total:* Rs.'+total.toLocaleString('en-IN')+'\n*Status:* '+(b.paid?'✅ Fully Paid':'Balance pending')+'\n\nPDF downloaded — please attach it here. Thank you!';
+      const msg='Hi '+b.name+'! 🙏\n\nYour invoice from *Magizh Studio* is ready 📄\n\n*'+b.type+'* on '+dateStr+'\n*Total After Discount:* Rs.'+Math.max(0,total-disc).toLocaleString('en-IN')+'\n*Status:* '+(b.paid?'✅ Fully Paid':'Balance pending')+'\n\nPDF downloaded — please attach it here. Thank you!';
       window.open('https://wa.me/91'+phone+'?text='+encodeURIComponent(msg),'_blank');
       showToast('PDF saved! Attach it in WhatsApp.',5000);
     },800);
