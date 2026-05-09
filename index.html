@@ -907,7 +907,7 @@ function renderBookingList(){
   list.innerHTML=items.map(b=>{
     const dt=b.date===ts?'Today':new Date(b.date).toLocaleDateString('en-IN',{day:'numeric',month:'short',weekday:'short'});
     const reminderBtn=b.date===ts?'<button class="btn-reminder" onclick="event.stopPropagation();openModal(\''+b.id+'\')" style="background:#25D366;border:none;border-radius:6px;padding:4px 8px;font-size:10px;color:#fff;cursor:pointer;">Invoice</button>':'';
-    return '<div class="bitem" data-booking="'+b.id+'" onclick="openModal(this.dataset.booking)">'
+    return '<div class="bitem" data-booking="'+b.id+'" onclick="openModal(\''+b.id+'\')">'
       +'<div class="bitem-info">'
       +'<div class="bitem-name">'+b.name+'</div>'
       +'<div class="bitem-meta"><span style="color:var(--raja);font-weight:600;">'+dt+'</span> · '+b.slot+' · '+b.type+'</div>'
@@ -948,7 +948,7 @@ function renderUpcomingBookings(){
       weekday:'short'
     });
 
-    return '<div class="bitem" data-booking="'+b.id+'" onclick="openModal(this.dataset.booking)">'
+    return '<div class="bitem" data-booking="'+b.id+'" onclick="openModal(\''+b.id+'\')">'
       +'<div class="bitem-info">'
       +'<div class="bitem-name">'+b.name+'</div>'
       +'<div class="bitem-meta">'
@@ -966,59 +966,11 @@ function renderUpcomingBookings(){
 
 
 
-window.updateModalPayment=function(){
-  try{
-    if(!modalBookingId || !bookings[modalBookingId]) return;
-
-    const discountEl=document.getElementById('modal-discount-input');
-    const advanceEl=document.getElementById('modal-adv-input');
-    const balanceEl=document.getElementById('modal-balance');
-    const statusEl=document.getElementById('modal-status');
-
-    if(!discountEl || !advanceEl || !balanceEl || !statusEl){
-      return;
-    }
-
-    const b = bookings[modalBookingId];
-
-    const total = Number(b.total)||0;
-    const discount = Number(discountEl.value)||0;
-
-    let advance = Number(advanceEl.value)||0;
-
-    const finalAmount = Math.max(0,total-discount);
-
-    if(advance > finalAmount){
-      advance = finalAmount;
-      advanceEl.value = advance;
-    }
-
-    const balance = Math.max(0,finalAmount-advance);
-
-    b.discount = discount;
-    b.advance = advance;
-    b.balance = balance;
-    b.paid = balance===0;
-
-    balanceEl.textContent='₹'+balance.toLocaleString('en-IN');
-    statusEl.textContent=b.paid?'✅ Fully Paid':'Pending';
-
-    backupBookings();
-
-    if(typeof save === 'function'){
-      save();
-    }
-
-  }catch(err){
-    console.error('Modal payment update failed', err);
-  }
-}
 
 
 // ── MODAL ──
 
 window.openModal=function(id){
-  try{
 
   const b=bookings[id]; if(!b)return;
   modalBookingId=id;
@@ -1032,8 +984,8 @@ window.openModal=function(id){
   document.getElementById('modal-type').textContent=b.type;
   document.getElementById('modal-slot').textContent=b.slot;
   document.getElementById('modal-total').textContent='₹'+total.toLocaleString('en-IN');
-  document.getElementById('modal-discount-input').value=disc;
-  document.getElementById('modal-adv-input').value=Math.min(adv,total);
+  document.getElementById('modal-discount').textContent=disc>0?'₹'+disc.toLocaleString('en-IN'):'—';
+  document.getElementById('modal-adv').textContent='₹'+adv.toLocaleString('en-IN');
   document.getElementById('modal-balance').textContent='₹'+bal.toLocaleString('en-IN');
   document.getElementById('modal-status').textContent=b.paid?'✅ Fully Paid':adv>0?'Advance Paid':'Pending';
   document.getElementById('modal-pay-btn').style.display=b.paid?'none':'block';
@@ -1041,9 +993,6 @@ window.openModal=function(id){
   extendHrs=1;
   document.getElementById('extend-hrs').textContent=1;
   document.getElementById('payment-modal').classList.add('open');
-  }catch(err){
-    console.error('Modal open failed',err);
-  }
 };
 
 window.closeModal=function(){document.getElementById('payment-modal').classList.remove('open');};
