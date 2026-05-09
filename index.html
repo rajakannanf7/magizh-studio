@@ -12,7 +12,25 @@
 <title>Magizh Studio</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
-<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js">
+function openTeamBooking(details){
+  const msg = encodeURIComponent(
+`NEW BOOKING
+
+Client: ${details.client || '-'}
+Date: ${details.date || '-'}
+Slot: ${details.slot || '-'}
+Studio: ${details.studio || '-'}
+Shoot Type: ${details.shootType || '-'}
+Advance: Rs.${details.advance || 0}
+
+Please check booking dashboard.`
+  );
+
+  window.open('https://wa.me/?text=' + msg,'_blank');
+}
+
+</script>
 <style>
 *{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent;}
 :root{
@@ -565,7 +583,7 @@ onchange="updateDiscount()">
       <button class="btn-paid" id="modal-pay-btn" onclick="markFullPayment()">Mark Full Payment</button>
       <button class="btn-close-modal" onclick="closeModal()">Close</button>
     </div>
-    <button id="modal-invoice-btn" onclick="sendInvoicePDF()" style="display:none;width:100%;margin-top:10px;padding:13px;border-radius:var(--r);border:none;background:var(--keer);color:#fff;font-size:14px;font-weight:700;cursor:pointer;font-family:'Syne',sans-serif;">📄 Send Invoice to Client</button>
+    <button id="modal-invoice-btn" onclick="sendInvoicePDF()" style="display:none;width:100%;margin-top:10px;padding:13px;border-radius:var(--r);border:none;background:var(--keer);color:#fff;font-size:14px;font-weight:700;cursor:pointer;font-family:'Syne',sans-serif;">📄 Download PDF + Send Invoice</button>
     <div style="display:flex;gap:8px;margin-top:8px;">
       <button onclick="sendClientWhatsApp()" style="flex:1;padding:11px;border-radius:var(--r);border:none;background:#25D366;color:#fff;font-size:12px;font-weight:700;cursor:pointer;">📱 Details</button>
       <button onclick="sendReminderWhatsApp()" style="flex:1;padding:11px;border-radius:var(--r);border:none;background:#075E54;color:#fff;font-size:12px;font-weight:700;cursor:pointer;">🔔 Remind</button>
@@ -888,7 +906,7 @@ window.confirmBooking=async function(){
 
 function renderBookingList(){
   const list=document.getElementById('booking-list');
-  const studioLabel=selStudio==='photo'?'📸 Photography':'🎙️ Podcast';
+  const studioLabel=selStudio==='photo'?' Photography':'🎙️ Podcast';
   const lbl=document.getElementById('booking-list-label');
   const selectedDateLabel = selDate
     ? new Date(selDate).toLocaleDateString('en-IN',{day:'numeric',month:'short',weekday:'short'})
@@ -1094,14 +1112,14 @@ window.sendClientWhatsApp=function(){
   const b=bookings[modalBookingId];if(!b)return;
   const phone=cleanPhone(b.phone);
   const dateStr=new Date(b.date).toLocaleDateString('en-IN',{weekday:'long',day:'numeric',month:'long',year:'numeric'});
-  const msg='Hi '+b.name+'! 👋\n\nYour shoot at *Magizh Rental Photo Studio* is confirmed ✅\n\n📅 *Date:* '+dateStr+'\n⏰ *Slot:* '+b.slot+'\n📸 *Shoot type:* '+b.type+'\n💰 *Advance paid:* ₹'+Number(b.advance).toLocaleString('en-IN')+'\n\n📍 *Location:* '+STUDIO_LOC+'\n\nPlease arrive 10 minutes early!\n— Magizh Studio Team';
+  const msg='Hi '+b.name+'! 👋\n\nYour shoot at *Magizh Rental Photo Studio* is confirmed ✅\n\n📅 *Date:* '+dateStr+'\n⏰ *Slot:* '+b.slot+'\n *Shoot type:* '+b.type+'\n💰 *Advance paid: Rs.'+Math.min(Number(advance)||0,Number(total)||0).toLocaleString('en-IN')+'\n\n📍 *Location:* '+STUDIO_LOC+'\n\nPlease arrive 10 minutes early!\n— Magizh Studio Team';
   window.open('https://wa.me/91'+phone+'?text='+encodeURIComponent(msg),'_blank');
 };
 
 window.sendTeamWhatsApp=function(){
   const b=bookings[modalBookingId];if(!b)return;
   const dateStr=new Date(b.date).toLocaleDateString('en-IN',{weekday:'short',day:'numeric',month:'short'});
-  const msg='🆕 *New Booking — Magizh Studio*\n\n👤 '+b.name+'\n📞 '+b.phone+'\n📅 '+dateStr+'\n⏰ '+b.slot+'\n📸 '+b.type+'\n💰 Advance: ₹'+Number(b.advance).toLocaleString('en-IN')+'\n🏢 '+b.studioName+'\n🔖 Booked by: '+currentUser;
+  const msg='🆕 *New Booking — Magizh Studio*\n\n👤 '+b.name+'\n📞 '+b.phone+'\n📅 '+dateStr+'\n⏰ '+b.slot+'\n '+b.type+'\n💰 Advance: ₹'+Number(b.advance).toLocaleString('en-IN')+'\n🏢 '+b.studioName+'\n🔖 Booked by: '+currentUser;
   window.open('https://wa.me/919876543210?text='+encodeURIComponent(msg),'_blank');
 };
 
@@ -1109,7 +1127,7 @@ window.sendReminderWhatsApp=function(){
   const b=bookings[modalBookingId];if(!b)return;
   const phone=cleanPhone(b.phone);
   const dateStr=new Date(b.date).toLocaleDateString('en-IN',{weekday:'long',day:'numeric',month:'long'});
-  const msg='Hi '+b.name+'! 👋\n\nReminder for your shoot *tomorrow* at Magizh Studio 📸\n\n📅 *Date:* '+dateStr+'\n⏰ *Slot:* '+b.slot+'\n📍 *Location:* '+STUDIO_LOC+'\n\nPlease arrive 10 minutes early!\n— Magizh Studio';
+  const msg='Hi '+b.name+'! 👋\n\nReminder for your shoot *tomorrow* at Magizh Studio \n\n📅 *Date:* '+dateStr+'\n⏰ *Slot:* '+b.slot+'\n📍 *Location:* '+STUDIO_LOC+'\n\nPlease arrive 10 minutes early!\n— Magizh Studio';
   window.open('https://wa.me/91'+phone+'?text='+encodeURIComponent(msg),'_blank');
 };
 
