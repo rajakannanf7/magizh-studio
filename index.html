@@ -704,13 +704,8 @@ window.login=function(name,key){
   document.getElementById('login-screen').style.display='none';
   document.getElementById('main-screen').classList.add('active');
   ['b','s','a'].forEach(p=>{const el=document.getElementById(p+'-user-chip');if(el)el.textContent=name;});
-  if(key==='inba'){
-    document.getElementById('tab-shift').style.display='none';
-    document.getElementById('tab-annual').style.display='none';
-  }else{
-    document.getElementById('tab-shift').style.display='flex';
-    document.getElementById('tab-annual').style.display='flex';
-  }
+  document.getElementById('tab-shift').style.display='flex';
+  document.getElementById('tab-annual').style.display='flex';
   initDateStrip();
   renderShift();
   initFirebase();
@@ -1157,7 +1152,7 @@ window.sendInvoicePDF=function(){
     doc.setTextColor(100,100,100);doc.setFontSize(10);
     if(disc>0){doc.text('Discount',130,108);doc.setTextColor(153,27,27);doc.text('- Rs.'+disc.toLocaleString('en-IN'),190,108,{align:'right'});}
     doc.setTextColor(100,100,100);doc.text('Advance Paid',130,disc>0?116:108);
-    const pdfSafeAdv = adv > (total*2) ? Math.floor(adv/10) : adv;doc.setTextColor(26,122,74);doc.text('- Rs.'+pdfSafeAdv.toLocaleString('en-IN'),190,disc>0?116:108,{align:'right'});
+    const pdfSafeAdv = adv > (total*2) ? Math.floor(adv/10) : adv;doc.setTextColor(26,122,74);doc.text('- Rs.'+Math.min(Number(adv)||0, Number(total)||0).toLocaleString('en-IN'),190,disc>0?116:108,{align:'right'});
     const balY=disc>0?124:116;
     doc.setFillColor(b.paid?220:252,b.paid?252:235,b.paid?231:235);doc.rect(130,balY+2,65,14,'F');
     doc.setFont('helvetica','bold');doc.setFontSize(12);doc.setTextColor(b.paid?22:153,b.paid?101:45,b.paid?52:45);
