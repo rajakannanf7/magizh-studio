@@ -291,8 +291,21 @@ body{background:var(--bg);font-family:'Inter',sans-serif;font-size:14px;}
       </div>
 
       <div class="sec" id="slot-section" style="display:none;">
-        <div class="sec-lbl">Time slot · 9am – 9pm</div>
+        <div class="sec-lbl">Start time · 9am – 9pm</div>
         <div class="slot-grid" id="slot-grid"></div>
+      </div>
+
+      <div class="sec" id="dur-section" style="display:none;">
+        <div class="sec-lbl">Duration</div>
+        <div style="display:flex;align-items:center;gap:12px;background:var(--surface);border-radius:var(--r);padding:12px 14px;border:0.5px solid #e0dbd0;">
+          <button onclick="changeDur(-1)" style="width:36px;height:36px;border-radius:50%;border:0.5px solid #e0dbd0;background:var(--bg);font-size:20px;font-weight:700;cursor:pointer;">−</button>
+          <div style="flex:1;text-align:center;">
+            <div style="font-family:'Syne',sans-serif;font-size:24px;font-weight:800;color:var(--dark);" id="dur-display">2</div>
+            <div style="font-size:10px;color:var(--light);" id="dur-hrs-lbl">hours</div>
+          </div>
+          <button onclick="changeDur(1)" style="width:36px;height:36px;border-radius:50%;border:0.5px solid #e0dbd0;background:var(--bg);font-size:20px;font-weight:700;cursor:pointer;">+</button>
+        </div>
+        <div style="font-size:11px;color:var(--keer);text-align:center;margin-top:6px;font-weight:600;" id="slot-summary"></div>
       </div>
 
       <div class="sec" id="form-section" style="display:none;">
@@ -311,7 +324,17 @@ body{background:var(--bg);font-family:'Inter',sans-serif;font-size:14px;}
             <option>Other</option>
           </select>
         </div>
-        <div class="field"><div class="field-lbl">Advance paid (₹)</div><input id="f-adv" type="number" placeholder="0" min="0"></div>
+        <div class="sec-lbl" style="margin-top:10px;">Payment</div>
+        <div class="field"><div class="field-lbl">Total amount (₹)</div><input id="f-total" type="number" placeholder="Auto-calculated" min="0" readonly style="color:var(--mid);"></div>
+        <div class="field" style="display:flex;align-items:center;gap:10px;">
+          <div style="flex:1;"><div class="field-lbl">Discount (₹)</div><input id="f-discount" type="number" placeholder="0" min="0" oninput="recalcTotal()"></div>
+          <div style="flex:1;"><div class="field-lbl">After discount</div><div id="f-after-discount" style="font-size:14px;font-weight:600;color:var(--keer);padding-top:4px;">₹0</div></div>
+        </div>
+        <div class="field"><div class="field-lbl">Advance paid (₹)</div><input id="f-adv" type="number" placeholder="0" min="0" oninput="recalcBalance()"></div>
+        <div class="field" style="background:var(--surface2);">
+          <div class="field-lbl">Balance due (₹)</div>
+          <div id="f-balance" style="font-size:15px;font-weight:700;color:var(--raja);">₹0</div>
+        </div>
         <button class="btn-confirm" id="btn-confirm" onclick="confirmBooking()">Confirm Booking</button>
       </div>
 
@@ -436,7 +459,88 @@ const P=[{name:'Ari',role:'weekends + holidays',c:'a'},{name:'Raja',role:'work f
 const MONTHS=['January','February','March','April','May','June','July','August','September','October','November','December'];
 const MS=['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
 const DS=['Sun','Mon','Tue','Wed','Thu','Fri','Sat'];
-const SLOTS=['9–10am','10–11am','11am–12pm','12–1pm','1–2pm','2–3pm','3–4pm','4–5pm','5–6pm','6–7pm','7–8pm','8–9pm'];
+const HOUR_LABELS=['9am','10am','11am','12pm','1pm','2pm','3pm','4pm','5pm','6pm','7pm','8pm','9pm'];
+const HOURLY_RATE = 750;
+let selStartH = null;
+let selDur = 2;
+
+function formatSlot(start, dur){
+  return HOUR_LABELS[start-9]+' – '+HOUR_LABELS[start-9+dur]+' ('+dur+'hr'+(dur>1?'s':'')+')';
+}
+
+function slotOverlaps(existingSlots, startH, dur){
+  const newEnd = startH + dur;
+  return existingSlots.some(s=>{
+    if(!s) return false;
+    let eS, eE;
+    if(s.indexOf('|') !== -1){
+      const parts = s.split('|');
+      eS = parseInt(parts[0]);
+      eE = eS + parseInt(parts[1]);
+    } else {
+      const match = s.match(/(\d+)(am|pm)\s*[–-]\s*(\d+)(am|pm)/i);
+      if(!match) return false;
+      const h2n = (h,p) => {
+        h = parseInt(h); p = p.toLowerCase();
+        if(p==='am' && h===12) return 0;
+        if(p==='pm' && h!==12) return h+12;
+        return h;
+      };
+      eS = h2n(match[1], match[2]);
+      eE = h2n(match[3], match[4]);
+    }
+    if(isNaN(eS) || isNaN(eE)) return false;
+    return startH < eE && newEnd > eS;
+  });
+}
+
+function recalcTotal(){
+  if(selStartH === null) return;
+  const total = selDur * HOURLY_RATE;
+  const disc = parseFloat(document.getElementById('f-discount').value)||0;
+  const afterDisc = Math.max(0, total - disc);
+  document.getElementById('f-total').value = total;
+  document.getElementById('f-after-discount').textContent = '₹'+afterDisc.toLocaleString('en-IN');
+  recalcBalance();
+}
+
+function recalcBalance(){
+  const total = selDur * HOURLY_RATE;
+  const disc = parseFloat(document.getElementById('f-discount')?document.getElementById('f-discount').value:0)||0;
+  const afterDisc = Math.max(0, total - disc);
+  const adv = parseFloat(document.getElementById('f-adv').value)||0;
+  const bal = Math.max(0, afterDisc - adv);
+  const balEl = document.getElementById('f-balance');
+  if(balEl){
+    balEl.textContent = '₹'+bal.toLocaleString('en-IN');
+    balEl.style.color = bal > 0 ? 'var(--raja)' : 'var(--keer)';
+  }
+}
+
+window.changeDur = function(delta){
+  if(selStartH === null) return;
+  selDur = Math.max(1, Math.min(21-selStartH, selDur+delta));
+  updateDurDisplay();
+  renderSlots();
+};
+
+function updateDurDisplay(){
+  if(selStartH === null) return;
+  const endH = selStartH + selDur;
+  document.getElementById('dur-display').textContent = selDur;
+  document.getElementById('dur-hrs-lbl').textContent = selDur===1?'hour':'hours';
+  const dayBookings = Object.values(bookings).filter(b=>b.date===selDate&&(b.studio||'photo')===selStudio);
+  const bookedRaw = dayBookings.map(b=>b.slotRaw||b.slot);
+  const conflict = slotOverlaps(bookedRaw, selStartH, selDur);
+  const sumEl = document.getElementById('slot-summary');
+  if(sumEl){
+    sumEl.textContent = conflict
+      ? '⚠️ Conflicts with existing booking — adjust hours'
+      : `✓ ${HOUR_LABELS[selStartH-9]} to ${HOUR_LABELS[endH-9]} · ₹${(selDur*HOURLY_RATE).toLocaleString('en-IN')}`;
+    sumEl.style.color = conflict ? '#991b1b' : 'var(--keer)';
+  }
+  recalcTotal();
+}
 
 let db, currentUser='', currentUserKey='';
 let sync='off';
@@ -533,57 +637,88 @@ function initDateStrip(){
 }
 
 function selectDate(dateStr,el,silent=false){
-  selDate=dateStr; selSlot='';
+  selDate=dateStr; selStartH=null; selDur=2;
   document.querySelectorAll('.dc').forEach(d=>d.classList.remove('sel'));
   el.classList.add('sel');
   document.getElementById('slot-section').style.display='block';
+  document.getElementById('dur-section').style.display='none';
   document.getElementById('form-section').style.display='none';
   renderSlots();
   renderTodayBookings();
 }
 
 function renderSlots(){
-  const grid=document.getElementById('slot-grid');
-  const dayBookings=Object.values(bookings).filter(b=>b.date===selDate);
-  const bookedSlots=dayBookings.map(b=>b.slot);
-  grid.innerHTML=SLOTS.map(slot=>{
-    const isBooked=bookedSlots.includes(slot);
-    const isSel=selSlot===slot;
-    return`<div class="slot ${isBooked?'booked':isSel?'sel':'free'}" onclick="${isBooked?'':`selectSlot('${slot}')`}">
-      ${slot}
-    </div>`;
+  const grid = document.getElementById('slot-grid');
+  const dayBookings = Object.values(bookings).filter(b=>b.date===selDate&&(b.studio||'photo')===selStudio);
+  const bookedRaw = dayBookings.map(b=>b.slotRaw||b.slot);
+  grid.innerHTML = HOUR_LABELS.slice(0,-1).map((lbl,i)=>{
+    const h = 9+i;
+    const isBooked = dayBookings.some(b=>{
+      const parts=(b.slotRaw||'').split('|');
+      const bS=parseInt(parts[0]), bE=bS+parseInt(parts[1]||1);
+      return h>=bS && h<bE;
+    });
+    const isSel = selStartH===h;
+    const cls = isBooked?'booked':isSel?'sel':'free';
+    return `<div class="slot ${cls}" ${isBooked?'':`onclick="selectStart(${h})"`}>${lbl}</div>`;
   }).join('');
 }
 
-window.selectSlot=function(slot){
-  selSlot=slot;
+window.selectStart = function(h){
+  selStartH = h; selDur = 2;
+  document.getElementById('dur-section').style.display='block';
   document.getElementById('form-section').style.display='block';
+  if(document.getElementById('f-discount')) document.getElementById('f-discount').value='';
+  if(document.getElementById('f-adv')) document.getElementById('f-adv').value='';
+  updateDurDisplay();
   renderSlots();
 };
 
 window.confirmBooking=async function(){
-  const name=document.getElementById('f-name').value.trim();
-  const phone=document.getElementById('f-phone').value.trim();
-  const type=document.getElementById('f-type').value;
-  const adv=parseFloat(document.getElementById('f-adv').value)||0;
-  if(!name||!phone||!type||!selSlot){alert('Please fill all fields and select a time slot');return;}
-  const id='bk-'+Date.now();
-  bookings[id]={id,name,phone,type,date:selDate,slot:selSlot,advance:adv,paid:false,createdBy:currentUser,createdAt:Date.now()};
+  const name = document.getElementById('f-name').value.trim();
+  const phone = document.getElementById('f-phone').value.trim();
+  const type = document.getElementById('f-type').value;
+  const adv = parseFloat(document.getElementById('f-adv').value)||0;
+  const disc = parseFloat(document.getElementById('f-discount').value)||0;
+  if(!name||!phone||!type||!selStartH){ alert('Please fill all fields and select a start time'); return; }
+  // Check conflict one more time
+  const dayBookings = Object.values(bookings).filter(b=>b.date===selDate&&(b.studio||'photo')===selStudio);
+  const bookedRaw = dayBookings.map(b=>b.slotRaw||b.slot);
+  if(slotOverlaps(bookedRaw, selStartH, selDur)){ alert('This slot conflicts with an existing booking!'); return; }
+  const slotRaw = selStartH+'|'+selDur;
+  const slotLabel = formatSlot(selStartH, selDur);
+  const total = selDur * HOURLY_RATE;
+  const afterDisc = Math.max(0, total - disc);
+  const balance = Math.max(0, afterDisc - adv);
+  const studioName = selStudio==='photo' ? 'Photography Studio' : 'Podcast Studio';
+  const id = 'bk-'+Date.now();
+  bookings[id] = {id,name,phone,type,date:selDate,slot:slotLabel,slotRaw,studio:selStudio,studioName,total,discount:disc,advance:adv,balance,paid:false,createdBy:currentUser,createdAt:Date.now()};
   await save();
+  syncToSheets(bookings[id]);
+  // Reset form
   document.getElementById('f-name').value='';
   document.getElementById('f-phone').value='';
   document.getElementById('f-type').value='';
   document.getElementById('f-adv').value='';
-  selSlot='';
+  document.getElementById('f-discount').value='';
+  document.getElementById('f-balance').textContent='₹0';
+  document.getElementById('f-after-discount').textContent='₹0';
+  selStartH=null; selDur=2;
+  document.getElementById('dur-section').style.display='none';
   document.getElementById('form-section').style.display='none';
   renderSlots();
   renderTodayBookings();
+  showToast(name+' booked ✓ '+slotLabel, 3000);
 };
 
 function renderTodayBookings(){
   const list=document.getElementById('booking-list');
   const todayStr=selDate||today.toISOString().split('T')[0];
-  const dayBookings=Object.values(bookings).filter(b=>b.date===todayStr).sort((a,b)=>SLOTS.indexOf(a.slot)-SLOTS.indexOf(b.slot));
+  const dayBookings=Object.values(bookings).filter(b=>b.date===todayStr&&(b.studio||'photo')===selStudio).sort((a,b)=>{
+    const aS=parseInt((a.slotRaw||'0|2').split('|')[0]);
+    const bS=parseInt((b.slotRaw||'0|2').split('|')[0]);
+    return aS-bS;
+  });
   if(!dayBookings.length){list.innerHTML='<div class="bl-empty">No bookings for this day</div>';return;}
   list.innerHTML=dayBookings.map(b=>`<div class="bitem" onclick="openModal('${b.id}')">
     <div class="bitem-info"><div class="bitem-name">${b.name}</div><div class="bitem-meta">${b.slot} · ${b.type}</div></div>
@@ -598,9 +733,13 @@ window.openModal=function(id){
   document.getElementById('modal-client-name').textContent=b.name;
   document.getElementById('modal-meta').textContent=b.slot+' · '+new Date(b.date).toLocaleDateString('en-IN',{day:'numeric',month:'short'});
   document.getElementById('modal-type').textContent=b.type;
-  document.getElementById('modal-adv').textContent='₹'+b.advance.toLocaleString('en-IN');
-  document.getElementById('modal-balance').textContent=b.paid?'₹0 (Cleared)':'To be collected';
-  document.getElementById('modal-status').textContent=b.paid?'Fully Paid':b.advance>0?'Advance Paid':'Pending';
+  const bAdv = Number(b.advance)||0;
+  const bTotal = Number(b.total)||(b.slotRaw?parseInt(b.slotRaw.split('|')[1]||2)*750:0);
+  const bDisc = Number(b.discount)||0;
+  const bBal = b.paid ? 0 : Math.max(0,(bTotal-bDisc)-bAdv);
+  document.getElementById('modal-adv').textContent='₹'+bAdv.toLocaleString('en-IN')+(bDisc>0?' (Disc: ₹'+bDisc.toLocaleString('en-IN')+')':'');
+  document.getElementById('modal-balance').textContent=b.paid?'₹0 (Cleared)':'₹'+bBal.toLocaleString('en-IN');
+  document.getElementById('modal-status').textContent=b.paid?'Fully Paid':bAdv>0?'Advance Paid':'Pending';
   document.getElementById('modal-pay-btn').style.display=b.paid?'none':'block';
   const invBtn = document.getElementById('modal-invoice-btn');
   if(invBtn) invBtn.style.display = b.paid ? 'flex' : 'none';
