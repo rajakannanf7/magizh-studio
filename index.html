@@ -410,14 +410,16 @@ margin-top:4px;
       <div class="sec" style="margin-top:16px;">
         <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;">
           <div class="sec-lbl" style="margin-bottom:0;" id="booking-list-label">Today's Bookings</div>
-          <div style="display:flex;gap:6px;">
-            <button id="bf-today" onclick="setFilter('today')" style="font-size:10px;font-weight:600;padding:4px 10px;border-radius:20px;border:none;background:var(--raja);color:#fff;cursor:pointer;">Today</button>
-            <button id="bf-all" onclick="setFilter('all')" style="font-size:10px;font-weight:600;padding:4px 10px;border-radius:20px;border:0.5px solid #e0dbd0;background:transparent;color:var(--mid);cursor:pointer;">All</button>
-            <button id="bf-past" onclick="setFilter('past')" style="font-size:10px;font-weight:600;padding:4px 10px;border-radius:20px;border:0.5px solid #e0dbd0;background:transparent;color:var(--mid);cursor:pointer;">Past</button>
           </div>
-        </div>
       </div>
-      <div class="booking-list" id="booking-list"></div>
+      
+<div class="booking-list" id="booking-list"></div>
+
+<div class="sec" style="padding-top:8px;">
+  <div class="sec-lbl">Upcoming Bookings</div>
+</div>
+<div class="booking-list" id="upcoming-booking-list"></div>
+
     </div>
 
     <!-- SHIFT PAGE -->
@@ -662,6 +664,7 @@ function initFirebase(){
       setSyncStatus('live');
       renderSlots();
       renderBookingList();
+      renderUpcomingBookings();
       renderShift();
       if(adminUnlocked)renderAnnual();
     },err=>{console.error(err);setSyncStatus('err');});
@@ -881,26 +884,21 @@ window.confirmBooking=async function(){
 };
 
 // ── BOOKING LIST ──
-window.setFilter=function(f){
-  bookingFilter=f;
-  ['today','all','past'].forEach(k=>{
-    const btn=document.getElementById('bf-'+k);
-    if(!btn)return;
-    if(k===f){btn.style.background='var(--raja)';btn.style.color='#fff';btn.style.border='none';}
-    else{btn.style.background='transparent';btn.style.color='var(--mid)';btn.style.border='0.5px solid #e0dbd0';}
-  });
-  renderBookingList();
-};
+
 
 function renderBookingList(){
   const list=document.getElementById('booking-list');
   const studioLabel=selStudio==='photo'?'📸 Photography':'🎙️ Podcast';
   const lbl=document.getElementById('booking-list-label');
-  if(lbl)lbl.textContent=studioLabel+' · '+(bookingFilter==='today'?"Today's":bookingFilter==='past'?'Past':'All')+' Bookings';
+  const selectedDateLabel = selDate
+    ? new Date(selDate).toLocaleDateString('en-IN',{day:'numeric',month:'short',weekday:'short'})
+    : 'Selected Day';
+  if(lbl)lbl.textContent=studioLabel+' · '+selectedDateLabel+' Bookings';
   const ts=todayStr();
   let items=Object.values(bookings).filter(b=>(b.studio||'photo')===selStudio);
-  if(bookingFilter==='today')items=items.filter(b=>b.date===ts);
-  else if(bookingFilter==='past')items=items.filter(b=>b.date<ts);
+  if(selDate){
+    items=items.filter(b=>b.date===selDate);
+  }
   items.sort((a,b)=>{
     if(a.date!==b.date)return bookingFilter==='past'?b.date.localeCompare(a.date):a.date.localeCompare(b.date);
     return parseInt((a.slotRaw||'0|1').split('|')[0])-parseInt((b.slotRaw||'0|1').split('|')[0]);
@@ -922,7 +920,52 @@ function renderBookingList(){
   }).join('');
 }
 
+
+function renderUpcomingBookings(){
+  const list=document.getElementById('upcoming-booking-list');
+  if(!list)return;
+
+  const ts=todayStr();
+
+  let items=Object.values(bookings)
+    .filter(b=>b.date>=ts)
+    .sort((a,b)=>{
+      if(a.date!==b.date)return a.date.localeCompare(b.date);
+      return parseInt((a.slotRaw||'0|1').split('|')[0])-
+             parseInt((b.slotRaw||'0|1').split('|')[0]);
+    })
+    .slice(0,5);
+
+  if(!items.length){
+    list.innerHTML='<div class="bl-empty">No upcoming bookings</div>';
+    return;
+  }
+
+  list.innerHTML=items.map(b=>{
+    const dt=new Date(b.date).toLocaleDateString('en-IN',{
+      day:'numeric',
+      month:'short',
+      weekday:'short'
+    });
+
+    return '<div class="bitem" onclick="openModal(\''+b.id+'\')">'
+      +'<div class="bitem-info">'
+      +'<div class="bitem-name">'+b.name+'</div>'
+      +'<div class="bitem-meta">'
+      +dt+' · '+b.slot+' · '+b.type
+      +'</div>'
+      +'</div>'
+      +'<span class="badge '
+      +(b.paid?'badge-paid':b.advance>0?'badge-adv':'badge-pend')
+      +'">'
+      +(b.paid?'Paid':b.advance>0?'Advance':'Pending')
+      +'</span>'
+      +'</div>';
+  }).join('');
+}
+
 // ── MODAL ──
+
 window.openModal=function(id){
   const b=bookings[id]; if(!b)return;
   modalBookingId=id;
