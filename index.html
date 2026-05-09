@@ -1211,8 +1211,8 @@ window.sendInvoicePDF=async function(){
     const total=Number(b.total)||(dur*HOURLY_RATE);
     const disc=getLiveDiscount();
     b.discount=disc;bookings[modalBookingId].discount=disc;
-    const adv=Math.min(Number(b.advance)||0,total);
     const afterDisc=Math.max(0,total-disc);
+    const adv=Math.min(Number(b.advance)||0,afterDisc);
     const bal=b.paid?0:Math.max(0,afterDisc-adv);
     const invNo='MZ-'+b.id.slice(-6).toUpperCase();
     const dateStr=new Date(b.date).toLocaleDateString('en-IN',{day:'numeric',month:'long',year:'numeric'});
@@ -1288,7 +1288,7 @@ window.sendInvoicePDF=async function(){
     doc.setFont('helvetica','bold');doc.setFontSize(12);
     doc.setTextColor(...textColor);
     doc.text(b.paid?'FULLY PAID':'BALANCE DUE',133,rowY+9);
-    doc.text('Rs.'+bal.toLocaleString('en-IN'),190,rowY+9,{align:'right'});
+    doc.text('Rs.'+(b.paid?afterDisc:bal).toLocaleString('en-IN'),190,rowY+9,{align:'right'});
 
     // ── Footer ──
     doc.setFont('helvetica','italic');doc.setFontSize(11);doc.setTextColor(80,80,80);
