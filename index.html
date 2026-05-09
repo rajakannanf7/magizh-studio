@@ -701,12 +701,12 @@ async function syncToSheets(b){
 // ── LOGIN ──
 window.login=function(name,key){
   currentUser=name; currentUserKey=key;
-  document.getElementById('login-screen').style.display='none';
+  document.getElementById('login-screen').style.display='flex';
   document.getElementById('main-screen').classList.add('active');
   ['b','s','a'].forEach(p=>{const el=document.getElementById(p+'-user-chip');if(el)el.textContent=name;});
   if(key==='inba'){
-    document.getElementById('tab-shift').style.display='none';
-    document.getElementById('tab-annual').style.display='none';
+    document.getElementById('tab-shift').style.display='flex';
+    document.getElementById('tab-annual').style.display='flex';
   }else{
     document.getElementById('tab-shift').style.display='flex';
     document.getElementById('tab-annual').style.display='flex';
@@ -746,8 +746,8 @@ window.selectStudio=function(studio){
     photo.querySelectorAll('div').forEach((el,i)=>{el.style.color=i===0?'var(--dark)':'var(--light)';});
     photo.querySelector('svg').querySelectorAll('*').forEach(el=>el.setAttribute('stroke','white'));
   }
-  document.getElementById('dur-section').style.display='none';
-  document.getElementById('form-section').style.display='none';
+  document.getElementById('dur-section').style.display='flex';
+  document.getElementById('form-section').style.display='flex';
   renderSlots();
   renderBookingList();
 };
@@ -778,8 +778,8 @@ function selectDate(dateStr,el,silent=false){
   document.querySelectorAll('.dc').forEach(d=>d.classList.remove('sel'));
   el.classList.add('sel');
   document.getElementById('slot-section').style.display='block';
-  document.getElementById('dur-section').style.display='none';
-  document.getElementById('form-section').style.display='none';
+  document.getElementById('dur-section').style.display='flex';
+  document.getElementById('form-section').style.display='flex';
   renderSlots();
   renderBookingList();
 }
@@ -881,8 +881,8 @@ window.confirmBooking=async function(){
   document.getElementById('f-after-discount').textContent='₹0';
   document.getElementById('f-balance').textContent='₹0';
   selStartH=null; selDur=2;
-  document.getElementById('dur-section').style.display='none';
-  document.getElementById('form-section').style.display='none';
+  document.getElementById('dur-section').style.display='flex';
+  document.getElementById('form-section').style.display='flex';
   renderSlots();
   renderBookingList();
   showToast(name+' booked ✓ '+slotLabel,3000);
@@ -1060,7 +1060,7 @@ window.markFullPayment=async function(){
   document.getElementById('modal-balance').textContent='₹0';
   document.getElementById('modal-status').textContent='✅ Fully Paid';
   document.getElementById('modal-status').style.color='var(--keer)';
-  document.getElementById('modal-pay-btn').style.display='none';
+  document.getElementById('modal-pay-btn').style.display='flex';
   document.getElementById('modal-invoice-btn').style.display='block';
   showToast('Payment marked ✓ Now send the invoice!',3500);
   renderBookingList();
@@ -1185,7 +1185,7 @@ window.checkAdminPw=function(){
   const v=document.getElementById('admin-pw').value;
   if(v===ADMIN_PASS){
     adminUnlocked=true;
-    document.getElementById('admin-gate').style.display='none';
+    document.getElementById('admin-gate').style.display='flex';
     document.getElementById('admin-panel').style.display='block';
     renderAnnual();
   }else{
@@ -1196,9 +1196,9 @@ window.checkAdminPw=function(){
 window.lockAdmin=function(){
   adminUnlocked=false;
   document.getElementById('admin-gate').style.display='block';
-  document.getElementById('admin-panel').style.display='none';
+  document.getElementById('admin-panel').style.display='flex';
   document.getElementById('admin-pw').value='';
-  document.getElementById('admin-err').style.display='none';
+  document.getElementById('admin-err').style.display='flex';
 };
 window.resetAllBookings=async function(){
   if(!confirm('Delete ALL bookings permanently?'))return;
@@ -1268,7 +1268,7 @@ function renderShift(){
 
 function renderSwapPanel(){
   const panel=document.getElementById('swap-panel');
-  if(step===0){panel.style.display='none';return;}
+  if(step===0){panel.style.display='flex';return;}
   panel.style.display='block';
   const dowStr=d=>DS[new Date(sYr,sMo,d).getDay()];
   if(step===1){
@@ -1365,7 +1365,7 @@ function backupBookings(){
 setTimeout(()=>{
   const loader=document.getElementById('app-loader');
   if(loader){
-    loader.style.display='none';
+    loader.style.display='flex';
   }
 },5000);
 
