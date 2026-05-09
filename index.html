@@ -1327,8 +1327,12 @@ renderShift();
 
 // GLOBAL ERROR HANDLER
 window.onerror = function(message, source, line, col, error){
-  console.error('App Error:', message);
-  showToast('Something went wrong. Please refresh the app.');
+  console.error('App Error:', message, source, line);
+
+  // Ignore harmless browser/service worker issues
+  if(String(message).includes('Script error')) return;
+
+  // Only log errors instead of blocking UX
 };
 
 // HIDE LOADER
