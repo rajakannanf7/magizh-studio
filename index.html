@@ -658,7 +658,8 @@ const today=new Date();
 const isMuh=(y,m,d)=>{ if(y!==2026)return false; const l=MUHURTHAM[m+1]; return l?l.includes(d):false; };
 const isGov=(y,m,d)=>{ if(y!==2026)return false; const l=GOVT[m+1]; return l?l.includes(d):false; };
 const mk=()=>sYr+'-'+String(sMo).padStart(2,'0');
-const todayStr=()=>today.toISOString().split('T')[0];
+function localDateStr(d){ return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0'); }
+const todayStr=()=>localDateStr(today);
 
 function showToast(msg,dur=3000){
   const t=document.getElementById('toast');
@@ -811,7 +812,7 @@ function initDateStrip(){
   let todayEl=null;
   for(let i=-30;i<60;i++){
     const d=new Date();d.setDate(d.getDate()+i);
-    const ds=d.toISOString().split('T')[0];
+    const ds=localDateStr(d);
     const div=document.createElement('div');
     div.className='dc'+(ds===ts?' sel':'');
     if(i<0)div.style.opacity='0.55';
