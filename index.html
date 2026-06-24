@@ -98,9 +98,11 @@ body{background:var(--bg);font-family:'Inter',sans-serif;font-size:14px;}
 .dc.sel{background:var(--raja);color:#fff;}
 .dc.has-booking{border-color:var(--raja);}
 .dc-day{font-size:9px;font-weight:500;color:var(--light);margin-top:1px;}
+.pod-opt{flex:1;padding:10px 6px;border-radius:var(--r);border:2px solid #e0dbd0;background:var(--surface);font-size:12px;font-weight:700;font-family:'Syne',sans-serif;cursor:pointer;text-align:center;color:var(--dark);transition:all .15s;}
+.pod-opt.sel{background:var(--ari);border-color:var(--ari);color:#fff;}
 .dc.sel .dc-day{color:rgba(255,255,255,.7);}
 
-.slot-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:6px;}
+.slot-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:6px;}
 .slot{border-radius:10px;padding:10px 4px;text-align:center;font-size:12px;font-weight:600;cursor:pointer;transition:all .15s;border:0.5px solid #e0dbd0;}
 .slot:active{transform:scale(.93);}
 .slot.free{background:var(--surface);color:var(--dark);}
@@ -364,7 +366,7 @@ margin-top:4px;
 
       <!-- Slot grid -->
       <div class="sec" id="slot-section" style="display:none;">
-        <div class="sec-lbl">Start Time · 9am – 9pm</div>
+        <div class="sec-lbl">Start Time · 7am – 11pm</div>
         <div class="slot-grid" id="slot-grid"></div>
       </div>
 
@@ -387,6 +389,7 @@ margin-top:4px;
         <div class="sec-lbl">Client Details</div>
         <div class="field"><div class="field-lbl">Client name</div><input id="f-name" type="text" placeholder="Full name"></div>
         <div class="field"><div class="field-lbl">Contact number</div><input id="f-phone" type="tel" placeholder="+91 00000 00000"></div>
+        <div class="field"><div class="field-lbl">Notes</div><textarea id="f-notes" placeholder="Any special requests or notes..." rows="2" style="width:100%;border:1px solid #e0dbd0;border-radius:8px;padding:10px;font-family:'Inter',sans-serif;font-size:13px;resize:vertical;"></textarea></div>
         <div class="field"><div class="field-lbl">Shoot type</div>
           <select id="f-type">
             <option value="">Select type</option>
@@ -399,9 +402,18 @@ margin-top:4px;
             <option>Other</option>
           </select>
         </div>
+        <!-- Podcast setup selector -->
+        <div class="field" id="pod-setup-field" style="display:none;">
+          <div class="field-lbl">Podcast Setup</div>
+          <div style="display:flex;gap:6px;" id="pod-setup-btns">
+            <button type="button" class="pod-opt sel" data-val="space" onclick="selectPodSetup('space')">Space Only<br><span style="font-size:10px;opacity:.7;">₹750/hr</span></button>
+            <button type="button" class="pod-opt" data-val="single_cam" onclick="selectPodSetup('single_cam')">Single Cam<br><span style="font-size:10px;opacity:.7;">₹1,000/hr</span></button>
+            <button type="button" class="pod-opt" data-val="dual_cam" onclick="selectPodSetup('dual_cam')">Dual Cam<br><span style="font-size:10px;opacity:.7;">₹1,500/hr</span></button>
+          </div>
+        </div>
         <div class="sec-lbl" style="margin-top:12px;">Payment</div>
         <div class="field" style="background:#f9f6f0;">
-          <div class="field-lbl">Total (₹750/hr)</div>
+          <div class="field-lbl" id="f-total-label">Total (₹750/hr)</div>
           <div style="font-family:'Syne',sans-serif;font-size:20px;font-weight:800;color:var(--dark);" id="f-total-display">₹0</div>
         </div>
         <div class="field">
@@ -560,9 +572,19 @@ margin-top:4px;
 style="width:90px;padding:6px 10px;border:1px solid #ddd;border-radius:8px;text-align:right;font-weight:600;"
 onchange="updateDiscount()">
 </div>
-    <div class="modal-row"><span class="modal-row-label">Advance paid</span><span class="modal-row-val" id="modal-adv"></span></div>
+    <div class="modal-row"><span class="modal-row-label">Advance paid</span><input id="modal-adv" type="number" min="0" style="width:90px;padding:6px 10px;border:1px solid #ddd;border-radius:8px;text-align:right;font-weight:600;" onchange="updateAdvance()"></div>
     <div class="modal-row"><span class="modal-row-label">Balance due</span><span class="modal-row-val" id="modal-balance"></span></div>
     <div class="modal-row"><span class="modal-row-label">Status</span><span class="modal-row-val" id="modal-status"></span></div>
+    <div class="modal-row" id="modal-notes-row" style="display:none;flex-direction:column;gap:4px;"><span class="modal-row-label">Notes</span><div id="modal-notes" style="font-size:12px;color:var(--mid);white-space:pre-wrap;"></div></div>
+    <!-- Reschedule section -->
+    <div id="reschedule-section" style="padding:12px 0 0;">
+      <div class="sec-lbl">Reschedule Start Time</div>
+      <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;">
+        <select id="reschedule-hour" style="flex:1;padding:10px;border:1px solid #e0dbd0;border-radius:8px;font-size:13px;font-weight:600;background:#fff;">
+        </select>
+        <button onclick="applyReschedule()" style="padding:10px 16px;border-radius:var(--r);border:none;background:var(--ari);color:#fff;font-size:12px;font-weight:700;cursor:pointer;font-family:'Syne',sans-serif;">Reschedule</button>
+      </div>
+    </div>
     <!-- Extend section -->
     <div id="extend-section" style="padding:12px 0 0;">
       <div class="sec-lbl">Edit Duration</div>
@@ -613,7 +635,7 @@ const P=[{name:'Ari',role:'weekends + holidays',c:'a'},{name:'Raja',role:'work f
 const MONTHS=['January','February','March','April','May','June','July','August','September','October','November','December'];
 const MS=['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
 const DS=['Sun','Mon','Tue','Wed','Thu','Fri','Sat'];
-const HOUR_LABELS=['9am','10am','11am','12pm','1pm','2pm','3pm','4pm','5pm','6pm','7pm','8pm','9pm'];
+const HOUR_LABELS=['7am','8am','9am','10am','11am','12pm','1pm','2pm','3pm','4pm','5pm','6pm','7pm','8pm','9pm','10pm','11pm'];
 
 // ── STATE ──
 let db, currentUser='', currentUserKey='';
@@ -627,6 +649,9 @@ let modalBookingId=null;
 let extendHrs=1;
 let adminUnlocked=false;
 let bookingFilter='today';
+let podSetup='space'; // space | single_cam | dual_cam
+const POD_RATES={space:750,single_cam:1000,dual_cam:1500};
+function getHourlyRate(){ return selStudio==='pod'?POD_RATES[podSetup]:HOURLY_RATE; }
 const today=new Date();
 
 // ── HELPERS ──
@@ -644,7 +669,7 @@ function showToast(msg,dur=3000){
 }
 
 function formatSlot(start,dur){
-  return HOUR_LABELS[start-9]+' – '+HOUR_LABELS[start-9+dur]+' ('+dur+'hr'+(dur>1?'s':'')+')';
+  return HOUR_LABELS[start-7]+' – '+HOUR_LABELS[start-7+dur]+' ('+dur+'hr'+(dur>1?'s':'')+')';
 }
 
 function slotOverlaps(existingRaw,startH,dur){
@@ -761,8 +786,21 @@ window.selectStudio=function(studio){
   }
   document.getElementById('dur-section').style.display='none';
   document.getElementById('form-section').style.display='none';
+  const podField=document.getElementById('pod-setup-field');
+  if(podField)podField.style.display=studio==='pod'?'block':'none';
+  const totalLabel=document.getElementById('f-total-label');
+  if(totalLabel)totalLabel.textContent='Total (₹'+getHourlyRate().toLocaleString('en-IN')+'/hr)';
   renderSlots();
   renderBookingList();
+};
+
+window.selectPodSetup=function(val){
+  podSetup=val;
+  document.querySelectorAll('.pod-opt').forEach(b=>{b.classList.toggle('sel',b.dataset.val===val);});
+  const totalLabel=document.getElementById('f-total-label');
+  if(totalLabel)totalLabel.textContent='Total (₹'+getHourlyRate().toLocaleString('en-IN')+'/hr)';
+  updateDurDisplay();
+  recalcPayment();
 };
 
 // ── DATE STRIP ──
@@ -803,7 +841,7 @@ function renderSlots(){
   if(!grid)return;
   const dayBookings=Object.values(bookings).filter(b=>b.date===selDate&&(b.studio||'photo')===selStudio);
   grid.innerHTML=HOUR_LABELS.slice(0,-1).map((lbl,i)=>{
-    const h=9+i;
+    const h=7+i;
     const isBooked=dayBookings.some(b=>{
       const p=(b.slotRaw||'').split('|');
       const bS=parseInt(p[0]),bD=parseInt(p[1]||1);
@@ -819,6 +857,10 @@ window.selectStart=function(h){
   selStartH=h; selDur=2;
   document.getElementById('dur-section').style.display='block';
   document.getElementById('form-section').style.display='block';
+  const podField=document.getElementById('pod-setup-field');
+  if(podField)podField.style.display=selStudio==='pod'?'block':'none';
+  const totalLabel=document.getElementById('f-total-label');
+  if(totalLabel)totalLabel.textContent='Total (₹'+getHourlyRate().toLocaleString('en-IN')+'/hr)';
   if(document.getElementById('f-discount'))document.getElementById('f-discount').value='';
   if(document.getElementById('f-adv'))document.getElementById('f-adv').value='';
   updateDurDisplay();
@@ -828,7 +870,7 @@ window.selectStart=function(h){
 
 window.changeDur=function(delta){
   if(selStartH===null)return;
-  selDur=Math.max(1,Math.min(21-selStartH,selDur+delta));
+  selDur=Math.max(1,Math.min(23-selStartH,selDur+delta));
   updateDurDisplay();
   renderSlots();
   recalcPayment();
@@ -846,14 +888,14 @@ function updateDurDisplay(){
   if(sumEl){
     sumEl.textContent=conflict
       ?'⚠️ Conflicts with existing booking — adjust hours'
-      :'✓ '+HOUR_LABELS[selStartH-9]+' to '+HOUR_LABELS[endH-9]+' · ₹'+(selDur*HOURLY_RATE).toLocaleString('en-IN');
+      :'✓ '+HOUR_LABELS[selStartH-7]+' to '+HOUR_LABELS[endH-7]+' · ₹'+(selDur*getHourlyRate()).toLocaleString('en-IN');
     sumEl.style.color=conflict?'#991b1b':'var(--keer)';
   }
 }
 
 window.recalcPayment=function(){
   if(selStartH===null)return;
-  const total=selDur*HOURLY_RATE;
+  const total=selDur*getHourlyRate();
   const disc=parseFloat(document.getElementById('f-discount').value)||0;
   const afterDisc=Math.max(0,total-disc);
   const adv=parseFloat(document.getElementById('f-adv').value)||0;
@@ -875,13 +917,15 @@ window.confirmBooking=async function(){
   if(slotOverlaps(bookedRaw,selStartH,selDur)){showToast('Slot conflicts with existing booking!');return;}
   const slotRaw=selStartH+'|'+selDur;
   const slotLabel=formatSlot(selStartH,selDur);
-  const total=selDur*HOURLY_RATE;
+  const rate=getHourlyRate();
+  const total=selDur*rate;
   const disc=parseFloat(document.getElementById('f-discount').value)||0;
   const adv=parseFloat(document.getElementById('f-adv').value)||0;
   const balance=Math.max(0,total-disc-adv);
   const studioName=selStudio==='photo'?'Photography Studio':'Podcast Studio';
+  const notes=(document.getElementById('f-notes')?document.getElementById('f-notes').value:'').trim();
   const id='bk-'+Date.now();
-  bookings[id]={id,name,phone,type,date:selDate,slot:slotLabel,slotRaw,studio:selStudio,studioName,total,discount:disc,advance:adv,balance,paid:false,createdBy:currentUser,createdAt:Date.now()};
+  bookings[id]={id,name,phone,type,date:selDate,slot:slotLabel,slotRaw,studio:selStudio,studioName,total,discount:disc,advance:adv,balance,paid:false,createdBy:currentUser,createdAt:Date.now(),notes,hourlyRate:rate,podSetup:selStudio==='pod'?podSetup:null};
   backupBookings();
   await save();
   syncToSheets(bookings[id]);
@@ -890,6 +934,7 @@ window.confirmBooking=async function(){
   document.getElementById('f-type').value='';
   document.getElementById('f-discount').value='';
   document.getElementById('f-adv').value='';
+  if(document.getElementById('f-notes'))document.getElementById('f-notes').value='';
   document.getElementById('f-total-display').textContent='₹0';
   document.getElementById('f-after-discount').textContent='₹0';
   document.getElementById('f-balance').textContent='₹0';
@@ -928,7 +973,7 @@ function renderBookingList(){
     return '<div class="bitem" data-booking="'+b.id+'" onclick="openModal(\''+b.id+'\')">'
       +'<div class="bitem-info">'
       +'<div class="bitem-name">'+b.name+'</div>'
-      +'<div class="bitem-meta"><span style="color:var(--raja);font-weight:600;">'+dt+'</span> · '+b.slot+' · '+b.type+'</div>'
+      +'<div class="bitem-meta"><span style="color:var(--raja);font-weight:600;">'+dt+'</span> · '+b.slot+' · '+b.type+(b.notes?' · 📝':'')+'</div>'
       +'</div>'
       +'<div style="display:flex;align-items:center;gap:6px;">'
       +reminderBtn
@@ -970,7 +1015,7 @@ function renderUpcomingBookings(){
       +'<div class="bitem-info">'
       +'<div class="bitem-name">'+b.name+'</div>'
       +'<div class="bitem-meta">'
-      +dt+' · '+b.slot+' · '+b.type
+      +dt+' · '+b.slot+' · '+b.type+(b.notes?' · 📝':'')
       +'</div>'
       +'</div>'
       +'<span class="badge '
@@ -999,12 +1044,14 @@ window.updateDiscount=function(){
 
     const discount = Number(discountInput.value)||0;
     const total = Number(b.total)||0;
-    const advance = Number(b.advance)||0;
+    const advInput = document.getElementById('modal-adv');
+    const advance = advInput?Number(advInput.value)||0:Number(b.advance)||0;
 
     const finalAmount = Math.max(0,total-discount);
     const balance = Math.max(0,finalAmount-advance);
 
     b.discount = discount;
+    b.advance = advance;
     b.finalAmount = finalAmount;
     b.balance = balance;
     b.paid = balance<=0;
@@ -1030,6 +1077,56 @@ window.updateDiscount=function(){
   }
 }
 
+window.updateAdvance=function(){
+  try{
+    if(!modalBookingId || !bookings[modalBookingId]) return;
+    const b = bookings[modalBookingId];
+    const advInput = document.getElementById('modal-adv');
+    if(!advInput) return;
+    const advance = Number(advInput.value)||0;
+    const total = Number(b.total)||0;
+    const discount = Number(b.discount)||0;
+    const balance = Math.max(0,total-discount-advance);
+    b.advance = advance;
+    b.balance = balance;
+    b.paid = balance<=0;
+    const balEl=document.getElementById('modal-balance');
+    if(balEl) balEl.textContent='₹'+balance.toLocaleString('en-IN');
+    const statusEl=document.getElementById('modal-status');
+    if(statusEl) statusEl.textContent=b.paid?'✅ Fully Paid':advance>0?'Advance Paid':'Pending';
+    const payBtn=document.getElementById('modal-pay-btn');
+    if(payBtn) payBtn.style.display=b.paid?'none':'block';
+    const invBtn=document.getElementById('modal-invoice-btn');
+    if(invBtn) invBtn.style.display=b.paid?'block':'none';
+    backupBookings();
+    if(typeof save==='function') save();
+    renderBookingList();
+  }catch(err){
+    console.error('Advance update failed',err);
+  }
+}
+
+window.applyReschedule=async function(){
+  if(!modalBookingId)return;
+  const b=bookings[modalBookingId];if(!b)return;
+  const newStart=parseInt(document.getElementById('reschedule-hour').value);
+  const parts=(b.slotRaw||'9|2').split('|');
+  const oldStart=parseInt(parts[0]),dur=parseInt(parts[1]||1);
+  if(newStart===oldStart){showToast('Same time selected');return;}
+  if(newStart+dur>23){showToast('Booking would go past 11pm!');return;}
+  const dayBookings=Object.values(bookings).filter(bk=>bk.date===b.date&&(bk.studio||'photo')===(b.studio||'photo')&&bk.id!==b.id);
+  if(slotOverlaps(dayBookings.map(bk=>bk.slotRaw||''),newStart,dur)){showToast('Conflicts with another booking!');return;}
+  b.slotRaw=newStart+'|'+dur;
+  b.slot=formatSlot(newStart,dur);
+  backupBookings();
+  await save();
+  syncToSheets(b);
+  document.getElementById('modal-slot').textContent=b.slot;
+  showToast('Rescheduled to '+b.slot+' ✓');
+  renderBookingList();
+  renderSlots();
+}
+
 
 
 // ── MODAL ──
@@ -1050,11 +1147,23 @@ window.openModal=function(id){
   document.getElementById('modal-total').textContent='₹'+total.toLocaleString('en-IN');
   document.getElementById('modal-discount-input').value=disc||0;
   const safeAdv = Math.min(adv, total);
-  document.getElementById('modal-adv').textContent='₹'+Number(safeAdv).toLocaleString('en-IN');
+  document.getElementById('modal-adv').value=safeAdv||0;
   document.getElementById('modal-balance').textContent='₹'+bal.toLocaleString('en-IN');
   document.getElementById('modal-status').textContent=b.paid?'✅ Fully Paid':adv>0?'Advance Paid':'Pending';
   document.getElementById('modal-pay-btn').style.display=b.paid?'none':'block';
   document.getElementById('modal-invoice-btn').style.display=b.paid?'block':'none';
+  // Notes
+  const notesRow=document.getElementById('modal-notes-row');
+  const notesEl=document.getElementById('modal-notes');
+  if(b.notes){notesRow.style.display='flex';notesEl.textContent=b.notes;}else{notesRow.style.display='none';}
+  // Reschedule dropdown
+  const rescheduleSelect=document.getElementById('reschedule-hour');
+  const parts=(b.slotRaw||'9|2').split('|');
+  const curStart=parseInt(parts[0]),curDur=parseInt(parts[1]||1);
+  rescheduleSelect.innerHTML=HOUR_LABELS.slice(0,-1).map((_,i)=>{
+    const h=7+i;
+    return '<option value="'+h+'"'+(h===curStart?' selected':'')+'>'+HOUR_LABELS[i]+'</option>';
+  }).join('');
   extendHrs=1;
   document.getElementById('extend-hrs').textContent=1;
   document.getElementById('payment-modal').classList.add('open');
@@ -1087,21 +1196,22 @@ window.applyExtension=async function(isAdd){
   const parts=(b.slotRaw||'9|2').split('|');
   const startH=parseInt(parts[0]),oldDur=parseInt(parts[1]);
   const newDur=isAdd?oldDur+extendHrs:Math.max(1,oldDur-extendHrs);
-  if(startH+newDur>21){showToast('Cannot go past 9pm!');return;}
+  if(startH+newDur>23){showToast('Cannot go past 11pm!');return;}
   if(isAdd){
     const dayBookings=Object.values(bookings).filter(bk=>bk.date===b.date&&(bk.studio||'photo')===(b.studio||'photo')&&bk.id!==b.id);
     if(slotOverlaps(dayBookings.map(bk=>bk.slotRaw||''),startH+oldDur,extendHrs)){showToast('Conflicts with another booking!');return;}
   }
   bookings[modalBookingId].slotRaw=startH+'|'+newDur;
   bookings[modalBookingId].slot=formatSlot(startH,newDur);
-  bookings[modalBookingId].total=newDur*HOURLY_RATE;
+  const bRate=Number(b.hourlyRate)||HOURLY_RATE;
+  bookings[modalBookingId].total=newDur*bRate;
   const adv=Number(b.advance)||0,disc=Number(b.discount)||0;
-  bookings[modalBookingId].balance=b.paid?0:Math.max(0,newDur*HOURLY_RATE-disc-adv);
+  bookings[modalBookingId].balance=b.paid?0:Math.max(0,newDur*bRate-disc-adv);
   backupBookings();
   await save();
   syncToSheets(bookings[modalBookingId]);
   document.getElementById('modal-slot').textContent=bookings[modalBookingId].slot;
-  document.getElementById('modal-total').textContent='₹'+(newDur*HOURLY_RATE).toLocaleString('en-IN');
+  document.getElementById('modal-total').textContent='₹'+(newDur*bRate).toLocaleString('en-IN');
   showToast((isAdd?'Extended':'Reduced')+' to '+bookings[modalBookingId].slot+' ✓',3000);
   renderBookingList();
   renderSlots();
@@ -1131,6 +1241,7 @@ window.sendClientWhatsApp=function(){
   msg+='📅 *Date:* '+dateStr+'\n';
   msg+='⏰ *Slot:* '+b.slot+'\n';
   msg+='📸 *Shoot type:* '+b.type+'\n\n';
+  if(b.notes)msg+='📝 *Notes:* '+b.notes+'\n\n';
   msg+='💵 *Total:* ₹'+total.toLocaleString('en-IN')+'\n';
   if(disc>0){msg+='🏷️ *Discount:* - ₹'+disc.toLocaleString('en-IN')+'\n';}
   if(disc>0){msg+='✅ *After discount:* ₹'+afterDisc.toLocaleString('en-IN')+'\n';}
@@ -1158,6 +1269,7 @@ window.sendTeamWhatsApp=function(){
   msg+='⏰ *Slot:* '+b.slot+'\n';
   msg+='📸 *Shoot type:* '+b.type+'\n';
   msg+='🏢 *Studio:* '+(b.studioName||'Photography Studio')+'\n\n';
+  if(b.notes)msg+='📝 *Notes:* '+b.notes+'\n';
   msg+='💵 *Total:* ₹'+total.toLocaleString('en-IN')+'\n';
   if(disc>0){
     msg+='🏷️ *Discount:* - ₹'+disc.toLocaleString('en-IN')+'\n';
