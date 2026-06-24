@@ -142,7 +142,7 @@ body{background:var(--bg);font-family:'Inter',sans-serif;font-size:14px;}
 .modal-row-val{font-size:13px;font-weight:600;color:var(--dark);}
 .modal-actions{display:flex;gap:8px;margin-top:16px;}
 .btn-paid{flex:1;padding:13px;border-radius:var(--r);border:none;background:var(--keer);color:#fff;font-size:13px;font-weight:700;cursor:pointer;font-family:'Syne',sans-serif;}
-.btn-close-modal{flex:1;padding:13px;border-radius:var(--r);border:0.5px solid #e0dbd0;background:transparent;color:var(--mid);font-size:13px;cursor:pointer;}
+.btn-close-modal{flex:1;padding:13px;border-radius:var(--r);border:1px solid #ccc;background:var(--surface2);color:var(--dark);font-size:13px;font-weight:600;cursor:pointer;}
 
 /* SHIFT */
 .shift-swap-panel{background:var(--dark);margin:0;padding:14px 16px 12px;border-radius:0 0 20px 20px;}
@@ -558,8 +558,8 @@ margin-top:4px;
 </div>
 
 <!-- PAYMENT MODAL -->
-<div class="modal-overlay" id="payment-modal">
-  <div class="modal-box">
+<div class="modal-overlay" id="payment-modal" onclick="closeModal()">
+  <div class="modal-box" onclick="event.stopPropagation()">
     <div class="modal-handle"></div>
     <div class="modal-title" id="modal-client-name"></div>
     <div class="modal-meta" id="modal-meta"></div>
