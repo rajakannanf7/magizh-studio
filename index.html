@@ -13,29 +13,11 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
-<script>
-function openTeamBooking(details){
-  const msg = encodeURIComponent(
-`NEW BOOKING
-
-Client: ${details.client || '-'}
-Date: ${details.date || '-'}
-Slot: ${details.slot || '-'}
-Studio: ${details.studio || '-'}
-Shoot Type: ${details.shootType || '-'}
-Advance: Rs.${details.advance || 0}
-
-Please check booking dashboard.`
-  );
-
-  window.open('https://wa.me/?text=' + msg,'_blank');
-}
-</script>
 <style>
 *{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent;}
 :root{
   --bg:#f5f0e8;--surface:#fff;--surface2:#ede9df;
-  --ari:#7C5CBF;--raja:#E8601A;--keer:#1A7A4A;
+  --ari:#7C5CBF;--raja:#E8601A;--keer:#1A7A4A;--inba:#888;--intern:#3B82F6;
   --dark:#1a1a1a;--mid:#666;--light:#aaa;--lighter:#ccc;
   --r:12px;--rl:20px;
 }
@@ -44,16 +26,14 @@ body{background:var(--bg);font-family:'Inter',sans-serif;font-size:14px;}
 .app{max-width:430px;margin:0 auto;height:100vh;display:flex;flex-direction:column;overflow:hidden;}
 
 /* LOGIN */
-#login-screen{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:32px 24px;background:var(--bg);}
+#login-screen{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:32px 24px;background:var(--bg);overflow-y:auto;}
 .login-logo{width:56px;height:56px;background:var(--raja);border-radius:18px;display:flex;align-items:center;justify-content:center;margin-bottom:16px;}
 .login-title{font-family:'Syne',sans-serif;font-size:24px;font-weight:800;color:var(--dark);margin-bottom:4px;}
-.login-sub{font-size:13px;color:var(--light);margin-bottom:28px;}
-.login-options{display:flex;flex-direction:column;gap:10px;width:100%;}
+.login-sub{font-size:13px;color:var(--light);margin-bottom:20px;}
+.login-section-lbl{font-size:10px;font-weight:600;letter-spacing:.12em;text-transform:uppercase;color:var(--light);margin-bottom:8px;width:100%;text-align:left;}
+.login-options{display:flex;flex-direction:column;gap:10px;width:100%;margin-bottom:20px;}
 .login-btn{padding:14px 18px;border-radius:var(--rl);border:none;cursor:pointer;display:flex;align-items:center;gap:12px;font-size:15px;font-weight:600;font-family:'Syne',sans-serif;transition:transform .1s;}
 .login-btn:active{transform:scale(.97);}
-.login-btn-a{background:var(--ari);color:#fff;}
-.login-btn-r{background:var(--raja);color:#fff;}
-.login-btn-k{background:var(--keer);color:#fff;}
 .login-av{width:28px;height:28px;border-radius:50%;background:rgba(255,255,255,.25);display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700;color:#fff;}
 .login-role{font-size:11px;font-weight:400;opacity:.7;margin-left:auto;}
 
@@ -75,8 +55,9 @@ body{background:var(--bg);font-family:'Inter',sans-serif;font-size:14px;}
 /* HERO */
 .hero{padding:52px 20px 20px;position:relative;}
 .hero-booking{background:var(--raja);}
-.hero-shift{background:var(--ari);}
+.hero-calendar{background:var(--ari);}
 .hero-annual{background:var(--keer);}
+.hero-intern{background:var(--intern);}
 .hero-top{display:flex;align-items:center;gap:6px;margin-bottom:8px;}
 .hero-eye{font-size:10px;font-weight:500;letter-spacing:.12em;text-transform:uppercase;color:rgba(255,255,255,.5);flex:1;}
 .live-pill{display:flex;align-items:center;gap:4px;background:rgba(255,255,255,.15);border-radius:20px;padding:3px 8px;}
@@ -98,9 +79,9 @@ body{background:var(--bg);font-family:'Inter',sans-serif;font-size:14px;}
 .dc.sel{background:var(--raja);color:#fff;}
 .dc.has-booking{border-color:var(--raja);}
 .dc-day{font-size:9px;font-weight:500;color:var(--light);margin-top:1px;}
+.dc.sel .dc-day{color:rgba(255,255,255,.7);}
 .pod-opt{flex:1;padding:10px 6px;border-radius:var(--r);border:2px solid #e0dbd0;background:var(--surface);font-size:12px;font-weight:700;font-family:'Syne',sans-serif;cursor:pointer;text-align:center;color:var(--dark);transition:all .15s;}
 .pod-opt.sel{background:var(--ari);border-color:var(--ari);color:#fff;}
-.dc.sel .dc-day{color:rgba(255,255,255,.7);}
 
 .slot-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:6px;}
 .slot{border-radius:10px;padding:10px 4px;text-align:center;font-size:12px;font-weight:600;cursor:pointer;transition:all .15s;border:0.5px solid #e0dbd0;}
@@ -108,6 +89,8 @@ body{background:var(--bg);font-family:'Inter',sans-serif;font-size:14px;}
 .slot.free{background:var(--surface);color:var(--dark);}
 .slot.booked{background:#fee2e2;color:#991b1b;cursor:default;border-color:#fca5a5;text-decoration:line-through;}
 .slot.sel{background:var(--raja);color:#fff;border-color:var(--raja);transform:scale(1.04);}
+/* Intern slots */
+.slot.avail{background:#dcfce7;color:#166534;border-color:#86efac;cursor:default;}
 
 .field{background:var(--surface);border-radius:var(--r);padding:12px 14px;margin-bottom:6px;}
 .field-lbl{font-size:10px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;color:var(--light);margin-bottom:3px;}
@@ -144,75 +127,34 @@ body{background:var(--bg);font-family:'Inter',sans-serif;font-size:14px;}
 .btn-paid{flex:1;padding:13px;border-radius:var(--r);border:none;background:var(--keer);color:#fff;font-size:13px;font-weight:700;cursor:pointer;font-family:'Syne',sans-serif;}
 .btn-close-modal{flex:1;padding:13px;border-radius:var(--r);border:1px solid #ccc;background:var(--surface2);color:var(--dark);font-size:13px;font-weight:600;cursor:pointer;}
 
-/* SHIFT */
-.shift-swap-panel{background:var(--dark);margin:0;padding:14px 16px 12px;border-radius:0 0 20px 20px;}
-.ssp-head{display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;}
-.ssp-title{font-family:'Syne',sans-serif;font-size:15px;font-weight:700;color:#fff;}
-.ssp-close{width:28px;height:28px;background:rgba(255,255,255,.1);border:none;border-radius:50%;cursor:pointer;display:flex;align-items:center;justify-content:center;}
-.ssp-steps{display:flex;gap:3px;margin-bottom:10px;}
-.ssp-seg{flex:1;height:2px;border-radius:1px;background:rgba(255,255,255,.15);}
-.ssp-seg.done{background:var(--raja);}
-.ssp-seg.act{background:var(--raja);opacity:.5;}
-.ssp-opts{display:flex;flex-direction:column;gap:6px;}
-.ssp-opt{padding:11px 14px;border-radius:var(--r);cursor:pointer;display:flex;align-items:center;gap:10px;transition:transform .1s;}
-.ssp-opt:active{transform:scale(.97);}
-.ssp-opt.p-a{background:var(--ari);}
-.ssp-opt.p-r{background:var(--raja);}
-.ssp-opt.p-k{background:var(--keer);}
-.ssp-opt.cur{opacity:.35;}
-.ssp-opt-name{font-family:'Syne',sans-serif;font-size:14px;font-weight:700;color:#fff;}
-.ssp-opt-role{font-size:11px;color:rgba(255,255,255,.55);margin-top:1px;}
-.ssp-hint{font-size:11px;color:rgba(255,255,255,.5);padding:2px 0 6px;}
-.ssp-back{font-size:11px;color:rgba(255,255,255,.4);border:none;background:none;cursor:pointer;text-decoration:underline;padding:4px 0;font-family:'Inter',sans-serif;}
-.shift-confirm-rows{background:rgba(255,255,255,.06);border-radius:var(--r);padding:12px 14px;margin-bottom:10px;}
-.scr-row{display:flex;align-items:center;gap:8px;margin-bottom:6px;}
-.scr-row:last-child{margin-bottom:0;}
-.scr-day{font-size:11px;color:rgba(255,255,255,.5);min-width:72px;font-family:'Inter',sans-serif;}
-.scr-arrow{color:rgba(255,255,255,.3);font-size:14px;}
-.scr-badge{font-family:'Syne',sans-serif;font-size:12px;font-weight:700;padding:3px 10px;border-radius:16px;color:#fff;}
-.scr-badge.p-a{background:var(--ari);}
-.scr-badge.p-r{background:var(--raja);}
-.scr-badge.p-k{background:var(--keer);}
-.cal-section{padding:12px 16px 0;}
-.wds{display:grid;grid-template-columns:repeat(7,1fr);gap:3px;margin-bottom:4px;}
-.wd{text-align:center;font-size:9px;font-weight:600;letter-spacing:.04em;color:var(--light);}
-.wd.wk{color:var(--ari);}
-.cgrid{display:grid;grid-template-columns:repeat(7,1fr);gap:3px;}
-.cday{border-radius:9px;padding:6px 3px;min-height:52px;cursor:pointer;position:relative;overflow:hidden;transition:transform .1s;}
-.cday:active{transform:scale(.91);}
-.cday.empty{background:transparent;pointer-events:none;}
-.cday.p-a{background:var(--ari);}
-.cday.p-r{background:var(--raja);}
-.cday.p-k{background:var(--keer);}
-.cday.today{box-shadow:0 0 0 2px var(--dark);}
-.cday.sel{box-shadow:0 0 0 2px #fff,0 0 0 4px var(--dark);}
-.cday.ghi{box-shadow:0 0 0 2px #fbbf24;}
-.cday.gdim{opacity:.18;pointer-events:none;}
-.cday.swapped::after{content:'';position:absolute;bottom:3px;right:3px;width:5px;height:5px;border-radius:50%;background:#fbbf24;}
-.cdn{font-size:10px;font-weight:500;color:rgba(255,255,255,.6);display:block;margin-bottom:3px;font-family:'Inter',sans-serif;}
-.cdb{font-family:'Syne',sans-serif;font-size:9px;font-weight:700;color:#fff;display:block;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
-.shift-nav-month{font-family:'Syne',sans-serif;font-size:18px;font-weight:700;color:var(--dark);}
-.shift-nav-btns{display:flex;gap:6px;}
-.nav-btn{width:32px;height:32px;border-radius:50%;background:var(--surface);border:0.5px solid #e0dbd0;cursor:pointer;display:flex;align-items:center;justify-content:center;color:var(--dark);}
-.nav-btn:active{transform:scale(.9);}
-.pcards{display:flex;gap:8px;padding:12px 16px 0;}
-.pc{flex:1;border-radius:var(--r);padding:10px;}
-.pc-a{background:var(--ari);}
-.pc-r{background:var(--raja);}
-.pc-k{background:var(--keer);}
-.pc-name{font-size:10px;font-weight:700;color:#fff;}
-.pc-days{font-family:'Syne',sans-serif;font-size:22px;font-weight:800;color:#fff;line-height:1;}
-.pc-role{font-size:8px;letter-spacing:.06em;text-transform:uppercase;color:rgba(255,255,255,.5);margin-top:2px;}
-.shift-info{margin:12px 16px 0;background:var(--surface);border-radius:var(--r);padding:12px 14px;border:0.5px solid #e0dbd0;}
-.shift-info-row{font-size:11px;color:var(--mid);line-height:1.8;}
-.shift-info-row strong{color:var(--dark);}
-.swap-logs{padding:12px 16px 0;}
-.log-head{font-size:10px;font-weight:600;letter-spacing:.1em;text-transform:uppercase;color:var(--light);margin-bottom:6px;}
-.log-item{background:var(--surface);border-radius:var(--r);padding:10px 12px;margin-bottom:5px;display:flex;align-items:center;gap:8px;border:0.5px solid #e0dbd0;}
-.log-txt{font-size:11px;color:var(--mid);flex:1;line-height:1.4;}
-.log-undo{font-size:11px;font-weight:600;color:var(--raja);border:none;background:none;cursor:pointer;white-space:nowrap;}
-.reset-row{padding:10px 16px 20px;text-align:right;}
-.reset-btn{font-size:11px;color:var(--light);border:none;background:none;cursor:pointer;text-decoration:underline;font-family:'Inter',sans-serif;}
+/* CALENDAR TAB */
+.cal-month-nav{display:flex;align-items:center;justify-content:space-between;padding:12px 16px 4px;}
+.cal-month-label{font-family:'Syne',sans-serif;font-size:18px;font-weight:700;color:var(--dark);}
+.cal-nav-btns{display:flex;gap:6px;}
+.cal-nav-btn{width:32px;height:32px;border-radius:50%;background:var(--surface);border:0.5px solid #e0dbd0;cursor:pointer;display:flex;align-items:center;justify-content:center;color:var(--dark);}
+.cal-nav-btn:active{transform:scale(.9);}
+.cal-wdays{display:grid;grid-template-columns:repeat(7,1fr);gap:3px;padding:8px 16px 4px;}
+.cal-wd{text-align:center;font-size:9px;font-weight:600;letter-spacing:.04em;color:var(--light);}
+.cal-grid{display:grid;grid-template-columns:repeat(7,1fr);gap:3px;padding:0 16px;}
+.cal-day{border-radius:10px;padding:8px 4px;min-height:48px;cursor:pointer;text-align:center;background:var(--surface);border:0.5px solid #e0dbd0;transition:transform .1s;position:relative;}
+.cal-day:active{transform:scale(.93);}
+.cal-day.empty{background:transparent;border-color:transparent;pointer-events:none;}
+.cal-day.today{border-color:var(--raja);border-width:2px;}
+.cal-day-num{font-size:11px;font-weight:600;color:var(--dark);}
+.cal-day-count{font-family:'Syne',sans-serif;font-size:14px;font-weight:800;color:var(--raja);margin-top:2px;}
+.cal-day.has-bookings{background:#fff8f5;}
+.cal-day.past-day{opacity:.5;}
+
+/* Calendar popup */
+.cal-popup-overlay{position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:100;display:none;align-items:center;justify-content:center;max-width:430px;margin:0 auto;padding:20px;}
+.cal-popup-overlay.open{display:flex;}
+.cal-popup{background:var(--surface);border-radius:20px;padding:20px;width:100%;max-height:70vh;overflow-y:auto;}
+.cal-popup-title{font-family:'Syne',sans-serif;font-size:16px;font-weight:700;color:var(--dark);margin-bottom:4px;}
+.cal-popup-sub{font-size:12px;color:var(--light);margin-bottom:12px;}
+.cal-popup-item{background:var(--surface2);border-radius:var(--r);padding:10px 12px;margin-bottom:6px;}
+.cal-popup-item-name{font-size:13px;font-weight:600;color:var(--dark);}
+.cal-popup-item-meta{font-size:11px;color:var(--mid);margin-top:2px;}
+.cal-popup-close{width:100%;padding:12px;border-radius:var(--r);border:1px solid #ccc;background:var(--surface2);color:var(--dark);font-size:13px;font-weight:600;cursor:pointer;margin-top:8px;font-family:'Syne',sans-serif;}
 
 /* ADMIN */
 .ann-stats{display:grid;grid-template-columns:1fr 1fr;gap:8px;padding:16px 16px 0;}
@@ -220,81 +162,33 @@ body{background:var(--bg);font-family:'Inter',sans-serif;font-size:14px;}
 .astat-lbl{font-size:10px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;color:var(--light);margin-bottom:3px;}
 .astat-val{font-family:'Syne',sans-serif;font-size:26px;font-weight:800;color:var(--dark);}
 .astat-sub{font-size:10px;color:var(--light);margin-top:1px;}
-.bal-section{padding:16px 16px 0;}
-.bal-card{background:var(--surface);border-radius:var(--r);padding:14px;border:0.5px solid #e0dbd0;}
-.bal-lbl{font-size:10px;font-weight:600;letter-spacing:.1em;text-transform:uppercase;color:var(--light);margin-bottom:10px;}
-.bal-row{display:flex;align-items:center;gap:8px;margin-bottom:8px;}
-.bal-row:last-child{margin-bottom:0;}
-.bal-name{font-size:12px;font-weight:600;min-width:52px;}
-.bal-track{flex:1;height:7px;border-radius:4px;background:var(--surface2);overflow:hidden;}
-.bal-fill{height:100%;border-radius:4px;}
-.bal-pct{font-size:11px;font-weight:600;color:var(--mid);min-width:28px;text-align:right;}
-.month-section{padding:16px 16px 0;}
-.month-sec-lbl{font-size:10px;font-weight:600;letter-spacing:.1em;text-transform:uppercase;color:var(--light);margin-bottom:8px;}
-.month-hdr{display:grid;grid-template-columns:44px repeat(3,1fr) 48px;gap:4px;padding:5px 10px;background:var(--surface2);border-radius:8px 8px 0 0;}
-.mhdr-txt{font-size:9px;font-weight:600;letter-spacing:.06em;text-transform:uppercase;color:var(--light);text-align:center;}
-.mhdr-txt:first-child{text-align:left;}
-.month-row{display:grid;grid-template-columns:44px repeat(3,1fr) 48px;gap:4px;align-items:center;padding:8px 10px;background:var(--surface);border-bottom:0.5px solid #f0ece4;}
-.month-row:last-child{border-radius:0 0 8px 8px;border-bottom:none;}
-.mrow-month{font-size:11px;font-weight:500;color:var(--dark);}
-.mrow-cell{text-align:center;}
-.mbar-wrap{height:4px;border-radius:2px;background:var(--surface2);overflow:hidden;margin-bottom:2px;}
-.mbar{height:100%;border-radius:2px;}
-.mnum{font-size:10px;font-weight:600;}
-.mnum.a{color:var(--ari);} .mnum.r{color:var(--raja);} .mnum.k{color:var(--keer);}
-.meq{font-size:9px;font-weight:600;text-align:center;}
-.meq.ok{color:var(--keer);} .meq.off{color:var(--raja);}
 
 /* TOAST */
 .toast{position:fixed;bottom:100px;left:50%;transform:translateX(-50%);background:var(--dark);color:#fff;padding:10px 20px;border-radius:20px;font-size:13px;font-weight:500;opacity:0;transition:opacity .3s;z-index:200;pointer-events:none;white-space:nowrap;}
 .toast.show{opacity:1;}
 
-/* APP LOADER */
-#app-loader{
-position:fixed;
-inset:0;
-background:#f5f0e8;
-display:flex;
-align-items:center;
-justify-content:center;
-flex-direction:column;
-z-index:9999;
-transition:opacity .3s ease;
-}
-.loader-logo{
-width:70px;
-height:70px;
-background:#E8601A;
-border-radius:22px;
-display:flex;
-align-items:center;
-justify-content:center;
-margin-bottom:16px;
-box-shadow:0 10px 25px rgba(0,0,0,.12);
-}
-.loader-text{
-font-family:'Syne',sans-serif;
-font-size:22px;
-font-weight:800;
-color:#1a1a1a;
-}
-.loader-sub{
-font-size:12px;
-color:#666;
-margin-top:4px;
-}
+/* INTERN DASHBOARD */
+.intern-card{background:var(--surface);border-radius:var(--r);padding:14px;margin:0 16px 8px;border:0.5px solid #e0dbd0;}
+.intern-card-lbl{font-size:10px;font-weight:600;letter-spacing:.1em;text-transform:uppercase;color:var(--light);margin-bottom:8px;}
+.intern-bitem{background:var(--surface2);border-radius:var(--r);padding:10px 12px;margin-bottom:6px;}
+.intern-bitem:last-child{margin-bottom:0;}
+.intern-bitem-name{font-size:13px;font-weight:600;color:var(--dark);}
+.intern-bitem-meta{font-size:11px;color:var(--mid);margin-top:2px;}
+.btn-request{background:#25D366;border:none;border-radius:var(--r);padding:14px;text-align:center;font-size:14px;font-weight:700;color:#fff;cursor:pointer;font-family:'Syne',sans-serif;width:100%;margin-top:10px;transition:transform .1s;}
+.btn-request:active{transform:scale(.97);}
 
+/* APP LOADER */
+#app-loader{position:fixed;inset:0;background:#f5f0e8;display:flex;align-items:center;justify-content:center;flex-direction:column;z-index:9999;transition:opacity .3s ease;}
+.loader-logo{width:70px;height:70px;background:#E8601A;border-radius:22px;display:flex;align-items:center;justify-content:center;margin-bottom:16px;box-shadow:0 10px 25px rgba(0,0,0,.12);}
+.loader-text{font-family:'Syne',sans-serif;font-size:22px;font-weight:800;color:#1a1a1a;}
+.loader-sub{font-size:12px;color:#666;margin-top:4px;}
 </style>
 </head>
 <body>
 
 <div id="app-loader">
   <div class="loader-logo">
-    <svg width="32" height="32" viewBox="0 0 24 24" fill="none">
-      <rect x="2" y="6" width="20" height="14" rx="2" stroke="#fff" stroke-width="2"/>
-      <circle cx="12" cy="13" r="3" stroke="#fff" stroke-width="2"/>
-      <path d="M8 6l1.5-3h5L16 6" stroke="#fff" stroke-width="2"/>
-    </svg>
+    <svg width="32" height="32" viewBox="0 0 24 24" fill="none"><rect x="2" y="6" width="20" height="14" rx="2" stroke="#fff" stroke-width="2"/><circle cx="12" cy="13" r="3" stroke="#fff" stroke-width="2"/><path d="M8 6l1.5-3h5L16 6" stroke="#fff" stroke-width="2"/></svg>
   </div>
   <div class="loader-text">Magizh Studio</div>
   <div class="loader-sub">Loading workspace...</div>
@@ -309,18 +203,33 @@ margin-top:4px;
   </div>
   <div class="login-title">Magizh Studio</div>
   <div class="login-sub">Who's using the app today?</div>
+
+  <div class="login-section-lbl">The Squad 🔑</div>
   <div class="login-options">
-    <button class="login-btn login-btn-a" onclick="login('Ari','a')">
-      <div class="login-av">A</div>Ari<span class="login-role">Weekends only</span>
+    <button class="login-btn" style="background:var(--raja);color:#fff;" onclick="login('Raja','r','owner')">
+      <div class="login-av">R</div>Raja
     </button>
-    <button class="login-btn login-btn-r" onclick="login('Raja','r')">
-      <div class="login-av">R</div>Raja<span class="login-role">Work from home</span>
+    <button class="login-btn" style="background:var(--keer);color:#fff;" onclick="login('Keerthi','k','owner')">
+      <div class="login-av">K</div>Keerthi
     </button>
-    <button class="login-btn login-btn-k" onclick="login('Keerthi','k')">
-      <div class="login-av">K</div>Keerthi<span class="login-role">Freelancer</span>
+    <button class="login-btn" style="background:var(--ari);color:#fff;" onclick="login('Ari','a','owner')">
+      <div class="login-av">A</div>Ari
     </button>
-    <button class="login-btn" style="background:#888;color:#fff;" onclick="login('Inba','inba')">
-      <div class="login-av" style="background:rgba(255,255,255,.25);">I</div>Inba<span class="login-role">Full access</span>
+    <button class="login-btn" style="background:var(--inba);color:#fff;" onclick="login('Inba','inba','owner')">
+      <div class="login-av">I</div>Inba
+    </button>
+  </div>
+
+  <div class="login-section-lbl">Crew 🎬</div>
+  <div class="login-options">
+    <button class="login-btn" style="background:var(--intern);color:#fff;" onclick="login('Manisha','manisha','intern')">
+      <div class="login-av">M</div>Manisha
+    </button>
+    <button class="login-btn" style="background:var(--intern);color:#fff;" onclick="login('Abi','abi','intern')">
+      <div class="login-av">A</div>Abi
+    </button>
+    <button class="login-btn" style="background:var(--intern);color:#fff;" onclick="login('Kamlesh','kamlesh','intern')">
+      <div class="login-av">K</div>Kamlesh
     </button>
   </div>
 </div>
@@ -402,7 +311,6 @@ margin-top:4px;
             <option>Other</option>
           </select>
         </div>
-        <!-- Podcast setup selector -->
         <div class="field" id="pod-setup-field" style="display:none;">
           <div class="field-lbl">Podcast Setup</div>
           <div style="display:flex;gap:6px;" id="pod-setup-btns">
@@ -416,18 +324,12 @@ margin-top:4px;
           <div class="field-lbl" id="f-total-label">Total (₹750/hr)</div>
           <div style="font-family:'Syne',sans-serif;font-size:20px;font-weight:800;color:var(--dark);" id="f-total-display">₹0</div>
         </div>
-        <div class="field">
-          <div class="field-lbl">Discount (₹)</div>
-          <input id="f-discount" type="number" placeholder="0" min="0" oninput="recalcPayment()">
-        </div>
+        <div class="field"><div class="field-lbl">Discount (₹)</div><input id="f-discount" type="number" placeholder="0" min="0" oninput="recalcPayment()"></div>
         <div class="field" style="background:#f0faf4;">
           <div class="field-lbl">After discount</div>
           <div style="font-family:'Syne',sans-serif;font-size:18px;font-weight:700;color:var(--keer);" id="f-after-discount">₹0</div>
         </div>
-        <div class="field">
-          <div class="field-lbl">Advance paid (₹)</div>
-          <input id="f-adv" type="number" placeholder="0" min="0" oninput="recalcPayment()">
-        </div>
+        <div class="field"><div class="field-lbl">Advance paid (₹)</div><input id="f-adv" type="number" placeholder="0" min="0" oninput="recalcPayment()"></div>
         <div class="field" style="background:#fff8f5;">
           <div class="field-lbl">Balance due</div>
           <div style="font-family:'Syne',sans-serif;font-size:18px;font-weight:700;color:var(--raja);" id="f-balance">₹0</div>
@@ -440,119 +342,114 @@ margin-top:4px;
       <div class="sec" style="margin-top:16px;">
         <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;">
           <div class="sec-lbl" style="margin-bottom:0;" id="booking-list-label">Today's Bookings</div>
-          </div>
+        </div>
       </div>
-      
-<div class="booking-list" id="booking-list"></div>
-
-<div class="sec" style="padding-top:8px;">
-  <div class="sec-lbl">Upcoming Bookings</div>
-</div>
-<div class="booking-list" id="upcoming-booking-list"></div>
-
+      <div class="booking-list" id="booking-list"></div>
+      <div class="sec" style="padding-top:8px;"><div class="sec-lbl">Upcoming Bookings</div></div>
+      <div class="booking-list" id="upcoming-booking-list"></div>
     </div>
 
-    <!-- SHIFT PAGE -->
-    <div class="page" id="page-shift">
-      <div class="hero hero-shift">
+    <!-- CALENDAR PAGE -->
+    <div class="page" id="page-calendar">
+      <div class="hero hero-calendar">
         <div class="hero-top">
           <span class="hero-eye">Magizh Studio</span>
-          <div class="live-pill"><div class="live-dot off" id="s-sync-dot"></div><span class="live-txt" id="s-sync-txt">connecting</span></div>
-          <span class="user-chip" id="s-user-chip"></span>
+          <div class="live-pill"><div class="live-dot off" id="c-sync-dot"></div><span class="live-txt" id="c-sync-txt">connecting</span></div>
+          <span class="user-chip" id="c-user-chip"></span>
         </div>
-        <div class="hero-title" id="shift-hero-title">2026</div>
-        <div class="hero-sub">Tap a day to swap</div>
+        <div class="hero-title">Calendar</div>
+        <div class="hero-sub">Tap any date to view bookings</div>
       </div>
-      <div id="swap-panel" style="display:none;"></div>
-      <div style="padding:12px 16px 4px;display:flex;align-items:center;justify-content:space-between;">
-        <div class="shift-nav-month" id="shift-month-label"></div>
-        <div class="shift-nav-btns">
-          <button class="nav-btn" id="shift-prev"><svg width="14" height="14" viewBox="0 0 24 24" fill="none"><path d="M15 18l-6-6 6-6" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg></button>
-          <button class="nav-btn" id="shift-next"><svg width="14" height="14" viewBox="0 0 24 24" fill="none"><path d="M9 18l6-6-6-6" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg></button>
-        </div>
-      </div>
-      <div class="pcards" id="shift-pcards"></div>
-      <div class="cal-section">
-        <div class="wds">
-          <div class="wd wk">SUN</div><div class="wd">MON</div><div class="wd">TUE</div><div class="wd">WED</div><div class="wd">THU</div><div class="wd">FRI</div><div class="wd wk">SAT</div>
-        </div>
-        <div class="cgrid" id="cal-grid"></div>
-      </div>
-      <div class="shift-info" id="shift-info"></div>
-      <div class="swap-logs" id="swap-logs"></div>
-      <div class="reset-row"><button class="reset-btn" id="reset-swaps-btn">Reset all swaps this month</button></div>
-      <div style="height:20px;"></div>
-    </div>
-
-    <!-- ADMIN PAGE -->
-    <div class="page" id="page-annual">
-      <div id="admin-gate">
-        <div class="hero hero-annual">
-          <div class="hero-top">
-            <span class="hero-eye">Magizh Studio</span>
-            <div class="live-pill"><div class="live-dot off" id="a-sync-dot"></div><span class="live-txt" id="a-sync-txt">connecting</span></div>
-            <span class="user-chip" id="a-user-chip"></span>
-          </div>
-          <div class="hero-title">Admin</div>
-          <div class="hero-sub">Enter password to continue</div>
-        </div>
-        <div style="padding:40px 24px;display:flex;flex-direction:column;align-items:center;">
-          <div style="width:64px;height:64px;background:var(--surface);border-radius:20px;display:flex;align-items:center;justify-content:center;margin-bottom:20px;border:0.5px solid #e0dbd0;">
-            <svg width="28" height="28" viewBox="0 0 24 24" fill="none"><rect x="3" y="11" width="18" height="11" rx="2" stroke="#1a1a1a" stroke-width="2"/><path d="M7 11V7a5 5 0 0110 0v4" stroke="#1a1a1a" stroke-width="2" stroke-linecap="round"/><circle cx="12" cy="16" r="1.5" fill="#1a1a1a"/></svg>
-          </div>
-          <div style="font-family:'Syne',sans-serif;font-size:22px;font-weight:800;margin-bottom:6px;">Admin Access</div>
-          <input id="admin-pw" type="password" placeholder="Password" onkeydown="if(event.key==='Enter')checkAdminPw()" style="width:100%;max-width:280px;padding:14px 16px;border-radius:var(--r);border:1.5px solid #e0dbd0;background:var(--surface);font-size:18px;text-align:center;letter-spacing:6px;margin-bottom:10px;outline:none;font-family:'Inter',sans-serif;">
-          <button onclick="checkAdminPw()" style="width:100%;max-width:280px;padding:14px;border-radius:var(--rl);border:none;background:var(--keer);color:#fff;font-family:'Syne',sans-serif;font-size:15px;font-weight:700;cursor:pointer;">Unlock</button>
-          <div id="admin-err" style="font-size:12px;color:#cc0000;text-align:center;margin-top:10px;display:none;">Wrong password. Try again.</div>
+      <div class="cal-month-nav">
+        <div class="cal-month-label" id="cal-month-label"></div>
+        <div class="cal-nav-btns">
+          <button class="cal-nav-btn" id="cal-prev"><svg width="14" height="14" viewBox="0 0 24 24" fill="none"><path d="M15 18l-6-6 6-6" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg></button>
+          <button class="cal-nav-btn" id="cal-next"><svg width="14" height="14" viewBox="0 0 24 24" fill="none"><path d="M9 18l6-6-6-6" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg></button>
         </div>
       </div>
-      <div id="admin-panel" style="display:none;">
-        <div class="hero hero-annual">
-          <div class="hero-top">
-            <span class="hero-eye">Magizh Studio · Admin</span>
-            <div class="live-pill"><div class="live-dot"></div><span class="live-txt">unlocked</span></div>
-            <button onclick="lockAdmin()" style="background:rgba(255,255,255,.15);border:none;border-radius:8px;padding:4px 10px;font-size:11px;font-weight:600;color:#fff;cursor:pointer;">Lock</button>
-          </div>
-          <div class="hero-title">Admin Panel</div>
-          <div class="hero-sub">Report + Controls</div>
-        </div>
-        <div class="ann-stats" id="ann-stats"></div>
-        <div class="bal-section" id="bal-section"></div>
-        <div class="month-section" id="month-section"></div>
-        <div style="padding:20px 16px 0;">
-          <div class="sec-lbl">Controls</div>
-          <div style="background:var(--surface);border-radius:var(--r);border:0.5px solid #e0dbd0;overflow:hidden;margin-bottom:8px;">
-            <div style="padding:12px 16px;border-bottom:0.5px solid #f0ece4;"><div style="font-size:13px;font-weight:600;">Delete all bookings</div><div style="font-size:11px;color:var(--light);margin-top:1px;">Permanently clears all booking data</div></div>
-            <button onclick="resetAllBookings()" style="width:100%;padding:12px;border:none;background:#fee2e2;color:#991b1b;font-size:13px;font-weight:700;cursor:pointer;font-family:'Syne',sans-serif;">Delete All Bookings</button>
-          </div>
-          <div style="background:var(--surface);border-radius:var(--r);border:0.5px solid #e0dbd0;overflow:hidden;margin-bottom:8px;">
-            <div style="padding:12px 16px;border-bottom:0.5px solid #f0ece4;"><div style="font-size:13px;font-weight:600;">Clear all swaps</div><div style="font-size:11px;color:var(--light);margin-top:1px;">Reset shift swap history only</div></div>
-            <button onclick="resetAllSwaps()" style="width:100%;padding:12px;border:none;background:#fef9c3;color:#854d0e;font-size:13px;font-weight:700;cursor:pointer;font-family:'Syne',sans-serif;">Clear All Swaps</button>
-          </div>
-          <div style="background:var(--surface);border-radius:var(--r);border:0.5px solid #e0dbd0;overflow:hidden;margin-bottom:20px;">
-            <div style="padding:12px 16px;border-bottom:0.5px solid #f0ece4;"><div style="font-size:13px;font-weight:600;">Factory reset</div><div style="font-size:11px;color:var(--light);margin-top:1px;">Wipe everything</div></div>
-            <button onclick="factoryReset()" style="width:100%;padding:12px;border:none;background:#1a1a1a;color:#fff;font-size:13px;font-weight:700;cursor:pointer;font-family:'Syne',sans-serif;">Factory Reset</button>
-          </div>
-        </div>
-        <div style="height:30px;"></div>
+      <!-- Studio filter for calendar -->
+      <div style="display:flex;gap:6px;padding:8px 16px 0;">
+        <button class="cal-filter-btn sel" id="cal-filter-all" onclick="setCalFilter('all')" style="flex:1;padding:8px;border-radius:8px;border:1.5px solid var(--dark);background:var(--dark);color:#fff;font-size:11px;font-weight:700;cursor:pointer;font-family:'Syne',sans-serif;">All</button>
+        <button class="cal-filter-btn" id="cal-filter-photo" onclick="setCalFilter('photo')" style="flex:1;padding:8px;border-radius:8px;border:1.5px solid #e0dbd0;background:var(--surface);color:var(--dark);font-size:11px;font-weight:700;cursor:pointer;font-family:'Syne',sans-serif;">📷 Photo</button>
+        <button class="cal-filter-btn" id="cal-filter-pod" onclick="setCalFilter('pod')" style="flex:1;padding:8px;border-radius:8px;border:1.5px solid #e0dbd0;background:var(--surface);color:var(--dark);font-size:11px;font-weight:700;cursor:pointer;font-family:'Syne',sans-serif;">🎙️ Podcast</button>
+      </div>
+      <div class="cal-wdays">
+        <div class="cal-wd">SUN</div><div class="cal-wd">MON</div><div class="cal-wd">TUE</div><div class="cal-wd">WED</div><div class="cal-wd">THU</div><div class="cal-wd">FRI</div><div class="cal-wd">SAT</div>
+      </div>
+      <div class="cal-grid" id="cal-grid"></div>
+      <!-- Monthly summary -->
+      <div class="sec" style="padding-bottom:20px;">
+        <div id="cal-month-summary" style="background:var(--surface);border-radius:var(--r);padding:14px;border:0.5px solid #e0dbd0;"></div>
       </div>
     </div>
 
   </div>
 
   <!-- TAB BAR -->
-  <div class="tabbar">
+  <div class="tabbar" id="owner-tabbar">
     <button class="tab active" id="tab-booking" onclick="switchTab('booking')">
       <svg width="18" height="18" viewBox="0 0 24 24" fill="none"><rect x="3" y="4" width="18" height="18" rx="2.5" stroke="white" stroke-width="2"/><path d="M16 2v4M8 2v4M3 10h18" stroke="white" stroke-width="2" stroke-linecap="round"/></svg>
       <span class="tab-lbl">Booking</span>
     </button>
-    <button class="tab" id="tab-shift" onclick="switchTab('shift')">
-      <svg width="18" height="18" viewBox="0 0 24 24" fill="none"><circle cx="12" cy="7" r="4" stroke="white" stroke-width="2"/><path d="M4 21c0-3.866 3.582-7 8-7s8 3.134 8 7" stroke="white" stroke-width="2" stroke-linecap="round"/></svg>
-      <span class="tab-lbl">Shift</span>
+    <button class="tab" id="tab-calendar" onclick="switchTab('calendar')">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none"><rect x="3" y="4" width="18" height="18" rx="2" stroke="white" stroke-width="2"/><path d="M3 10h18M8 2v4M16 2v4" stroke="white" stroke-width="2" stroke-linecap="round"/><circle cx="8" cy="15" r="1.5" fill="white"/><circle cx="12" cy="15" r="1.5" fill="white"/><circle cx="16" cy="15" r="1.5" fill="white"/></svg>
+      <span class="tab-lbl">Calendar</span>
     </button>
-    <button class="tab" id="tab-annual" onclick="switchTab('annual')">
-      <svg width="18" height="18" viewBox="0 0 24 24" fill="none"><rect x="3" y="11" width="18" height="11" rx="2" stroke="white" stroke-width="2"/><path d="M7 11V7a5 5 0 0110 0v4" stroke="white" stroke-width="2" stroke-linecap="round"/></svg>
-      <span class="tab-lbl">Admin</span>
+  </div>
+</div>
+
+<!-- INTERN SCREEN -->
+<div id="intern-screen" class="app" style="display:none;">
+  <div class="pages">
+    <div class="page active" id="page-intern">
+      <div class="hero hero-intern">
+        <div class="hero-top">
+          <span class="hero-eye">Magizh Studio</span>
+          <div class="live-pill"><div class="live-dot off" id="i-sync-dot"></div><span class="live-txt" id="i-sync-txt">connecting</span></div>
+          <span class="user-chip" id="i-user-chip"></span>
+        </div>
+        <div class="hero-title">Dashboard</div>
+        <div class="hero-sub">Today's schedule &amp; availability</div>
+      </div>
+
+      <!-- Today's bookings -->
+      <div class="sec"><div class="sec-lbl" id="intern-today-lbl">Today's Bookings</div></div>
+      <div style="padding:0 16px;" id="intern-today-list"></div>
+
+      <!-- Quick availability checker -->
+      <div class="sec" style="margin-top:8px;">
+        <div class="sec-lbl">Check Availability</div>
+        <div style="display:flex;gap:8px;margin-bottom:8px;">
+          <button id="intern-studio-photo" onclick="internSelectStudio('photo')" style="flex:1;padding:10px;border-radius:8px;border:2px solid var(--raja);background:var(--raja);color:#fff;font-size:12px;font-weight:700;cursor:pointer;font-family:'Syne',sans-serif;">📷 Photo</button>
+          <button id="intern-studio-pod" onclick="internSelectStudio('pod')" style="flex:1;padding:10px;border-radius:8px;border:2px solid #e0dbd0;background:var(--surface);color:var(--dark);font-size:12px;font-weight:700;cursor:pointer;font-family:'Syne',sans-serif;">🎙️ Podcast</button>
+        </div>
+        <div class="date-strip" id="intern-date-strip"></div>
+      </div>
+      <div class="sec">
+        <div class="sec-lbl" id="intern-avail-lbl">Available Slots</div>
+        <div class="slot-grid" id="intern-slot-grid"></div>
+      </div>
+
+      <!-- Request booking button -->
+      <div style="padding:16px;">
+        <button class="btn-request" onclick="requestBooking()">📱 Request Booking via WhatsApp</button>
+        <div style="font-size:11px;color:var(--light);text-align:center;margin-top:6px;">Sends request to Inba for confirmation</div>
+      </div>
+
+      <!-- Upcoming -->
+      <div class="sec"><div class="sec-lbl">Upcoming Bookings</div></div>
+      <div style="padding:0 16px 20px;" id="intern-upcoming-list"></div>
+    </div>
+  </div>
+  <!-- Intern has no tab bar — single page -->
+  <div class="tabbar">
+    <button class="tab active">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none"><rect x="3" y="4" width="18" height="18" rx="2.5" stroke="white" stroke-width="2"/><path d="M16 2v4M8 2v4M3 10h18" stroke="white" stroke-width="2" stroke-linecap="round"/></svg>
+      <span class="tab-lbl">Dashboard</span>
+    </button>
+    <button class="tab" onclick="internLogout()">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none"><path d="M9 21H5a2 2 0 01-2-2V5a2 2 0 012-2h4M16 17l5-5-5-5M21 12H9" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      <span class="tab-lbl">Logout</span>
     </button>
   </div>
 </div>
@@ -567,25 +464,22 @@ margin-top:4px;
     <div class="modal-row"><span class="modal-row-label">Slot</span><span class="modal-row-val" id="modal-slot"></span></div>
     <div class="modal-row"><span class="modal-row-label">Total</span><span class="modal-row-val" id="modal-total"></span></div>
     <div class="modal-row">
-<span class="modal-row-label">Discount</span>
-<input id="modal-discount-input" type="number" min="0"
-style="width:90px;padding:6px 10px;border:1px solid #ddd;border-radius:8px;text-align:right;font-weight:600;"
-onchange="updateDiscount()">
-</div>
+      <span class="modal-row-label">Discount</span>
+      <input id="modal-discount-input" type="number" min="0" style="width:90px;padding:6px 10px;border:1px solid #ddd;border-radius:8px;text-align:right;font-weight:600;" onchange="updateDiscount()">
+    </div>
     <div class="modal-row"><span class="modal-row-label">Advance paid</span><input id="modal-adv" type="number" min="0" style="width:90px;padding:6px 10px;border:1px solid #ddd;border-radius:8px;text-align:right;font-weight:600;" onchange="updateAdvance()"></div>
     <div class="modal-row"><span class="modal-row-label">Balance due</span><span class="modal-row-val" id="modal-balance"></span></div>
     <div class="modal-row"><span class="modal-row-label">Status</span><span class="modal-row-val" id="modal-status"></span></div>
     <div class="modal-row" id="modal-notes-row" style="display:none;flex-direction:column;gap:4px;"><span class="modal-row-label">Notes</span><div id="modal-notes" style="font-size:12px;color:var(--mid);white-space:pre-wrap;"></div></div>
-    <!-- Reschedule section -->
+    <!-- Reschedule -->
     <div id="reschedule-section" style="padding:12px 0 0;">
       <div class="sec-lbl">Reschedule Start Time</div>
       <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;">
-        <select id="reschedule-hour" style="flex:1;padding:10px;border:1px solid #e0dbd0;border-radius:8px;font-size:13px;font-weight:600;background:#fff;">
-        </select>
+        <select id="reschedule-hour" style="flex:1;padding:10px;border:1px solid #e0dbd0;border-radius:8px;font-size:13px;font-weight:600;background:#fff;"></select>
         <button onclick="applyReschedule()" style="padding:10px 16px;border-radius:var(--r);border:none;background:var(--ari);color:#fff;font-size:12px;font-weight:700;cursor:pointer;font-family:'Syne',sans-serif;">Reschedule</button>
       </div>
     </div>
-    <!-- Extend section -->
+    <!-- Extend -->
     <div id="extend-section" style="padding:12px 0 0;">
       <div class="sec-lbl">Edit Duration</div>
       <div style="display:flex;align-items:center;gap:10px;background:var(--surface2);border-radius:var(--r);padding:10px 14px;">
@@ -614,6 +508,16 @@ onchange="updateDiscount()">
   </div>
 </div>
 
+<!-- Calendar day popup -->
+<div class="cal-popup-overlay" id="cal-popup" onclick="closeCalPopup()">
+  <div class="cal-popup" onclick="event.stopPropagation()">
+    <div class="cal-popup-title" id="cal-popup-title"></div>
+    <div class="cal-popup-sub" id="cal-popup-sub"></div>
+    <div id="cal-popup-list"></div>
+    <button class="cal-popup-close" onclick="closeCalPopup()">Close</button>
+  </div>
+</div>
+
 <div class="toast" id="toast"></div>
 
 <script type="module">
@@ -627,45 +531,40 @@ const HOURLY_RATE = 750;
 const ADMIN_PW = '2023';
 const STUDIO_LOC = "https://maps.app.goo.gl/vdCkBeZE7Vg1tJra8";
 const SHEETS_URL = "https://script.google.com/macros/s/AKfycbxqTIGogoUiQRI0aDRZZmmKa9KmN_CLWv6lZAfGDMw1KGdxRmiG9XZapNLNfeNjYyymrw/exec";
+const INBA_PHONE = '918072659679'; // Inba's number for walk-in requests
 
-// ── MUHURTHAM & GOVT ──
-const MUHURTHAM={1:[28],2:[6,8,13,15,16,20],3:[5,6,8,15,16,25],4:[6,12,13,16,20,23,30],5:[8,13,14,18,28,29],6:[4,7,17,18,24,25],7:[2,5,12],8:[23,30,31],9:[7,13,17],10:[25,30],11:[1,11,13,15,16,20,29],12:[4,6,10,13,14]};
-const GOVT={1:[1,15,16,17,26],2:[],3:[19,21,31],4:[2,10,14],5:[1,28],6:[26],7:[18],8:[15,26],9:[],10:[2,22,24],11:[8,15],12:[25]};
-const P=[{name:'Ari',role:'weekends + holidays',c:'a'},{name:'Raja',role:'work from home',c:'r'},{name:'Keerthi',role:'freelancer',c:'k'}];
 const MONTHS=['January','February','March','April','May','June','July','August','September','October','November','December'];
 const MS=['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
 const DS=['Sun','Mon','Tue','Wed','Thu','Fri','Sat'];
 const HOUR_LABELS=['7am','8am','9am','10am','11am','12pm','1pm','2pm','3pm','4pm','5pm','6pm','7pm','8pm','9pm','10pm','11pm'];
 
 // ── STATE ──
-let db, currentUser='', currentUserKey='';
-let swaps={}, logs={}, bookings={};
-let sYr=2026, sMo=new Date().getMonth();
-let step=0, selDay=null, selP=null, selG=null;
-let _cache={};
+let db, currentUser='', currentUserKey='', userRole='owner';
+let bookings={};
 let selDate='', selStudio='photo';
 let selStartH=null, selDur=2;
 let modalBookingId=null;
 let extendHrs=1;
 let adminUnlocked=false;
-let bookingFilter='today';
-let podSetup='space'; // space | single_cam | dual_cam
+let podSetup='space';
 const POD_RATES={space:750,single_cam:1000,dual_cam:1500};
 function getHourlyRate(){ return selStudio==='pod'?POD_RATES[podSetup]:HOURLY_RATE; }
 const today=new Date();
 
+// Calendar state
+let calYr=today.getFullYear(), calMo=today.getMonth();
+let calFilter='all'; // all | photo | pod
+
+// Intern state
+let internStudio='photo', internDate='';
+
 // ── HELPERS ──
-const isMuh=(y,m,d)=>{ if(y!==2026)return false; const l=MUHURTHAM[m+1]; return l?l.includes(d):false; };
-const isGov=(y,m,d)=>{ if(y!==2026)return false; const l=GOVT[m+1]; return l?l.includes(d):false; };
-const mk=()=>sYr+'-'+String(sMo).padStart(2,'0');
 function localDateStr(d){ return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0'); }
 const todayStr=()=>localDateStr(today);
 
 function showToast(msg,dur=3000){
-  const t=document.getElementById('toast');
-  if(!t)return;
-  t.textContent=msg;
-  t.classList.add('show');
+  const t=document.getElementById('toast');if(!t)return;
+  t.textContent=msg;t.classList.add('show');
   setTimeout(()=>t.classList.remove('show'),dur);
 }
 
@@ -676,14 +575,10 @@ function formatSlot(start,dur){
 function slotOverlaps(existingRaw,startH,dur){
   const newEnd=startH+dur;
   return existingRaw.some(s=>{
-    if(!s)return false;
-    if(s.includes('|')){
-      const p=s.split('|');
-      const eS=parseInt(p[0]),eE=eS+parseInt(p[1]);
-      if(isNaN(eS)||isNaN(eE))return false;
-      return startH<eE&&newEnd>eS;
-    }
-    return false;
+    if(!s||!s.includes('|'))return false;
+    const p=s.split('|');const eS=parseInt(p[0]),eE=eS+parseInt(p[1]);
+    if(isNaN(eS)||isNaN(eE))return false;
+    return startH<eE&&newEnd>eS;
   });
 }
 
@@ -692,11 +587,11 @@ function cleanPhone(p){ return p.replace(/\D/g,'').replace(/^0+/,'').replace(/^9
 // ── FIREBASE ──
 async function save(){
   if(!db)return;
-  try{ await setDoc(doc(db,'studios',SID),{swaps,logs,bookings}); }catch(e){console.error(e);}
+  try{ await setDoc(doc(db,'studios',SID),{bookings}); }catch(e){console.error(e);}
 }
 
 function setSyncStatus(s){
-  ['b','s','a'].forEach(p=>{
+  ['b','c','i'].forEach(p=>{
     const dot=document.getElementById(p+'-sync-dot');
     const txt=document.getElementById(p+'-sync-txt');
     if(!dot)return;
@@ -709,13 +604,13 @@ function initFirebase(){
   try{
     const app=initializeApp(CFG); db=getFirestore(app);
     onSnapshot(doc(db,'studios',SID),snap=>{
-      if(snap.exists()){const d=snap.data();swaps=d.swaps||{};logs=d.logs||{};bookings=d.bookings||{};}
+      if(snap.exists()){const d=snap.data();bookings=d.bookings||{};}
       setSyncStatus('live');
-      renderSlots();
-      renderBookingList();
-      renderUpcomingBookings();
-      renderShift();
-      if(adminUnlocked)renderAnnual();
+      if(userRole==='owner'){
+        renderSlots();renderBookingList();renderUpcomingBookings();renderCalendar();
+      }else{
+        renderInternDashboard();
+      }
     },err=>{console.error(err);setSyncStatus('err');});
   }catch(e){console.error(e);setSyncStatus('err');}
 }
@@ -724,52 +619,54 @@ function initFirebase(){
 async function syncToSheets(b){
   try{
     const dur=b.slotRaw?parseInt(b.slotRaw.split('|')[1]||1):1;
-    const adv=Number(b.advance)||0;
-    const total=Number(b.total)||(dur*HOURLY_RATE);
-    const disc=Number(b.discount)||0;
-    const bal=b.paid?0:Math.max(0,total-disc-adv);
-    const data={
-      bookingId:b.id,studio:b.studioName||'Photography Studio',
+    const adv=Number(b.advance)||0;const total=Number(b.total)||(dur*HOURLY_RATE);
+    const disc=Number(b.discount)||0;const bal=b.paid?0:Math.max(0,total-disc-adv);
+    const data={bookingId:b.id,studio:b.studioName||'Photography Studio',
       date:new Date(b.date).toLocaleDateString('en-IN',{day:'numeric',month:'short',year:'numeric'}),
       name:b.name,phone:b.phone,type:b.type,slot:b.slot,hours:dur,
       total,discount:disc,advance:adv,balance:bal,
       status:b.paid?'Paid':adv>0?'Advance':'Pending',
-      bookedBy:b.createdBy||'',
-      timestamp:new Date().toLocaleString('en-IN')
-    };
+      bookedBy:b.createdBy||'',timestamp:new Date().toLocaleString('en-IN')};
     const params=new URLSearchParams(Object.entries(data).map(([k,v])=>[k,String(v)]));
     await fetch(SHEETS_URL+'?'+params.toString(),{method:'GET',mode:'no-cors'});
   }catch(e){console.error('Sheets sync failed:',e);}
 }
 
 // ── LOGIN ──
-window.login=function(name,key){
-  currentUser=name; currentUserKey=key;
+window.login=function(name,key,role){
+  currentUser=name; currentUserKey=key; userRole=role;
   document.getElementById('login-screen').style.display='none';
-  document.getElementById('main-screen').classList.add('active');
-  ['b','s','a'].forEach(p=>{const el=document.getElementById(p+'-user-chip');if(el)el.textContent=name;});
-  document.getElementById('tab-shift').style.display='flex';
-  document.getElementById('tab-annual').style.display='flex';
-  initDateStrip();
-  renderShift();
+  if(role==='owner'){
+    document.getElementById('main-screen').classList.add('active');
+    ['b','c'].forEach(p=>{const el=document.getElementById(p+'-user-chip');if(el)el.textContent=name;});
+    initDateStrip();
+    renderCalendar();
+  }else{
+    const is=document.getElementById('intern-screen');
+    is.style.display='flex';
+    const el=document.getElementById('i-user-chip');if(el)el.textContent=name;
+    initInternDateStrip();
+  }
   initFirebase();
+};
+
+window.internLogout=function(){
+  location.reload();
 };
 
 // ── TABS ──
 window.switchTab=function(tab){
-  ['booking','shift','annual'].forEach(t=>{
-    document.getElementById('page-'+t).classList.toggle('active',t===tab);
-    document.getElementById('tab-'+t).classList.toggle('active',t===tab);
+  ['booking','calendar'].forEach(t=>{
+    const page=document.getElementById('page-'+t);if(page)page.classList.toggle('active',t===tab);
+    const tabEl=document.getElementById('tab-'+t);if(tabEl)tabEl.classList.toggle('active',t===tab);
   });
-  if(tab==='annual'&&adminUnlocked)renderAnnual();
+  if(tab==='calendar')renderCalendar();
 };
 
 // ── STUDIO SELECTOR ──
 window.selectStudio=function(studio){
-  selStudio=studio;
-  selStartH=null; selDur=2;
-  const photo=document.getElementById('studio-photo');
-  const pod=document.getElementById('studio-pod');
+  selStudio=studio; selStartH=null; selDur=2;
+  const photo=document.getElementById('studio-photo'),pod=document.getElementById('studio-pod');
   if(studio==='photo'){
     photo.style.background='var(--raja)';photo.style.borderColor='var(--raja)';
     photo.querySelectorAll('div').forEach((el,i)=>{el.style.color=i===0?'#fff':'rgba(255,255,255,.7)';});
@@ -791,8 +688,7 @@ window.selectStudio=function(studio){
   if(podField)podField.style.display=studio==='pod'?'block':'none';
   const totalLabel=document.getElementById('f-total-label');
   if(totalLabel)totalLabel.textContent='Total (₹'+getHourlyRate().toLocaleString('en-IN')+'/hr)';
-  renderSlots();
-  renderBookingList();
+  renderSlots();renderBookingList();
 };
 
 window.selectPodSetup=function(val){
@@ -800,16 +696,13 @@ window.selectPodSetup=function(val){
   document.querySelectorAll('.pod-opt').forEach(b=>{b.classList.toggle('sel',b.dataset.val===val);});
   const totalLabel=document.getElementById('f-total-label');
   if(totalLabel)totalLabel.textContent='Total (₹'+getHourlyRate().toLocaleString('en-IN')+'/hr)';
-  updateDurDisplay();
-  recalcPayment();
+  updateDurDisplay();recalcPayment();
 };
 
 // ── DATE STRIP ──
 function initDateStrip(){
-  const strip=document.getElementById('date-strip');
-  strip.innerHTML='';
-  const ts=todayStr();
-  let todayEl=null;
+  const strip=document.getElementById('date-strip');strip.innerHTML='';
+  const ts=todayStr();let todayEl=null;
   for(let i=-30;i<60;i++){
     const d=new Date();d.setDate(d.getDate()+i);
     const ds=localDateStr(d);
@@ -827,25 +720,22 @@ function initDateStrip(){
 
 function selectDate(dateStr,el,silent=false){
   selDate=dateStr; selStartH=null; selDur=2;
-  document.querySelectorAll('.dc').forEach(d=>d.classList.remove('sel'));
+  document.querySelectorAll('#date-strip .dc').forEach(d=>d.classList.remove('sel'));
   el.classList.add('sel');
   document.getElementById('slot-section').style.display='block';
   document.getElementById('dur-section').style.display='none';
   document.getElementById('form-section').style.display='none';
-  renderSlots();
-  renderBookingList();
+  renderSlots();renderBookingList();
 }
 
 // ── SLOTS ──
 function renderSlots(){
-  const grid=document.getElementById('slot-grid');
-  if(!grid)return;
+  const grid=document.getElementById('slot-grid');if(!grid)return;
   const dayBookings=Object.values(bookings).filter(b=>b.date===selDate&&(b.studio||'photo')===selStudio);
   grid.innerHTML=HOUR_LABELS.slice(0,-1).map((lbl,i)=>{
     const h=7+i;
     const isBooked=dayBookings.some(b=>{
-      const p=(b.slotRaw||'').split('|');
-      const bS=parseInt(p[0]),bD=parseInt(p[1]||1);
+      const p=(b.slotRaw||'').split('|');const bS=parseInt(p[0]),bD=parseInt(p[1]||1);
       return !isNaN(bS)&&h>=bS&&h<bS+bD;
     });
     const isSel=selStartH===h;
@@ -864,17 +754,13 @@ window.selectStart=function(h){
   if(totalLabel)totalLabel.textContent='Total (₹'+getHourlyRate().toLocaleString('en-IN')+'/hr)';
   if(document.getElementById('f-discount'))document.getElementById('f-discount').value='';
   if(document.getElementById('f-adv'))document.getElementById('f-adv').value='';
-  updateDurDisplay();
-  renderSlots();
-  recalcPayment();
+  updateDurDisplay();renderSlots();recalcPayment();
 };
 
 window.changeDur=function(delta){
   if(selStartH===null)return;
   selDur=Math.max(1,Math.min(23-selStartH,selDur+delta));
-  updateDurDisplay();
-  renderSlots();
-  recalcPayment();
+  updateDurDisplay();renderSlots();recalcPayment();
 };
 
 function updateDurDisplay(){
@@ -887,8 +773,7 @@ function updateDurDisplay(){
   const conflict=slotOverlaps(bookedRaw,selStartH,selDur);
   const sumEl=document.getElementById('slot-summary');
   if(sumEl){
-    sumEl.textContent=conflict
-      ?'⚠️ Conflicts with existing booking — adjust hours'
+    sumEl.textContent=conflict?'⚠️ Conflicts with existing booking — adjust hours'
       :'✓ '+HOUR_LABELS[selStartH-7]+' to '+HOUR_LABELS[endH-7]+' · ₹'+(selDur*getHourlyRate()).toLocaleString('en-IN');
     sumEl.style.color=conflict?'#991b1b':'var(--keer)';
   }
@@ -914,12 +799,9 @@ window.confirmBooking=async function(){
   const type=document.getElementById('f-type').value;
   if(!name||!phone||!type||!selStartH){showToast('Please fill all fields and select a start time');return;}
   const dayBookings=Object.values(bookings).filter(b=>b.date===selDate&&(b.studio||'photo')===selStudio);
-  const bookedRaw=dayBookings.map(b=>b.slotRaw||'');
-  if(slotOverlaps(bookedRaw,selStartH,selDur)){showToast('Slot conflicts with existing booking!');return;}
-  const slotRaw=selStartH+'|'+selDur;
-  const slotLabel=formatSlot(selStartH,selDur);
-  const rate=getHourlyRate();
-  const total=selDur*rate;
+  if(slotOverlaps(dayBookings.map(b=>b.slotRaw||''),selStartH,selDur)){showToast('Slot conflicts with existing booking!');return;}
+  const slotRaw=selStartH+'|'+selDur;const slotLabel=formatSlot(selStartH,selDur);
+  const rate=getHourlyRate();const total=selDur*rate;
   const disc=parseFloat(document.getElementById('f-discount').value)||0;
   const adv=parseFloat(document.getElementById('f-adv').value)||0;
   const balance=Math.max(0,total-disc-adv);
@@ -927,327 +809,187 @@ window.confirmBooking=async function(){
   const notes=(document.getElementById('f-notes')?document.getElementById('f-notes').value:'').trim();
   const id='bk-'+Date.now();
   bookings[id]={id,name,phone,type,date:selDate,slot:slotLabel,slotRaw,studio:selStudio,studioName,total,discount:disc,advance:adv,balance,paid:false,createdBy:currentUser,createdAt:Date.now(),notes,hourlyRate:rate,podSetup:selStudio==='pod'?podSetup:null};
-  backupBookings();
-  await save();
-  syncToSheets(bookings[id]);
-  document.getElementById('f-name').value='';
-  document.getElementById('f-phone').value='';
-  document.getElementById('f-type').value='';
-  document.getElementById('f-discount').value='';
+  backupBookings();await save();syncToSheets(bookings[id]);
+  document.getElementById('f-name').value='';document.getElementById('f-phone').value='';
+  document.getElementById('f-type').value='';document.getElementById('f-discount').value='';
   document.getElementById('f-adv').value='';
   if(document.getElementById('f-notes'))document.getElementById('f-notes').value='';
   document.getElementById('f-total-display').textContent='₹0';
   document.getElementById('f-after-discount').textContent='₹0';
   document.getElementById('f-balance').textContent='₹0';
-  selStartH=null; selDur=2;
+  selStartH=null;selDur=2;
   document.getElementById('dur-section').style.display='none';
   document.getElementById('form-section').style.display='none';
-  renderSlots();
-  renderBookingList();
+  renderSlots();renderBookingList();renderCalendar();
   showToast(name+' booked ✓ '+slotLabel,3000);
 };
 
 // ── BOOKING LIST ──
-
-
 function renderBookingList(){
   const list=document.getElementById('booking-list');
   const studioLabel=selStudio==='photo'?'📷 Photography':'🎙️ Podcast';
   const lbl=document.getElementById('booking-list-label');
-  const selectedDateLabel = selDate
-    ? new Date(selDate).toLocaleDateString('en-IN',{day:'numeric',month:'short',weekday:'short'})
-    : 'Selected Day';
+  const selectedDateLabel=selDate?new Date(selDate+'T12:00:00').toLocaleDateString('en-IN',{day:'numeric',month:'short',weekday:'short'}):'Selected Day';
   if(lbl)lbl.textContent=studioLabel+' · '+selectedDateLabel+' Bookings';
   const ts=todayStr();
-  let items=Object.values(bookings).filter(b=>(b.studio||'photo')===selStudio);
-  if(selDate){
-    items=items.filter(b=>b.date===selDate);
-  }
-  items.sort((a,b)=>{
-    if(a.date!==b.date)return bookingFilter==='past'?b.date.localeCompare(a.date):a.date.localeCompare(b.date);
-    return parseInt((a.slotRaw||'0|1').split('|')[0])-parseInt((b.slotRaw||'0|1').split('|')[0]);
-  });
+  let items=Object.values(bookings).filter(b=>(b.studio||'photo')===selStudio&&b.date===selDate);
+  items.sort((a,b)=>parseInt((a.slotRaw||'0|1').split('|')[0])-parseInt((b.slotRaw||'0|1').split('|')[0]));
   if(!items.length){list.innerHTML='<div class="bl-empty">No bookings found</div>';return;}
   list.innerHTML=items.map(b=>{
-    const dt=b.date===ts?'Today':new Date(b.date).toLocaleDateString('en-IN',{day:'numeric',month:'short',weekday:'short'});
-    const reminderBtn=b.date===ts?'<button class="btn-reminder" onclick="event.stopPropagation();openModal(\''+b.id+'\')" style="background:#25D366;border:none;border-radius:6px;padding:4px 8px;font-size:10px;color:#fff;cursor:pointer;">Invoice</button>':'';
-    return '<div class="bitem" data-booking="'+b.id+'" onclick="openModal(\''+b.id+'\')">'
-      +'<div class="bitem-info">'
-      +'<div class="bitem-name">'+b.name+'</div>'
-      +'<div class="bitem-meta"><span style="color:var(--raja);font-weight:600;">'+dt+'</span> · '+b.slot+' · '+b.type+(b.notes?' · 📝':'')+'</div>'
-      +'</div>'
-      +'<div style="display:flex;align-items:center;gap:6px;">'
-      +reminderBtn
-      +'<span class="badge '+(b.paid?'badge-paid':b.advance>0?'badge-adv':'badge-pend')+'">'+(b.paid?'Paid':b.advance>0?'Advance':'Pending')+'</span>'
-      +'</div>'
-      +'</div>';
+    const dt=b.date===ts?'Today':new Date(b.date+'T12:00:00').toLocaleDateString('en-IN',{day:'numeric',month:'short',weekday:'short'});
+    return '<div class="bitem" onclick="openModal(\''+b.id+'\')">'
+      +'<div class="bitem-info"><div class="bitem-name">'+b.name+'</div>'
+      +'<div class="bitem-meta"><span style="color:var(--raja);font-weight:600;">'+dt+'</span> · '+b.slot+' · '+b.type+(b.notes?' · 📝':'')+'</div></div>'
+      +'<span class="badge '+(b.paid?'badge-paid':b.advance>0?'badge-adv':'badge-pend')+'">'+(b.paid?'Paid':b.advance>0?'Advance':'Pending')+'</span></div>';
   }).join('');
 }
-
 
 function renderUpcomingBookings(){
-  const list=document.getElementById('upcoming-booking-list');
-  if(!list)return;
-
+  const list=document.getElementById('upcoming-booking-list');if(!list)return;
   const ts=todayStr();
-
-  let items=Object.values(bookings)
-    .filter(b=>b.date>=ts)
-    .sort((a,b)=>{
-      if(a.date!==b.date)return a.date.localeCompare(b.date);
-      return parseInt((a.slotRaw||'0|1').split('|')[0])-
-             parseInt((b.slotRaw||'0|1').split('|')[0]);
-    })
-    .slice(0,5);
-
-  if(!items.length){
-    list.innerHTML='<div class="bl-empty">No upcoming bookings</div>';
-    return;
-  }
-
+  let items=Object.values(bookings).filter(b=>b.date>=ts).sort((a,b)=>{
+    if(a.date!==b.date)return a.date.localeCompare(b.date);
+    return parseInt((a.slotRaw||'0|1').split('|')[0])-parseInt((b.slotRaw||'0|1').split('|')[0]);
+  }).slice(0,5);
+  if(!items.length){list.innerHTML='<div class="bl-empty">No upcoming bookings</div>';return;}
   list.innerHTML=items.map(b=>{
-    const dt=new Date(b.date).toLocaleDateString('en-IN',{
-      day:'numeric',
-      month:'short',
-      weekday:'short'
-    });
-
-    return '<div class="bitem" data-booking="'+b.id+'" onclick="openModal(\''+b.id+'\')">'
-      +'<div class="bitem-info">'
-      +'<div class="bitem-name">'+b.name+'</div>'
-      +'<div class="bitem-meta">'
-      +dt+' · '+b.slot+' · '+b.type+(b.notes?' · 📝':'')
-      +'</div>'
-      +'</div>'
-      +'<span class="badge '
-      +(b.paid?'badge-paid':b.advance>0?'badge-adv':'badge-pend')
-      +'">'
-      +(b.paid?'Paid':b.advance>0?'Advance':'Pending')
-      +'</span>'
-      +'</div>';
+    const dt=new Date(b.date+'T12:00:00').toLocaleDateString('en-IN',{day:'numeric',month:'short',weekday:'short'});
+    return '<div class="bitem" onclick="openModal(\''+b.id+'\')">'
+      +'<div class="bitem-info"><div class="bitem-name">'+b.name+'</div>'
+      +'<div class="bitem-meta">'+dt+' · '+b.slot+' · '+b.type+(b.notes?' · 📝':'')+'</div></div>'
+      +'<span class="badge '+(b.paid?'badge-paid':b.advance>0?'badge-adv':'badge-pend')+'">'+(b.paid?'Paid':b.advance>0?'Advance':'Pending')+'</span></div>';
   }).join('');
 }
 
-
-
-
-
-
-
-window.updateDiscount=function(){
-  try{
-    if(!modalBookingId || !bookings[modalBookingId]) return;
-
-    const b = bookings[modalBookingId];
-    const discountInput = document.getElementById('modal-discount-input');
-
-    if(!discountInput) return;
-
-    const discount = Number(discountInput.value)||0;
-    const total = Number(b.total)||0;
-    const advInput = document.getElementById('modal-adv');
-    const advance = advInput?Number(advInput.value)||0:Number(b.advance)||0;
-
-    const finalAmount = Math.max(0,total-discount);
-    const balance = Math.max(0,finalAmount-advance);
-
-    b.discount = discount;
-    b.advance = advance;
-    b.finalAmount = finalAmount;
-    b.balance = balance;
-    b.paid = balance<=0;
-
-    const balEl=document.getElementById('modal-balance');
-    if(balEl){
-      balEl.textContent='₹'+balance.toLocaleString('en-IN');
-    }
-
-    const statusEl=document.getElementById('modal-status');
-    if(statusEl){
-      statusEl.textContent=b.paid?'✅ Fully Paid':'Pending';
-    }
-
-    backupBookings();
-
-    if(typeof save==='function'){
-      save();
-    }
-
-  }catch(err){
-    console.error('Discount update failed',err);
-  }
-}
-
-window.updateAdvance=function(){
-  try{
-    if(!modalBookingId || !bookings[modalBookingId]) return;
-    const b = bookings[modalBookingId];
-    const advInput = document.getElementById('modal-adv');
-    if(!advInput) return;
-    const advance = Number(advInput.value)||0;
-    const total = Number(b.total)||0;
-    const discount = Number(b.discount)||0;
-    const balance = Math.max(0,total-discount-advance);
-    b.advance = advance;
-    b.balance = balance;
-    b.paid = balance<=0;
-    const balEl=document.getElementById('modal-balance');
-    if(balEl) balEl.textContent='₹'+balance.toLocaleString('en-IN');
-    const statusEl=document.getElementById('modal-status');
-    if(statusEl) statusEl.textContent=b.paid?'✅ Fully Paid':advance>0?'Advance Paid':'Pending';
-    const payBtn=document.getElementById('modal-pay-btn');
-    if(payBtn) payBtn.style.display=b.paid?'none':'block';
-    const invBtn=document.getElementById('modal-invoice-btn');
-    if(invBtn) invBtn.style.display=b.paid?'block':'none';
-    backupBookings();
-    if(typeof save==='function') save();
-    renderBookingList();
-  }catch(err){
-    console.error('Advance update failed',err);
-  }
-}
-
-window.applyReschedule=async function(){
-  if(!modalBookingId)return;
-  const b=bookings[modalBookingId];if(!b)return;
-  const newStart=parseInt(document.getElementById('reschedule-hour').value);
-  const parts=(b.slotRaw||'9|2').split('|');
-  const oldStart=parseInt(parts[0]),dur=parseInt(parts[1]||1);
-  if(newStart===oldStart){showToast('Same time selected');return;}
-  if(newStart+dur>23){showToast('Booking would go past 11pm!');return;}
-  const dayBookings=Object.values(bookings).filter(bk=>bk.date===b.date&&(bk.studio||'photo')===(b.studio||'photo')&&bk.id!==b.id);
-  if(slotOverlaps(dayBookings.map(bk=>bk.slotRaw||''),newStart,dur)){showToast('Conflicts with another booking!');return;}
-  b.slotRaw=newStart+'|'+dur;
-  b.slot=formatSlot(newStart,dur);
-  backupBookings();
-  await save();
-  syncToSheets(b);
-  document.getElementById('modal-slot').textContent=b.slot;
-  showToast('Rescheduled to '+b.slot+' ✓');
-  renderBookingList();
-  renderSlots();
-}
-
-
-
 // ── MODAL ──
-
 window.openModal=function(id){
-
-  const b=bookings[id]; if(!b)return;
+  const b=bookings[id];if(!b)return;
   modalBookingId=id;
   const dur=b.slotRaw?parseInt(b.slotRaw.split('|')[1]||1):1;
   const total=Number(b.total)||(dur*HOURLY_RATE);
-  const disc=Number(b.discount)||0;
-  const adv=Number(b.advance)||0;
+  const disc=Number(b.discount)||0;const adv=Number(b.advance)||0;
   const bal=b.paid?0:Math.max(0,total-disc-adv);
   document.getElementById('modal-client-name').textContent=b.name;
-  document.getElementById('modal-meta').textContent=(b.studioName||'Studio')+' · '+new Date(b.date).toLocaleDateString('en-IN',{day:'numeric',month:'short',year:'numeric'});
+  document.getElementById('modal-meta').textContent=(b.studioName||'Studio')+' · '+new Date(b.date+'T12:00:00').toLocaleDateString('en-IN',{day:'numeric',month:'short',year:'numeric'});
   document.getElementById('modal-type').textContent=b.type;
   document.getElementById('modal-slot').textContent=b.slot;
   document.getElementById('modal-total').textContent='₹'+total.toLocaleString('en-IN');
   document.getElementById('modal-discount-input').value=disc||0;
-  const safeAdv = Math.min(adv, total);
-  document.getElementById('modal-adv').value=safeAdv||0;
+  document.getElementById('modal-adv').value=Math.min(adv,total)||0;
   document.getElementById('modal-balance').textContent='₹'+bal.toLocaleString('en-IN');
   document.getElementById('modal-status').textContent=b.paid?'✅ Fully Paid':adv>0?'Advance Paid':'Pending';
   document.getElementById('modal-pay-btn').style.display=b.paid?'none':'block';
   document.getElementById('modal-invoice-btn').style.display=b.paid?'block':'none';
-  // Notes
-  const notesRow=document.getElementById('modal-notes-row');
-  const notesEl=document.getElementById('modal-notes');
+  const notesRow=document.getElementById('modal-notes-row'),notesEl=document.getElementById('modal-notes');
   if(b.notes){notesRow.style.display='flex';notesEl.textContent=b.notes;}else{notesRow.style.display='none';}
-  // Reschedule dropdown
   const rescheduleSelect=document.getElementById('reschedule-hour');
-  const parts=(b.slotRaw||'9|2').split('|');
-  const curStart=parseInt(parts[0]),curDur=parseInt(parts[1]||1);
+  const parts=(b.slotRaw||'9|2').split('|');const curStart=parseInt(parts[0]);
   rescheduleSelect.innerHTML=HOUR_LABELS.slice(0,-1).map((_,i)=>{
-    const h=7+i;
-    return '<option value="'+h+'"'+(h===curStart?' selected':'')+'>'+HOUR_LABELS[i]+'</option>';
+    const h=7+i;return '<option value="'+h+'"'+(h===curStart?' selected':'')+'>'+HOUR_LABELS[i]+'</option>';
   }).join('');
-  extendHrs=1;
-  document.getElementById('extend-hrs').textContent=1;
+  extendHrs=1;document.getElementById('extend-hrs').textContent=1;
   document.getElementById('payment-modal').classList.add('open');
 };
-
 window.closeModal=function(){document.getElementById('payment-modal').classList.remove('open');};
+
+window.updateDiscount=function(){
+  try{
+    if(!modalBookingId||!bookings[modalBookingId])return;
+    const b=bookings[modalBookingId];
+    const discount=Number(document.getElementById('modal-discount-input').value)||0;
+    const total=Number(b.total)||0;
+    const advInput=document.getElementById('modal-adv');
+    const advance=advInput?Number(advInput.value)||0:Number(b.advance)||0;
+    const finalAmount=Math.max(0,total-discount);const balance=Math.max(0,finalAmount-advance);
+    b.discount=discount;b.advance=advance;b.finalAmount=finalAmount;b.balance=balance;b.paid=balance<=0;
+    document.getElementById('modal-balance').textContent='₹'+balance.toLocaleString('en-IN');
+    document.getElementById('modal-status').textContent=b.paid?'✅ Fully Paid':'Pending';
+    backupBookings();save();
+  }catch(err){console.error('Discount update failed',err);}
+};
+
+window.updateAdvance=function(){
+  try{
+    if(!modalBookingId||!bookings[modalBookingId])return;
+    const b=bookings[modalBookingId];
+    const advance=Number(document.getElementById('modal-adv').value)||0;
+    const total=Number(b.total)||0;const discount=Number(b.discount)||0;
+    const balance=Math.max(0,total-discount-advance);
+    b.advance=advance;b.balance=balance;b.paid=balance<=0;
+    document.getElementById('modal-balance').textContent='₹'+balance.toLocaleString('en-IN');
+    document.getElementById('modal-status').textContent=b.paid?'✅ Fully Paid':advance>0?'Advance Paid':'Pending';
+    document.getElementById('modal-pay-btn').style.display=b.paid?'none':'block';
+    document.getElementById('modal-invoice-btn').style.display=b.paid?'block':'none';
+    backupBookings();save();renderBookingList();
+  }catch(err){console.error('Advance update failed',err);}
+};
+
+window.applyReschedule=async function(){
+  if(!modalBookingId)return;const b=bookings[modalBookingId];if(!b)return;
+  const newStart=parseInt(document.getElementById('reschedule-hour').value);
+  const parts=(b.slotRaw||'9|2').split('|');const oldStart=parseInt(parts[0]),dur=parseInt(parts[1]||1);
+  if(newStart===oldStart){showToast('Same time selected');return;}
+  if(newStart+dur>23){showToast('Booking would go past 11pm!');return;}
+  const dayBookings=Object.values(bookings).filter(bk=>bk.date===b.date&&(bk.studio||'photo')===(b.studio||'photo')&&bk.id!==b.id);
+  if(slotOverlaps(dayBookings.map(bk=>bk.slotRaw||''),newStart,dur)){showToast('Conflicts with another booking!');return;}
+  b.slotRaw=newStart+'|'+dur;b.slot=formatSlot(newStart,dur);
+  backupBookings();await save();syncToSheets(b);
+  document.getElementById('modal-slot').textContent=b.slot;
+  showToast('Rescheduled to '+b.slot+' ✓');renderBookingList();renderSlots();
+};
 
 window.markFullPayment=async function(){
   if(!modalBookingId)return;
-  bookings[modalBookingId].paid=true;
-  bookings[modalBookingId].balance=0;
-  backupBookings();
-  await save();
-  syncToSheets(bookings[modalBookingId]);
-  // Update modal in-place (don't close — let user send invoice)
+  bookings[modalBookingId].paid=true;bookings[modalBookingId].balance=0;
+  backupBookings();await save();syncToSheets(bookings[modalBookingId]);
   document.getElementById('modal-balance').textContent='₹0';
   document.getElementById('modal-status').textContent='✅ Fully Paid';
-  document.getElementById('modal-status').style.color='var(--keer)';
   document.getElementById('modal-pay-btn').style.display='none';
   document.getElementById('modal-invoice-btn').style.display='block';
-  showToast('Payment marked ✓ Now send the invoice!',3500);
-  renderBookingList();
+  showToast('Payment marked ✓',3000);renderBookingList();
 };
 
 // ── EXTEND ──
 window.changeExtend=function(d){extendHrs=Math.max(1,Math.min(8,extendHrs+d));document.getElementById('extend-hrs').textContent=extendHrs;};
-
 window.applyExtension=async function(isAdd){
   const b=bookings[modalBookingId];if(!b)return;
-  const parts=(b.slotRaw||'9|2').split('|');
-  const startH=parseInt(parts[0]),oldDur=parseInt(parts[1]);
+  const parts=(b.slotRaw||'9|2').split('|');const startH=parseInt(parts[0]),oldDur=parseInt(parts[1]);
   const newDur=isAdd?oldDur+extendHrs:Math.max(1,oldDur-extendHrs);
   if(startH+newDur>23){showToast('Cannot go past 11pm!');return;}
   if(isAdd){
     const dayBookings=Object.values(bookings).filter(bk=>bk.date===b.date&&(bk.studio||'photo')===(b.studio||'photo')&&bk.id!==b.id);
     if(slotOverlaps(dayBookings.map(bk=>bk.slotRaw||''),startH+oldDur,extendHrs)){showToast('Conflicts with another booking!');return;}
   }
+  const bRate=Number(b.hourlyRate)||HOURLY_RATE;
   bookings[modalBookingId].slotRaw=startH+'|'+newDur;
   bookings[modalBookingId].slot=formatSlot(startH,newDur);
-  const bRate=Number(b.hourlyRate)||HOURLY_RATE;
   bookings[modalBookingId].total=newDur*bRate;
   const adv=Number(b.advance)||0,disc=Number(b.discount)||0;
   bookings[modalBookingId].balance=b.paid?0:Math.max(0,newDur*bRate-disc-adv);
-  backupBookings();
-  await save();
-  syncToSheets(bookings[modalBookingId]);
+  backupBookings();await save();syncToSheets(bookings[modalBookingId]);
   document.getElementById('modal-slot').textContent=bookings[modalBookingId].slot;
   document.getElementById('modal-total').textContent='₹'+(newDur*bRate).toLocaleString('en-IN');
-  showToast((isAdd?'Extended':'Reduced')+' to '+bookings[modalBookingId].slot+' ✓',3000);
-  renderBookingList();
-  renderSlots();
+  showToast((isAdd?'Extended':'Reduced')+' to '+bookings[modalBookingId].slot+' ✓');
+  renderBookingList();renderSlots();
 };
 
-// ── WHATSAPP GROUP ──
-const TEAM_GROUP_LINK='https://chat.whatsapp.com/L2qwfveE7SdCHZEB4Tge7d';
-
-// ── HELPERS: read live discount from modal input ──
-function getLiveDiscount(){
-  const inp=document.getElementById('modal-discount-input');
-  return inp?Number(inp.value)||0:0;
-}
-
 // ── WHATSAPP ──
+const TEAM_GROUP_LINK='https://chat.whatsapp.com/L2qwfveE7SdCHZEB4Tge7d';
+function getLiveDiscount(){const inp=document.getElementById('modal-discount-input');return inp?Number(inp.value)||0:0;}
+
 window.sendClientWhatsApp=function(){
   const b=bookings[modalBookingId];if(!b)return;
-  const phone=cleanPhone(b.phone);
-  const dur=b.slotRaw?parseInt(b.slotRaw.split('|')[1]||1):1;
-  const total=Number(b.total)||(dur*HOURLY_RATE);
-  const disc=getLiveDiscount();
-  const adv=Math.min(Number(b.advance)||0,total);
-  const afterDisc=Math.max(0,total-disc);
+  const phone=cleanPhone(b.phone);const dur=b.slotRaw?parseInt(b.slotRaw.split('|')[1]||1):1;
+  const total=Number(b.total)||(dur*HOURLY_RATE);const disc=getLiveDiscount();
+  const adv=Math.min(Number(b.advance)||0,total);const afterDisc=Math.max(0,total-disc);
   const bal=b.paid?0:Math.max(0,afterDisc-adv);
-  const dateStr=new Date(b.date).toLocaleDateString('en-IN',{weekday:'long',day:'numeric',month:'long',year:'numeric'});
+  const dateStr=new Date(b.date+'T12:00:00').toLocaleDateString('en-IN',{weekday:'long',day:'numeric',month:'long',year:'numeric'});
   let msg='Hi '+b.name+'! 👋\n\nYour shoot at *Magizh Rental Photo Studio* is confirmed ✅\n\n';
-  msg+='📅 *Date:* '+dateStr+'\n';
-  msg+='⏰ *Slot:* '+b.slot+'\n';
-  msg+='📸 *Shoot type:* '+b.type+'\n\n';
+  msg+='📅 *Date:* '+dateStr+'\n⏰ *Slot:* '+b.slot+'\n📸 *Shoot type:* '+b.type+'\n\n';
   if(b.notes)msg+='📝 *Notes:* '+b.notes+'\n\n';
   msg+='💵 *Total:* ₹'+total.toLocaleString('en-IN')+'\n';
-  if(disc>0){msg+='🏷️ *Discount:* - ₹'+disc.toLocaleString('en-IN')+'\n';}
-  if(disc>0){msg+='✅ *After discount:* ₹'+afterDisc.toLocaleString('en-IN')+'\n';}
-  msg+='💰 *Advance paid:* ₹'+adv.toLocaleString('en-IN')+'\n';
-  msg+='🔖 *Balance due:* ₹'+bal.toLocaleString('en-IN')+'\n\n';
+  if(disc>0)msg+='🏷️ *Discount:* - ₹'+disc.toLocaleString('en-IN')+'\n✅ *After discount:* ₹'+afterDisc.toLocaleString('en-IN')+'\n';
+  msg+='💰 *Advance paid:* ₹'+adv.toLocaleString('en-IN')+'\n🔖 *Balance due:* ₹'+bal.toLocaleString('en-IN')+'\n\n';
   msg+='📍 *Location:* '+STUDIO_LOC+'\n\nPlease arrive 10 minutes early!\n— Magizh Studio Team';
   window.open('https://wa.me/91'+phone+'?text='+encodeURIComponent(msg),'_blank');
 };
@@ -1255,59 +997,31 @@ window.sendClientWhatsApp=function(){
 window.sendTeamWhatsApp=function(){
   const b=bookings[modalBookingId];if(!b)return;
   const dur=b.slotRaw?parseInt(b.slotRaw.split('|')[1]||1):1;
-  const total=Number(b.total)||(dur*HOURLY_RATE);
-  const disc=getLiveDiscount();
-  const adv=Math.min(Number(b.advance)||0, total);
-  const afterDisc=Math.max(0,total-disc);
+  const total=Number(b.total)||(dur*HOURLY_RATE);const disc=getLiveDiscount();
+  const adv=Math.min(Number(b.advance)||0,total);const afterDisc=Math.max(0,total-disc);
   const bal=b.paid?0:Math.max(0,afterDisc-adv);
   const invNo='MZ-'+b.id.slice(-6).toUpperCase();
-  const dateStr=new Date(b.date).toLocaleDateString('en-IN',{weekday:'short',day:'numeric',month:'short',year:'numeric'});
-  let msg='🆕 *New Booking — Magizh Studio*\n';
-  msg+='🔖 *Ref:* #'+invNo+'\n\n';
-  msg+='👤 *Client:* '+b.name+'\n';
-  msg+='📞 *Phone:* '+b.phone+'\n';
-  msg+='📅 *Date:* '+dateStr+'\n';
-  msg+='⏰ *Slot:* '+b.slot+'\n';
-  msg+='📸 *Shoot type:* '+b.type+'\n';
-  msg+='🏢 *Studio:* '+(b.studioName||'Photography Studio')+'\n\n';
+  const dateStr=new Date(b.date+'T12:00:00').toLocaleDateString('en-IN',{weekday:'short',day:'numeric',month:'short',year:'numeric'});
+  let msg='🆕 *New Booking — Magizh Studio*\n🔖 *Ref:* #'+invNo+'\n\n';
+  msg+='👤 *Client:* '+b.name+'\n📞 *Phone:* '+b.phone+'\n📅 *Date:* '+dateStr+'\n⏰ *Slot:* '+b.slot+'\n📸 *Shoot type:* '+b.type+'\n🏢 *Studio:* '+(b.studioName||'Photography Studio')+'\n\n';
   if(b.notes)msg+='📝 *Notes:* '+b.notes+'\n';
   msg+='💵 *Total:* ₹'+total.toLocaleString('en-IN')+'\n';
-  if(disc>0){
-    msg+='🏷️ *Discount:* - ₹'+disc.toLocaleString('en-IN')+'\n';
-    msg+='✅ *After discount:* ₹'+afterDisc.toLocaleString('en-IN')+'\n';
-  }
-  msg+='💰 *Advance:* ₹'+adv.toLocaleString('en-IN')+'\n';
-  msg+='🔖 *Balance:* ₹'+bal.toLocaleString('en-IN')+'\n';
-  msg+='📊 *Status:* '+(b.paid?'✅ Fully Paid':adv>0?'⏳ Advance Paid':'❌ Pending')+'\n\n';
-  msg+='👷 *Booked by:* '+currentUser;
-  // Group invite links don't support ?text= — copy to clipboard then open group
+  if(disc>0)msg+='🏷️ *Discount:* - ₹'+disc.toLocaleString('en-IN')+'\n✅ *After discount:* ₹'+afterDisc.toLocaleString('en-IN')+'\n';
+  msg+='💰 *Advance:* ₹'+adv.toLocaleString('en-IN')+'\n🔖 *Balance:* ₹'+bal.toLocaleString('en-IN')+'\n';
+  msg+='📊 *Status:* '+(b.paid?'✅ Fully Paid':adv>0?'⏳ Advance Paid':'❌ Pending')+'\n\n👷 *Booked by:* '+currentUser;
   if(navigator.clipboard&&navigator.clipboard.writeText){
-    navigator.clipboard.writeText(msg).then(()=>{
-      showToast('Message copied! Paste it in the group 👇',4000);
-      setTimeout(()=>window.open(TEAM_GROUP_LINK,'_blank'),400);
-    }).catch(()=>{
-      // Fallback if clipboard denied
-      window.open(TEAM_GROUP_LINK,'_blank');
-      showToast('Open group — type the booking details manually',4000);
-    });
-  }else{
-    window.open(TEAM_GROUP_LINK,'_blank');
-    showToast('Open group and share booking details',3000);
-  }
+    navigator.clipboard.writeText(msg).then(()=>{showToast('Message copied! Paste it in the group 👇',4000);setTimeout(()=>window.open(TEAM_GROUP_LINK,'_blank'),400);}).catch(()=>window.open(TEAM_GROUP_LINK,'_blank'));
+  }else{window.open(TEAM_GROUP_LINK,'_blank');}
 };
 
 window.sendReminderWhatsApp=function(){
   const b=bookings[modalBookingId];if(!b)return;
-  const phone=cleanPhone(b.phone);
-  const dur=b.slotRaw?parseInt(b.slotRaw.split('|')[1]||1):1;
-  const total=Number(b.total)||(dur*HOURLY_RATE);
-  const disc=getLiveDiscount();
-  const adv=Math.min(Number(b.advance)||0,total);
-  const bal=b.paid?0:Math.max(0,Math.max(0,total-disc)-adv);
-  const dateStr=new Date(b.date).toLocaleDateString('en-IN',{weekday:'long',day:'numeric',month:'long'});
+  const phone=cleanPhone(b.phone);const dur=b.slotRaw?parseInt(b.slotRaw.split('|')[1]||1):1;
+  const total=Number(b.total)||(dur*HOURLY_RATE);const disc=getLiveDiscount();
+  const adv=Math.min(Number(b.advance)||0,total);const bal=b.paid?0:Math.max(0,Math.max(0,total-disc)-adv);
+  const dateStr=new Date(b.date+'T12:00:00').toLocaleDateString('en-IN',{weekday:'long',day:'numeric',month:'long'});
   let msg='Hi '+b.name+'! 👋\n\nReminder for your shoot *tomorrow* at Magizh Studio 📸\n\n';
-  msg+='📅 *Date:* '+dateStr+'\n';
-  msg+='⏰ *Slot:* '+b.slot+'\n';
+  msg+='📅 *Date:* '+dateStr+'\n⏰ *Slot:* '+b.slot+'\n';
   if(bal>0)msg+='🔖 *Balance due:* ₹'+bal.toLocaleString('en-IN')+'\n';
   msg+='📍 *Location:* '+STUDIO_LOC+'\n\nPlease arrive 10 minutes early!\n— Magizh Studio';
   window.open('https://wa.me/91'+phone+'?text='+encodeURIComponent(msg),'_blank');
@@ -1318,157 +1032,266 @@ window.sendInvoicePDF=async function(){
   const b=bookings[modalBookingId];if(!b)return;
   if(typeof window.jspdf==='undefined'){showToast('PDF loading, try again...');return;}
   try{
-    const {jsPDF}=window.jspdf;
-    const doc=new jsPDF({unit:'mm',format:'a4'});
+    const {jsPDF}=window.jspdf;const pdf=new jsPDF({unit:'mm',format:'a4'});
     const dur=b.slotRaw?parseInt(b.slotRaw.split('|')[1]||1):1;
-    const total=Number(b.total)||(dur*HOURLY_RATE);
-    const disc=getLiveDiscount();
+    const total=Number(b.total)||(dur*HOURLY_RATE);const disc=getLiveDiscount();
     b.discount=disc;bookings[modalBookingId].discount=disc;
-    const afterDisc=Math.max(0,total-disc);
-    const adv=Math.min(Number(b.advance)||0,afterDisc);
+    const afterDisc=Math.max(0,total-disc);const adv=Math.min(Number(b.advance)||0,afterDisc);
     const bal=b.paid?0:Math.max(0,afterDisc-adv);
     const invNo='MZ-'+b.id.slice(-6).toUpperCase();
-    const dateStr=new Date(b.date).toLocaleDateString('en-IN',{day:'numeric',month:'long',year:'numeric'});
+    const dateStr=new Date(b.date+'T12:00:00').toLocaleDateString('en-IN',{day:'numeric',month:'long',year:'numeric'});
     const now=new Date().toLocaleString('en-IN',{day:'numeric',month:'short',year:'numeric',hour:'2-digit',minute:'2-digit'});
-
-    // ── Header ──
-    doc.setFillColor(232,96,26);doc.rect(0,0,210,40,'F');
-    doc.setTextColor(255,255,255);doc.setFont('helvetica','bold');doc.setFontSize(22);
-    doc.text('MAGIZH STUDIO',15,16);
-    doc.setFont('helvetica','normal');doc.setFontSize(9);
-    doc.text('Rental Photo Studio, Nerkundram, Chennai',15,23);
-    doc.text('+91 8072 659 679  |  @magizh_studio_',15,29);
-    doc.setFont('helvetica','bold');doc.setFontSize(20);doc.text('INVOICE',195,16,{align:'right'});
-    doc.setFont('helvetica','normal');doc.setFontSize(9);
-    doc.text('#'+invNo,195,23,{align:'right'});doc.text(now,195,29,{align:'right'});
-
-    // ── Bill To ──
-    doc.setTextColor(130,130,130);doc.setFont('helvetica','bold');doc.setFontSize(9);doc.text('BILL TO',15,52);
-    doc.setTextColor(20,20,20);doc.setFontSize(13);doc.text(b.name,15,59);
-    doc.setFont('helvetica','normal');doc.setFontSize(10);doc.text('Phone: '+b.phone,15,65);
-    doc.setTextColor(130,130,130);doc.setFont('helvetica','bold');doc.setFontSize(9);doc.text('BOOKING DATE',195,52,{align:'right'});
-    doc.setTextColor(20,20,20);doc.setFont('helvetica','normal');doc.setFontSize(11);doc.text(dateStr,195,59,{align:'right'});
-    doc.setFontSize(10);doc.text(b.studioName||'Photography Studio',195,65,{align:'right'});
-
-    // ── Table ──
-    doc.setFillColor(26,26,26);doc.rect(15,78,180,10,'F');
-    doc.setTextColor(255,255,255);doc.setFont('helvetica','bold');doc.setFontSize(10);
-    doc.text('DESCRIPTION',20,84);doc.text('SLOT',100,84);doc.text('HRS',148,84,{align:'center'});doc.text('AMOUNT',190,84,{align:'right'});
-    doc.setTextColor(20,20,20);doc.setFont('helvetica','normal');doc.setFontSize(10);
-    doc.text(b.type,20,96);doc.text(b.slot,100,96);doc.text(String(dur),148,96,{align:'center'});
-    // Show original total with strikethrough if discount applied
-    if(disc>0){
-      doc.setTextColor(160,160,160);
-      doc.text('Rs.'+total.toLocaleString('en-IN'),190,96,{align:'right'});
-      const tw=doc.getTextWidth('Rs.'+total.toLocaleString('en-IN'));
-      doc.setDrawColor(160,160,160);doc.line(190-tw,95.5,190,95.5);
-    }else{
-      doc.setTextColor(20,20,20);
-      doc.text('Rs.'+total.toLocaleString('en-IN'),190,96,{align:'right'});
-    }
-    doc.setDrawColor(230,230,230);doc.line(15,101,195,101);
-
-    // ── Totals block ──
-    let rowY=111;
-    doc.setFontSize(10);
-
-    if(disc>0){
-      // Discount row
-      doc.setTextColor(130,130,130);doc.setFont('helvetica','normal');
-      doc.text('Discount',130,rowY);
-      doc.setTextColor(153,27,27);
-      doc.text('- Rs.'+disc.toLocaleString('en-IN'),190,rowY,{align:'right'});
-      rowY+=9;
-
-      // NET PAYABLE — prominent highlight box
-      doc.setFillColor(232,96,26);doc.rect(128,rowY-5,67,12,'F');
-      doc.setFont('helvetica','bold');doc.setFontSize(10);doc.setTextColor(255,255,255);
-      doc.text('NET PAYABLE',133,rowY+3);
-      doc.text('Rs.'+afterDisc.toLocaleString('en-IN'),190,rowY+3,{align:'right'});
-      rowY+=16;
-    }
-
-    // Advance Paid row
-    doc.setFont('helvetica','normal');doc.setFontSize(10);
-    doc.setTextColor(130,130,130);doc.text('Advance Paid',130,rowY);
-    doc.setTextColor(26,122,74);doc.text('- Rs.'+adv.toLocaleString('en-IN'),190,rowY,{align:'right'});
-    rowY+=9;
-
-    // Balance / Fully Paid box
-    const paidColor=b.paid?[220,252,231]:[254,226,226];
-    const textColor=b.paid?[22,101,52]:[153,27,27];
-    doc.setFillColor(...paidColor);doc.rect(128,rowY-1,67,14,'F');
-    doc.setFont('helvetica','bold');doc.setFontSize(12);
-    doc.setTextColor(...textColor);
-    doc.text(b.paid?'FULLY PAID':'BALANCE DUE',133,rowY+9);
-    doc.text('Rs.'+(b.paid?afterDisc:bal).toLocaleString('en-IN'),190,rowY+9,{align:'right'});
-
-    // ── Footer ──
-    doc.setFont('helvetica','italic');doc.setFontSize(11);doc.setTextColor(80,80,80);
-    doc.text('Thank you for choosing Magizh Studio | Contact: +91 80726 59679',15,165);
-    doc.setFont('helvetica','normal');doc.setFontSize(9);doc.setTextColor(130,130,130);
-    doc.text('Tag us @magizh_studio_ on Instagram',15,171);
-    doc.setDrawColor(220,220,220);doc.line(15,272,195,272);
-    doc.setFontSize(8);doc.setTextColor(150,150,150);
-    doc.text('Magizh Rental Photo Studio  |  +91 8072 659 679  |  @magizh_studio_',105,278,{align:'center'});
-
-    const fileName='Invoice_'+b.name.replace(/\s+/g,'_')+'_'+b.date+'.pdf';
-
-    // ── Share or Download ──
-    const pdfBlob=doc.output('blob');
-    const pdfFile=new File([pdfBlob],fileName,{type:'application/pdf'});
-    const phone=cleanPhone(b.phone);
-    const waMsg='Hi '+b.name+'! 🙏\n\nYour invoice from *Magizh Studio* is attached 📄\n\n'
-      +'*'+b.type+'* on '+dateStr+'\n'
-      +(disc>0?'*Net Payable:* ₹'+afterDisc.toLocaleString('en-IN')+'\n':'*Total:* ₹'+total.toLocaleString('en-IN')+'\n')
-      +'*Status:* '+(b.paid?'✅ Fully Paid':'⏳ Balance ₹'+bal.toLocaleString('en-IN')+' pending')+'\n\n'
-      +'Thank you for choosing Magizh Studio! 🙌';
-
-    // Try Web Share API (works on mobile — shows native share sheet with WhatsApp option)
-    if(navigator.share&&navigator.canShare&&navigator.canShare({files:[pdfFile]})){
-      try{
-        await navigator.share({
-          files:[pdfFile],
-          title:'Invoice — '+b.name,
-          text:waMsg
-        });
-        showToast('Invoice shared ✓',3000);
-        backupBookings();save();
-        return;
-      }catch(shareErr){
-        if(shareErr.name!=='AbortError'){
-          // Share failed — fall through to download
-        }else{
-          // User cancelled share — don't do anything else
-          return;
-        }
-      }
-    }
-
-    // Desktop fallback — download PDF then open WA with message
-    doc.save(fileName);
-    showToast('PDF saved! Opening WhatsApp — attach the file 📎',5000);
-    setTimeout(()=>{
-      window.open('https://wa.me/91'+phone+'?text='+encodeURIComponent(waMsg),'_blank');
-    },800);
-
+    pdf.setFillColor(232,96,26);pdf.rect(0,0,210,40,'F');
+    pdf.setTextColor(255,255,255);pdf.setFont('helvetica','bold');pdf.setFontSize(22);
+    pdf.text('MAGIZH STUDIO',15,16);
+    pdf.setFont('helvetica','normal');pdf.setFontSize(9);
+    pdf.text('Rental Photo Studio, Nerkundram, Chennai',15,23);
+    pdf.text('+91 8072 659 679  |  @magizh_studio_',15,29);
+    pdf.setFont('helvetica','bold');pdf.setFontSize(20);pdf.text('INVOICE',195,16,{align:'right'});
+    pdf.setFont('helvetica','normal');pdf.setFontSize(9);
+    pdf.text('#'+invNo,195,23,{align:'right'});pdf.text(now,195,29,{align:'right'});
+    pdf.setTextColor(130,130,130);pdf.setFont('helvetica','bold');pdf.setFontSize(9);pdf.text('BILL TO',15,52);
+    pdf.setTextColor(20,20,20);pdf.setFontSize(13);pdf.text(b.name,15,59);
+    pdf.setFont('helvetica','normal');pdf.setFontSize(10);pdf.text('Phone: '+b.phone,15,65);
+    pdf.setTextColor(130,130,130);pdf.setFont('helvetica','bold');pdf.setFontSize(9);pdf.text('BOOKING DATE',195,52,{align:'right'});
+    pdf.setTextColor(20,20,20);pdf.setFont('helvetica','normal');pdf.setFontSize(11);pdf.text(dateStr,195,59,{align:'right'});
+    pdf.setFontSize(10);pdf.text(b.studioName||'Photography Studio',195,65,{align:'right'});
+    pdf.setFillColor(26,26,26);pdf.rect(15,78,180,10,'F');
+    pdf.setTextColor(255,255,255);pdf.setFont('helvetica','bold');pdf.setFontSize(10);
+    pdf.text('DESCRIPTION',20,84);pdf.text('SLOT',100,84);pdf.text('HRS',148,84,{align:'center'});pdf.text('AMOUNT',190,84,{align:'right'});
+    pdf.setTextColor(20,20,20);pdf.setFont('helvetica','normal');pdf.setFontSize(10);
+    pdf.text(b.type,20,96);pdf.text(b.slot,100,96);pdf.text(String(dur),148,96,{align:'center'});
+    if(disc>0){pdf.setTextColor(160,160,160);pdf.text('Rs.'+total.toLocaleString('en-IN'),190,96,{align:'right'});const tw=pdf.getTextWidth('Rs.'+total.toLocaleString('en-IN'));pdf.setDrawColor(160,160,160);pdf.line(190-tw,95.5,190,95.5);}
+    else{pdf.setTextColor(20,20,20);pdf.text('Rs.'+total.toLocaleString('en-IN'),190,96,{align:'right'});}
+    pdf.setDrawColor(230,230,230);pdf.line(15,101,195,101);
+    let rowY=111;pdf.setFontSize(10);
+    if(disc>0){pdf.setTextColor(130,130,130);pdf.setFont('helvetica','normal');pdf.text('Discount',130,rowY);pdf.setTextColor(153,27,27);pdf.text('- Rs.'+disc.toLocaleString('en-IN'),190,rowY,{align:'right'});rowY+=9;
+      pdf.setFillColor(232,96,26);pdf.rect(128,rowY-5,67,12,'F');pdf.setFont('helvetica','bold');pdf.setFontSize(10);pdf.setTextColor(255,255,255);pdf.text('NET PAYABLE',133,rowY+3);pdf.text('Rs.'+afterDisc.toLocaleString('en-IN'),190,rowY+3,{align:'right'});rowY+=16;}
+    pdf.setFont('helvetica','normal');pdf.setFontSize(10);pdf.setTextColor(130,130,130);pdf.text('Advance Paid',130,rowY);pdf.setTextColor(26,122,74);pdf.text('- Rs.'+adv.toLocaleString('en-IN'),190,rowY,{align:'right'});rowY+=9;
+    const paidColor=b.paid?[220,252,231]:[254,226,226];const textColor=b.paid?[22,101,52]:[153,27,27];
+    pdf.setFillColor(...paidColor);pdf.rect(128,rowY-1,67,14,'F');pdf.setFont('helvetica','bold');pdf.setFontSize(12);pdf.setTextColor(...textColor);
+    pdf.text(b.paid?'FULLY PAID':'BALANCE DUE',133,rowY+9);pdf.text('Rs.'+(b.paid?afterDisc:bal).toLocaleString('en-IN'),190,rowY+9,{align:'right'});
+    pdf.setFont('helvetica','italic');pdf.setFontSize(11);pdf.setTextColor(80,80,80);
+    pdf.text('Thank you for choosing Magizh Studio | Contact: +91 80726 59679',15,165);
+    pdf.setFont('helvetica','normal');pdf.setFontSize(9);pdf.setTextColor(130,130,130);pdf.text('Tag us @magizh_studio_ on Instagram',15,171);
+    pdf.setDrawColor(220,220,220);pdf.line(15,272,195,272);pdf.setFontSize(8);pdf.setTextColor(150,150,150);
+    pdf.text('This is a computer-generated invoice. No signature required.',105,278,{align:'center'});
+    const blob=pdf.output('blob');const url=URL.createObjectURL(blob);const a=document.createElement('a');a.href=url;a.download='Magizh_Invoice_'+invNo+'.pdf';a.click();URL.revokeObjectURL(url);
+    setTimeout(()=>{const phone=cleanPhone(b.phone);
+      let msg='Hi '+b.name+'! 📄\n\nHere\'s your invoice from *Magizh Studio*\n\n🔖 *Invoice:* #'+invNo+'\n💵 *Total:* ₹'+total.toLocaleString('en-IN')+'\n';
+      if(disc>0)msg+='🏷️ *Discount:* -₹'+disc.toLocaleString('en-IN')+'\n';
+      msg+='💰 *Advance:* ₹'+adv.toLocaleString('en-IN')+'\n';
+      msg+='🔖 *'+(b.paid?'Paid':'Balance')+':* ₹'+(b.paid?afterDisc:bal).toLocaleString('en-IN')+'\n\n📸 Thank you!\n— Magizh Studio';
+      window.open('https://wa.me/91'+phone+'?text='+encodeURIComponent(msg),'_blank');
+    },500);
     backupBookings();save();
-  }catch(e){showToast('PDF error: '+e.message,4000);}
+  }catch(e){console.error(e);showToast('PDF error — try again');}
+};
+
+// ════════════════════════════════════════
+// ── CALENDAR TAB ──
+// ════════════════════════════════════════
+
+window.setCalFilter=function(f){
+  calFilter=f;
+  ['all','photo','pod'].forEach(t=>{
+    const btn=document.getElementById('cal-filter-'+t);
+    if(btn){btn.style.background=t===f?'var(--dark)':'var(--surface)';btn.style.color=t===f?'#fff':'var(--dark)';btn.style.borderColor=t===f?'var(--dark)':'#e0dbd0';}
+  });
+  renderCalendar();
+};
+
+function renderCalendar(){
+  const label=document.getElementById('cal-month-label');
+  if(!label)return;
+  label.textContent=MONTHS[calMo]+' '+calYr;
+  const grid=document.getElementById('cal-grid');
+  const firstDay=new Date(calYr,calMo,1).getDay();
+  const daysInMonth=new Date(calYr,calMo+1,0).getDate();
+  const ts=todayStr();
+  let html='';
+  for(let i=0;i<firstDay;i++)html+='<div class="cal-day empty"></div>';
+  for(let d=1;d<=daysInMonth;d++){
+    const ds=calYr+'-'+String(calMo+1).padStart(2,'0')+'-'+String(d).padStart(2,'0');
+    let dayItems=Object.values(bookings).filter(b=>b.date===ds);
+    if(calFilter!=='all')dayItems=dayItems.filter(b=>(b.studio||'photo')===calFilter);
+    const count=dayItems.length;
+    const isToday=ds===ts;
+    const isPast=ds<ts;
+    let cls='cal-day'+(isToday?' today':'')+(count>0?' has-bookings':'')+(isPast?' past-day':'');
+    html+='<div class="'+cls+'" onclick="openCalPopup(\''+ds+'\')">';
+    html+='<div class="cal-day-num">'+d+'</div>';
+    if(count>0)html+='<div class="cal-day-count">'+count+'</div>';
+    html+='</div>';
+  }
+  grid.innerHTML=html;
+
+  // Monthly summary
+  const allMonth=Object.values(bookings).filter(b=>{
+    const bd=b.date;if(!bd)return false;
+    const [y,m]=bd.split('-').map(Number);
+    return y===calYr&&m===calMo+1;
+  });
+  let filtered=allMonth;
+  if(calFilter!=='all')filtered=allMonth.filter(b=>(b.studio||'photo')===calFilter);
+  const totalRev=filtered.reduce((s,b)=>s+(Number(b.total)||0),0);
+  const totalAdv=filtered.reduce((s,b)=>s+(Number(b.advance)||0),0);
+  const totalBal=filtered.reduce((s,b)=>s+(b.paid?0:Number(b.balance)||0),0);
+  const summary=document.getElementById('cal-month-summary');
+  if(summary){
+    summary.innerHTML='<div style="font-family:\'Syne\',sans-serif;font-size:14px;font-weight:700;margin-bottom:8px;">'+MONTHS[calMo]+' Summary</div>'
+      +'<div style="display:flex;gap:8px;">'
+      +'<div style="flex:1;text-align:center;"><div style="font-size:10px;color:var(--light);text-transform:uppercase;font-weight:600;">Bookings</div><div style="font-family:\'Syne\',sans-serif;font-size:22px;font-weight:800;">'+filtered.length+'</div></div>'
+      +'<div style="flex:1;text-align:center;"><div style="font-size:10px;color:var(--light);text-transform:uppercase;font-weight:600;">Revenue</div><div style="font-family:\'Syne\',sans-serif;font-size:22px;font-weight:800;">₹'+totalRev.toLocaleString('en-IN')+'</div></div>'
+      +'</div>'
+      +'<div style="display:flex;gap:8px;margin-top:8px;">'
+      +'<div style="flex:1;text-align:center;"><div style="font-size:10px;color:var(--keer);font-weight:600;">Advance</div><div style="font-size:14px;font-weight:700;color:var(--keer);">₹'+totalAdv.toLocaleString('en-IN')+'</div></div>'
+      +'<div style="flex:1;text-align:center;"><div style="font-size:10px;color:var(--raja);font-weight:600;">Pending</div><div style="font-size:14px;font-weight:700;color:var(--raja);">₹'+totalBal.toLocaleString('en-IN')+'</div></div>'
+      +'</div>';
+  }
+}
+
+window.openCalPopup=function(dateStr){
+  let items=Object.values(bookings).filter(b=>b.date===dateStr);
+  if(calFilter!=='all')items=items.filter(b=>(b.studio||'photo')===calFilter);
+  items.sort((a,b)=>parseInt((a.slotRaw||'0|1').split('|')[0])-parseInt((b.slotRaw||'0|1').split('|')[0]));
+  const dt=new Date(dateStr+'T12:00:00');
+  document.getElementById('cal-popup-title').textContent=dt.toLocaleDateString('en-IN',{weekday:'long',day:'numeric',month:'long',year:'numeric'});
+  document.getElementById('cal-popup-sub').textContent=items.length+' booking'+(items.length!==1?'s':'');
+  const list=document.getElementById('cal-popup-list');
+  if(!items.length){list.innerHTML='<div class="bl-empty">No bookings on this day</div>';}
+  else{
+    list.innerHTML=items.map(b=>{
+      const stIcon=(b.studio||'photo')==='photo'?'📷':'🎙️';
+      const status=b.paid?'✅ Paid':Number(b.advance)>0?'⏳ Advance':'❌ Pending';
+      return '<div class="cal-popup-item" onclick="closeCalPopup();openModal(\''+b.id+'\')" style="cursor:pointer;">'
+        +'<div class="cal-popup-item-name">'+stIcon+' '+b.name+'</div>'
+        +'<div class="cal-popup-item-meta">'+b.slot+' · '+b.type+' · '+status+'</div>'
+        +'<div class="cal-popup-item-meta">📞 '+b.phone+(b.notes?' · 📝 '+b.notes:'')+'</div>'
+        +'</div>';
+    }).join('');
+  }
+  document.getElementById('cal-popup').classList.add('open');
+};
+window.closeCalPopup=function(){document.getElementById('cal-popup').classList.remove('open');};
+
+document.getElementById('cal-prev').onclick=()=>{calMo--;if(calMo<0){calMo=11;calYr--;}renderCalendar();};
+document.getElementById('cal-next').onclick=()=>{calMo++;if(calMo>11){calMo=0;calYr++;}renderCalendar();};
+
+// ════════════════════════════════════════
+// ── INTERN DASHBOARD ──
+// ════════════════════════════════════════
+
+function initInternDateStrip(){
+  const strip=document.getElementById('intern-date-strip');strip.innerHTML='';
+  const ts=todayStr();let todayEl=null;
+  for(let i=0;i<14;i++){
+    const d=new Date();d.setDate(d.getDate()+i);
+    const ds=localDateStr(d);
+    const div=document.createElement('div');
+    div.className='dc'+(ds===ts?' sel':'');
+    div.dataset.date=ds;
+    div.innerHTML='<div>'+d.getDate()+'</div><div class="dc-day">'+DS[d.getDay()].slice(0,3)+'</div>';
+    div.onclick=()=>internSelectDate(ds,div);
+    strip.appendChild(div);
+    if(ds===ts){todayEl=div;internDate=ds;}
+  }
+  setTimeout(()=>{if(todayEl)todayEl.scrollIntoView({inline:'center',behavior:'auto'});},50);
+}
+
+function internSelectDate(dateStr,el){
+  internDate=dateStr;
+  document.querySelectorAll('#intern-date-strip .dc').forEach(d=>d.classList.remove('sel'));
+  el.classList.add('sel');
+  renderInternSlots();
+}
+
+window.internSelectStudio=function(studio){
+  internStudio=studio;
+  const photo=document.getElementById('intern-studio-photo'),pod=document.getElementById('intern-studio-pod');
+  if(studio==='photo'){
+    photo.style.background='var(--raja)';photo.style.borderColor='var(--raja)';photo.style.color='#fff';
+    pod.style.background='var(--surface)';pod.style.borderColor='#e0dbd0';pod.style.color='var(--dark)';
+  }else{
+    pod.style.background='var(--ari)';pod.style.borderColor='var(--ari)';pod.style.color='#fff';
+    photo.style.background='var(--surface)';photo.style.borderColor='#e0dbd0';photo.style.color='var(--dark)';
+  }
+  renderInternSlots();
+};
+
+function renderInternSlots(){
+  const grid=document.getElementById('intern-slot-grid');if(!grid)return;
+  const dt=internDate||todayStr();
+  const dayBookings=Object.values(bookings).filter(b=>b.date===dt&&(b.studio||'photo')===internStudio);
+  const lbl=document.getElementById('intern-avail-lbl');
+  const dateLabel=new Date(dt+'T12:00:00').toLocaleDateString('en-IN',{day:'numeric',month:'short',weekday:'short'});
+  if(lbl)lbl.textContent=(internStudio==='photo'?'📷':'🎙️')+' Slots · '+dateLabel;
+  grid.innerHTML=HOUR_LABELS.slice(0,-1).map((lbl,i)=>{
+    const h=7+i;
+    const isBooked=dayBookings.some(b=>{
+      const p=(b.slotRaw||'').split('|');const bS=parseInt(p[0]),bD=parseInt(p[1]||1);
+      return !isNaN(bS)&&h>=bS&&h<bS+bD;
+    });
+    return '<div class="slot '+(isBooked?'booked':'avail')+'">'+lbl+'</div>';
+  }).join('');
+}
+
+function renderInternDashboard(){
+  const ts=todayStr();
+  // Today's bookings
+  const todayLbl=document.getElementById('intern-today-lbl');
+  if(todayLbl)todayLbl.textContent='Today\'s Bookings · '+new Date().toLocaleDateString('en-IN',{day:'numeric',month:'short',weekday:'short'});
+  const todayList=document.getElementById('intern-today-list');
+  const todayItems=Object.values(bookings).filter(b=>b.date===ts).sort((a,b)=>parseInt((a.slotRaw||'0|1').split('|')[0])-parseInt((b.slotRaw||'0|1').split('|')[0]));
+  if(!todayItems.length){todayList.innerHTML='<div class="bl-empty">No bookings today</div>';}
+  else{
+    todayList.innerHTML=todayItems.map(b=>{
+      const stIcon=(b.studio||'photo')==='photo'?'📷':'🎙️';
+      return '<div class="intern-bitem">'
+        +'<div class="intern-bitem-name">'+stIcon+' '+b.name+'</div>'
+        +'<div class="intern-bitem-meta">'+b.slot+' · '+b.type+' · 📞 '+b.phone+'</div>'
+        +(b.notes?'<div class="intern-bitem-meta">📝 '+b.notes+'</div>':'')
+        +'</div>';
+    }).join('');
+  }
+  // Upcoming
+  const upList=document.getElementById('intern-upcoming-list');
+  const upItems=Object.values(bookings).filter(b=>b.date>ts).sort((a,b)=>a.date.localeCompare(b.date)).slice(0,8);
+  if(!upItems.length){upList.innerHTML='<div class="bl-empty">No upcoming bookings</div>';}
+  else{
+    upList.innerHTML=upItems.map(b=>{
+      const dt=new Date(b.date+'T12:00:00').toLocaleDateString('en-IN',{day:'numeric',month:'short',weekday:'short'});
+      const stIcon=(b.studio||'photo')==='photo'?'📷':'🎙️';
+      return '<div class="intern-bitem">'
+        +'<div class="intern-bitem-name">'+stIcon+' '+b.name+'</div>'
+        +'<div class="intern-bitem-meta">'+dt+' · '+b.slot+' · '+b.type+' · 📞 '+b.phone+'</div>'
+        +'</div>';
+    }).join('');
+  }
+  renderInternSlots();
+}
+
+// Request booking (intern → Inba via WhatsApp)
+window.requestBooking=function(){
+  const dt=internDate||todayStr();
+  const dateLabel=new Date(dt+'T12:00:00').toLocaleDateString('en-IN',{weekday:'long',day:'numeric',month:'long'});
+  const studioName=internStudio==='photo'?'Photography Studio':'Podcast Studio';
+  let msg='📋 *Walk-in Booking Request*\n\n';
+  msg+='🏢 *Studio:* '+studioName+'\n';
+  msg+='📅 *Date:* '+dateLabel+'\n';
+  msg+='👷 *Requested by:* '+currentUser+'\n\n';
+  msg+='Client is at the studio — please confirm and book.\n— Magizh Studio App';
+  window.open('https://wa.me/'+INBA_PHONE+'?text='+encodeURIComponent(msg),'_blank');
 };
 
 // ── ADMIN ──
-const ADMIN_PASS='2023';
 window.checkAdminPw=function(){
-  const v=document.getElementById('admin-pw').value;
-  if(v===ADMIN_PASS){
+  if(document.getElementById('admin-pw').value===ADMIN_PW){
     adminUnlocked=true;
     document.getElementById('admin-gate').style.display='none';
     document.getElementById('admin-panel').style.display='block';
-    renderAnnual();
-  }else{
-    document.getElementById('admin-err').style.display='block';
-    document.getElementById('admin-pw').value='';
-  }
+    renderAdmin();
+  }else{document.getElementById('admin-err').style.display='block';}
 };
 window.lockAdmin=function(){
   adminUnlocked=false;
@@ -1477,183 +1300,44 @@ window.lockAdmin=function(){
   document.getElementById('admin-pw').value='';
   document.getElementById('admin-err').style.display='none';
 };
+
+function renderAdmin(){
+  if(!adminUnlocked)return;
+  const all=Object.values(bookings);
+  const totalBookings=all.length;
+  const totalRevenue=all.reduce((s,b)=>s+(Number(b.total)||0),0);
+  const totalAdvance=all.reduce((s,b)=>s+(Number(b.advance)||0),0);
+  const totalPending=all.reduce((s,b)=>s+(b.paid?0:Number(b.balance)||0),0);
+  document.getElementById('ann-stats').innerHTML=
+    '<div class="astat"><div class="astat-lbl">Total bookings</div><div class="astat-val">'+totalBookings+'</div><div class="astat-sub">All time</div></div>'
+    +'<div class="astat"><div class="astat-lbl">Revenue</div><div class="astat-val">₹'+totalRevenue.toLocaleString('en-IN')+'</div><div class="astat-sub">Gross total</div></div>'
+    +'<div class="astat"><div class="astat-lbl">Advance collected</div><div class="astat-val">₹'+totalAdvance.toLocaleString('en-IN')+'</div><div class="astat-sub">From bookings</div></div>'
+    +'<div class="astat"><div class="astat-lbl">Pending balance</div><div class="astat-val">₹'+totalPending.toLocaleString('en-IN')+'</div><div class="astat-sub">Yet to collect</div></div>';
+}
+
 window.resetAllBookings=async function(){
-  if(!confirm('Delete ALL bookings permanently?'))return;
-  if(!confirm('Last chance — are you sure?'))return;
-  bookings={};backupBookings();
-  await save();renderBookingList();showToast('All bookings deleted',3000);
-};
-window.resetAllSwaps=async function(){
-  if(!confirm('Clear all swaps?'))return;
-  swaps={};logs={};backupBookings();
-  await save();renderShift();showToast('Swaps cleared',3000);
+  if(!confirm('Delete ALL bookings? This cannot be undone.'))return;
+  bookings={};backupBookings();await save();showToast('All bookings deleted');renderAdmin();renderCalendar();
 };
 window.factoryReset=async function(){
-  if(!confirm('Factory reset? Deletes EVERYTHING!'))return;
-  if(!confirm('Last chance!'))return;
-  bookings={};swaps={};logs={};backupBookings();
-  await save();renderBookingList();renderShift();showToast('Factory reset done',3000);
+  if(!confirm('FACTORY RESET? This will wipe everything.'))return;
+  bookings={};backupBookings();await save();showToast('Factory reset complete');location.reload();
 };
 
-// ── SHIFT ──
-function getSchedule(y,m){
-  const k=y+'-'+m;if(_cache[k])return _cache[k];
-  const dim=new Date(y,m+1,0).getDate();const res={};const free=[];
-  for(let d=1;d<=dim;d++){
-    const dow=new Date(y,m,d).getDay();const wknd=dow===0||dow===6;
-    if(wknd||isGov(y,m,d)){res[d]=0;}
-    else if(isMuh(y,m,d)){res[d]=1;}
-    else{free.push(d);}
-  }
-  const muhCnt=Object.values(res).filter(v=>v===1).length;
-  const total=free.length+muhCnt,each=Math.round(total/2);
-  const rajaFree=Math.max(0,each-muhCnt);
-  free.forEach((d,i)=>{res[d]=i<rajaFree?1:2;});
-  return _cache[k]=res;
-}
-function asgn(d){const s=swaps[mk()];return(s&&s[d]!==undefined)?s[d]:getSchedule(sYr,sMo)[d]??0;}
-const isSw=d=>{const s=swaps[mk()];return s&&s[d]!==undefined;};
+// ── BACKUP ──
+function backupBookings(){try{localStorage.setItem('magizh_backup_bookings',JSON.stringify(bookings));}catch(e){}}
 
-function renderShift(){
-  document.getElementById('shift-hero-title').textContent=MONTHS[sMo]+' '+sYr;
-  document.getElementById('shift-month-label').textContent=MONTHS[sMo]+' '+sYr;
-  const dim=new Date(sYr,sMo+1,0).getDate();const fd=new Date(sYr,sMo,1).getDay();
-  const cnt=[0,0,0];for(let d=1;d<=dim;d++)cnt[asgn(d)]++;
-  document.getElementById('shift-pcards').innerHTML=P.map((p,i)=>'<div class="pc pc-'+p.c+'"><div class="pc-name">'+p.name+'</div><div class="pc-days">'+cnt[i]+'</div><div class="pc-role">'+p.role+'</div></div>').join('');
-  let html='';
-  for(let i=0;i<fd;i++)html+='<div class="cday empty"></div>';
-  for(let d=1;d<=dim;d++){
-    const pi=asgn(d);
-    const isT=today.getDate()===d&&today.getMonth()===sMo&&today.getFullYear()===sYr;
-    const sw=isSw(d),sel=selDay===d;
-    const muh=isMuh(sYr,sMo,d),gov=isGov(sYr,sMo,d);
-    const icon=muh?'*':gov?'#':'';
-    let ex='';
-    if(step===3&&selP!==null){ex=(asgn(d)===selP&&d!==selDay)?' ghi':(d!==selDay?' gdim':'');}
-    html+='<div class="cday p-'+P[pi].c+(isT?' today':'')+(sw?' swapped':'')+(sel?' sel':'')+ex+'" onclick="tapCal('+d+')">'+'<span class="cdn">'+d+icon+'</span><span class="cdb">'+P[pi].name+'</span></div>';
-  }
-  document.getElementById('cal-grid').innerHTML=html;
-  const muhDays=[],govDays=[];
-  for(let d=1;d<=dim;d++){if(isMuh(sYr,sMo,d))muhDays.push(d);if(isGov(sYr,sMo,d))govDays.push(d);}
-  const diff=cnt[1]-cnt[2];
-  const balTxt=diff===0?'<span style="color:var(--keer);font-weight:600;">Perfectly balanced ✓</span>':diff>0?'Keerthi owes Raja <strong>'+diff+' day'+(diff>1?'s':'')+'</strong> next month':'Raja owes Keerthi <strong>'+Math.abs(diff)+' day'+(Math.abs(diff)>1?'s':'')+'</strong> next month';
-  document.getElementById('shift-info').innerHTML='<div class="shift-info-row">'+(muhDays.length?'* Muhurtham (Keerthi off): <strong>'+muhDays.map(d=>d+' '+MS[sMo]).join(', ')+'</strong><br>':'')+(govDays.length?'# Govt holiday (Ari covers): <strong>'+govDays.map(d=>d+' '+MS[sMo]).join(', ')+'</strong><br>':'')+balTxt+'</div>';
-  const ml=logs[mk()]||[];
-  document.getElementById('swap-logs').innerHTML=ml.length?'<div class="log-head">Swap history</div>'+ml.map(e=>'<div class="log-item"><span class="log-txt">'+e.text+'</span><button class="log-undo" onclick="undoSwap('+e.id+')">undo</button></div>').join(''):'';
-  renderSwapPanel();
-}
+// ── INIT ──
+window.onerror=function(message){if(String(message).includes('Script error'))return;console.error('App Error:',message);};
 
-function renderSwapPanel(){
-  const panel=document.getElementById('swap-panel');
-  if(step===0){panel.style.display='none';return;}
-  panel.style.display='block';
-  const dowStr=d=>DS[new Date(sYr,sMo,d).getDay()];
-  if(step===1){
-    panel.innerHTML='<div class="shift-swap-panel"><div class="ssp-head"><div class="ssp-title">'+dowStr(selDay)+' '+selDay+' '+MS[sMo]+' — who takes it?</div><button class="ssp-close" onclick="resetSwap()"><svg width="10" height="10" viewBox="0 0 12 12" fill="none"><path d="M1 1l10 10M11 1L1 11" stroke="white" stroke-width="2" stroke-linecap="round"/></svg></button></div><div class="ssp-steps"><div class="ssp-seg act"></div><div class="ssp-seg"></div><div class="ssp-seg"></div></div><div class="ssp-opts">'+P.map((p,i)=>'<div class="ssp-opt p-'+p.c+(i===asgn(selDay)?' cur':'')+ '" onclick="pickP('+i+')"><div><div class="ssp-opt-name">'+p.name+(i===asgn(selDay)?' ✓':'')+'</div><div class="ssp-opt-role">'+p.role+'</div></div></div>').join('')+'</div></div>';
-  }else if(step===2){
-    panel.innerHTML='<div class="shift-swap-panel"><div class="ssp-head"><div class="ssp-title">'+P[selP].name+' takes '+dowStr(selDay)+' '+selDay+'</div><button class="ssp-close" onclick="resetSwap()"><svg width="10" height="10" viewBox="0 0 12 12" fill="none"><path d="M1 1l10 10M11 1L1 11" stroke="white" stroke-width="2" stroke-linecap="round"/></svg></button></div><div class="ssp-steps"><div class="ssp-seg done"></div><div class="ssp-seg act"></div><div class="ssp-seg"></div></div><div class="ssp-hint">Which of your days will you give '+P[selP].name+' in return?</div><div class="ssp-opts"><div class="ssp-opt p-'+P[selP].c+'" onclick="goPickGive()" style="justify-content:center;"><div class="ssp-opt-name">Pick a day to give →</div></div></div><button class="ssp-back" onclick="resetSwap()">✕ Cancel</button></div>';
-  }else if(step===3){
-    panel.innerHTML='<div class="shift-swap-panel"><div class="ssp-head"><div class="ssp-title">Tap a highlighted day to give</div><button class="ssp-close" onclick="resetSwap()"><svg width="10" height="10" viewBox="0 0 12 12" fill="none"><path d="M1 1l10 10M11 1L1 11" stroke="white" stroke-width="2" stroke-linecap="round"/></svg></button></div><div class="ssp-steps"><div class="ssp-seg done"></div><div class="ssp-seg done"></div><div class="ssp-seg act"></div></div><div class="ssp-hint">'+P[selP].name+'\'s days highlighted in yellow</div><button class="ssp-back" onclick="stepBack()">← Back</button></div>';
-  }else if(step===4){
-    const pA=asgn(selDay),pB=asgn(selG);
-    panel.innerHTML='<div class="shift-swap-panel"><div class="ssp-head"><div class="ssp-title">Confirm swap</div><button class="ssp-close" onclick="resetSwap()"><svg width="10" height="10" viewBox="0 0 12 12" fill="none"><path d="M1 1l10 10M11 1L1 11" stroke="white" stroke-width="2" stroke-linecap="round"/></svg></button></div><div class="ssp-steps"><div class="ssp-seg done"></div><div class="ssp-seg done"></div><div class="ssp-seg done"></div></div><div class="shift-confirm-rows"><div class="scr-row"><span class="scr-day">'+dowStr(selDay)+' '+selDay+' '+MS[sMo]+'</span><span class="scr-arrow">→</span><span class="scr-badge p-'+P[pB].c+'">'+P[pB].name+'</span></div><div class="scr-row"><span class="scr-day">'+dowStr(selG)+' '+selG+' '+MS[sMo]+'</span><span class="scr-arrow">→</span><span class="scr-badge p-'+P[pA].c+'">'+P[pA].name+'</span></div></div><div class="ssp-opts"><div class="ssp-opt" style="background:var(--dark);justify-content:center;" onclick="confirmSwap()"><div class="ssp-opt-name">Confirm swap</div></div></div><button class="ssp-back" onclick="resetSwap()">✕ Cancel</button></div>';
-  }
-}
-
-window.tapCal=function(d){if(step===0){selDay=d;step=1;renderShift();}else if(step===3){if(d===selDay||asgn(d)!==selP)return;selG=d;step=4;renderShift();}};
-window.pickP=function(p){if(p===asgn(selDay)){resetSwap();return;}selP=p;step=2;renderShift();};
-window.goPickGive=function(){step=3;renderShift();};
-window.stepBack=function(){step=2;renderShift();};
-window.resetSwap=function(){step=0;selDay=null;selP=null;selG=null;renderShift();};
-window.confirmSwap=async function(){
-  const k=mk();if(!swaps[k])swaps[k]={};if(!logs[k])logs[k]=[];
-  const pA=asgn(selDay),pB=asgn(selG);
-  swaps[k][selDay]=pB;swaps[k][selG]=pA;
-  logs[k].unshift({id:Date.now(),text:DS[new Date(sYr,sMo,selDay).getDay()]+' '+selDay+' '+MS[sMo]+' → '+P[pB].name+'   ·   '+DS[new Date(sYr,sMo,selG).getDay()]+' '+selG+' '+MS[sMo]+' → '+P[pA].name,dayA:selDay,dayB:selG});
-  backupBookings();
-  await save();window.resetSwap();
-};
-window.undoSwap=async function(id){
-  const l=logs[mk()],e=l?l.find(x=>x.id===id):null;if(!e)return;
-  const s=swaps[mk()];if(s){delete s[e.dayA];delete s[e.dayB];}
-  logs[mk()]=l.filter(x=>x.id!==id);backupBookings();
-  await save();renderShift();
-};
-document.getElementById('shift-prev').onclick=()=>{_cache={};window.resetSwap();sMo--;if(sMo<0){sMo=11;sYr--;}renderShift();};
-document.getElementById('shift-next').onclick=()=>{_cache={};window.resetSwap();sMo++;if(sMo>11){sMo=0;sYr++;}renderShift();};
-document.getElementById('reset-swaps-btn').onclick=async()=>{delete swaps[mk()];delete logs[mk()];backupBookings();
-  await save();_cache={};window.resetSwap();};
-
-// ── ANNUAL ──
-function renderAnnual(){
-  if(!adminUnlocked)return;
-  function calcMonth(m){
-    const dim=new Date(2026,m,0).getDate();let ari=0,muhCnt=0,govCnt=0;const free=[];
-    for(let d=1;d<=dim;d++){
-      const dow=new Date(2026,m-1,d).getDay();
-      if(dow===0||dow===6){ari++;}else if(isGov(2026,m-1,d)){ari++;govCnt++;}else if(isMuh(2026,m-1,d)){muhCnt++;}else{free.push(d);}
-    }
-    const total=free.length+muhCnt,each=Math.round(total/2),rajaFree=Math.max(0,each-muhCnt);
-    return{ari,raja:muhCnt+rajaFree,keer:free.length-rajaFree,muh:muhCnt,gov:govCnt,total:dim};
-  }
-  const yearData=[];let tA=0,tR=0,tK=0,tM=0,tG=0,tD=0;
-  for(let m=1;m<=12;m++){const d=calcMonth(m);yearData.push({...d,month:m});tA+=d.ari;tR+=d.raja;tK+=d.keer;tM+=d.muh;tG+=d.gov;tD+=d.total;}
-  document.getElementById('ann-stats').innerHTML='<div class="astat"><div class="astat-lbl">Muhurtham days</div><div class="astat-val">'+tM+'</div><div class="astat-sub">Keerthi off, Raja covers</div></div><div class="astat"><div class="astat-lbl">Govt holidays</div><div class="astat-val">'+tG+'</div><div class="astat-sub">Ari covers all</div></div><div class="astat"><div class="astat-lbl">Total bookings</div><div class="astat-val">'+Object.keys(bookings).length+'</div><div class="astat-sub">All time</div></div><div class="astat"><div class="astat-lbl">Advance collected</div><div class="astat-val">₹'+Object.values(bookings).reduce((s,b)=>s+(Number(b.advance)||0),0).toLocaleString('en-IN')+'</div><div class="astat-sub">From bookings</div></div>';
-  const grand=tA+tR+tK,pA=Math.round(tA/grand*100),pR=Math.round(tR/grand*100),pK=100-pA-pR;
-  document.getElementById('bal-section').innerHTML='<div class="bal-card"><div class="bal-lbl">Workload share — 2026</div><div class="bal-row"><div class="bal-name" style="color:var(--ari);">Ari</div><div class="bal-track"><div class="bal-fill" style="width:'+pA+'%;background:var(--ari);"></div></div><div class="bal-pct">'+pA+'%</div></div><div class="bal-row"><div class="bal-name" style="color:var(--raja);">Raja</div><div class="bal-track"><div class="bal-fill" style="width:'+pR+'%;background:var(--raja);"></div></div><div class="bal-pct">'+pR+'%</div></div><div class="bal-row"><div class="bal-name" style="color:var(--keer);">Keerthi</div><div class="bal-track"><div class="bal-fill" style="width:'+pK+'%;background:var(--keer);"></div></div><div class="bal-pct">'+pK+'%</div></div></div>';
-  const maxD=Math.max(...yearData.map(d=>Math.max(d.ari,d.raja,d.keer)));
-  const rows=yearData.map(d=>{const diff=d.raja-d.keer,eq=Math.abs(diff)<=1;return'<div class="month-row"><div class="mrow-month">'+MS[d.month-1]+'</div><div class="mrow-cell"><div class="mbar-wrap"><div class="mbar" style="width:'+Math.round(d.ari/maxD*100)+'%;background:var(--ari);"></div></div><div class="mnum a">'+d.ari+'</div></div><div class="mrow-cell"><div class="mbar-wrap"><div class="mbar" style="width:'+Math.round(d.raja/maxD*100)+'%;background:var(--raja);"></div></div><div class="mnum r">'+d.raja+'</div></div><div class="mrow-cell"><div class="mbar-wrap"><div class="mbar" style="width:'+Math.round(d.keer/maxD*100)+'%;background:var(--keer);"></div></div><div class="mnum k">'+d.keer+'</div></div><div class="meq '+(eq?'ok':'off')+'">'+(diff===0?'=':(diff>0?'R':'K')+'+'+Math.abs(diff))+'</div></div>';}).join('');
-  document.getElementById('month-section').innerHTML='<div class="month-sec-lbl">Month-by-month</div><div class="month-hdr"><div class="mhdr-txt">Month</div><div class="mhdr-txt" style="color:var(--ari);">Ari</div><div class="mhdr-txt" style="color:var(--raja);">Raja</div><div class="mhdr-txt" style="color:var(--keer);">Keerthi</div><div class="mhdr-txt">Split</div></div>'+rows;
-}
-
-renderShift();
-
-// GLOBAL ERROR HANDLER
-window.onerror = function(message, source, line, col, error){
-  console.error('App Error:', message, source, line);
-
-  // Ignore harmless browser/service worker issues
-  if(String(message).includes('Script error')) return;
-
-  // Only log errors instead of blocking UX
-};
-
-// HIDE LOADER
 window.addEventListener('load',()=>{
-  setTimeout(()=>{
-    const loader=document.getElementById('app-loader');
-    if(loader){
-      loader.style.opacity='0';
-      setTimeout(()=>loader.remove(),300);
-    }
-  },700);
+  setTimeout(()=>{const loader=document.getElementById('app-loader');if(loader){loader.style.opacity='0';setTimeout(()=>loader.remove(),300);}},700);
 });
 
-// LOCAL BACKUP
-function backupBookings(){
-  try{
-    localStorage.setItem('magizh_backup_bookings', JSON.stringify(bookings));
-  }catch(e){
-    console.error('Backup failed',e);
-  }
-}
-
-
-
-
-
-// SERVICE WORKER REGISTER
 if('serviceWorker' in navigator){
-  window.addEventListener('load',()=>{
-    navigator.serviceWorker.register('/sw.js')
-      .then(()=>console.log('SW registered'))
-      .catch(err=>console.error('SW failed',err));
-  });
+  window.addEventListener('load',()=>{navigator.serviceWorker.register('/sw.js').catch(err=>console.error('SW failed',err));});
 }
 
 </script>
-
-
-
 </body>
 </html>
