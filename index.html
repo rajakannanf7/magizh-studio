@@ -383,6 +383,39 @@ body{background:var(--bg);font-family:'Inter',sans-serif;font-size:14px;}
       </div>
     </div>
 
+    <!-- INTERN DASHBOARD PAGE -->
+    <div class="page" id="page-intern">
+      <div class="hero hero-intern">
+        <div class="hero-top">
+          <span class="hero-eye">Magizh Studio</span>
+          <div class="live-pill"><div class="live-dot off" id="i-sync-dot"></div><span class="live-txt" id="i-sync-txt">connecting</span></div>
+          <span class="user-chip" id="i-user-chip"></span>
+        </div>
+        <div class="hero-title">Dashboard</div>
+        <div class="hero-sub">Today's schedule &amp; availability</div>
+      </div>
+      <div class="sec"><div class="sec-lbl" id="intern-today-lbl">Today's Bookings</div></div>
+      <div style="padding:0 16px;" id="intern-today-list"></div>
+      <div class="sec" style="margin-top:8px;">
+        <div class="sec-lbl">Check Availability</div>
+        <div style="display:flex;gap:8px;margin-bottom:8px;">
+          <button id="intern-studio-photo" onclick="internSelectStudio('photo')" style="flex:1;padding:10px;border-radius:8px;border:2px solid var(--raja);background:var(--raja);color:#fff;font-size:12px;font-weight:700;cursor:pointer;font-family:'Syne',sans-serif;">📷 Photo</button>
+          <button id="intern-studio-pod" onclick="internSelectStudio('pod')" style="flex:1;padding:10px;border-radius:8px;border:2px solid #e0dbd0;background:var(--surface);color:var(--dark);font-size:12px;font-weight:700;cursor:pointer;font-family:'Syne',sans-serif;">🎙️ Podcast</button>
+        </div>
+        <div class="date-strip" id="intern-date-strip"></div>
+      </div>
+      <div class="sec">
+        <div class="sec-lbl" id="intern-avail-lbl">Available Slots</div>
+        <div class="slot-grid" id="intern-slot-grid"></div>
+      </div>
+      <div style="padding:16px;">
+        <button class="btn-request" onclick="requestBooking()">📱 Request Booking via WhatsApp</button>
+        <div style="font-size:11px;color:var(--light);text-align:center;margin-top:6px;">Sends request to Inba for confirmation</div>
+      </div>
+      <div class="sec"><div class="sec-lbl">Upcoming Bookings</div></div>
+      <div style="padding:0 16px 20px;" id="intern-upcoming-list"></div>
+    </div>
+
   </div>
 
   <!-- TAB BAR -->
@@ -396,53 +429,8 @@ body{background:var(--bg);font-family:'Inter',sans-serif;font-size:14px;}
       <span class="tab-lbl">Calendar</span>
     </button>
   </div>
-</div>
-
-<!-- INTERN SCREEN -->
-<div id="intern-screen" class="app" style="display:none;">
-  <div class="pages">
-    <div class="page active" id="page-intern">
-      <div class="hero hero-intern">
-        <div class="hero-top">
-          <span class="hero-eye">Magizh Studio</span>
-          <div class="live-pill"><div class="live-dot off" id="i-sync-dot"></div><span class="live-txt" id="i-sync-txt">connecting</span></div>
-          <span class="user-chip" id="i-user-chip"></span>
-        </div>
-        <div class="hero-title">Dashboard</div>
-        <div class="hero-sub">Today's schedule &amp; availability</div>
-      </div>
-
-      <!-- Today's bookings -->
-      <div class="sec"><div class="sec-lbl" id="intern-today-lbl">Today's Bookings</div></div>
-      <div style="padding:0 16px;" id="intern-today-list"></div>
-
-      <!-- Quick availability checker -->
-      <div class="sec" style="margin-top:8px;">
-        <div class="sec-lbl">Check Availability</div>
-        <div style="display:flex;gap:8px;margin-bottom:8px;">
-          <button id="intern-studio-photo" onclick="internSelectStudio('photo')" style="flex:1;padding:10px;border-radius:8px;border:2px solid var(--raja);background:var(--raja);color:#fff;font-size:12px;font-weight:700;cursor:pointer;font-family:'Syne',sans-serif;">📷 Photo</button>
-          <button id="intern-studio-pod" onclick="internSelectStudio('pod')" style="flex:1;padding:10px;border-radius:8px;border:2px solid #e0dbd0;background:var(--surface);color:var(--dark);font-size:12px;font-weight:700;cursor:pointer;font-family:'Syne',sans-serif;">🎙️ Podcast</button>
-        </div>
-        <div class="date-strip" id="intern-date-strip"></div>
-      </div>
-      <div class="sec">
-        <div class="sec-lbl" id="intern-avail-lbl">Available Slots</div>
-        <div class="slot-grid" id="intern-slot-grid"></div>
-      </div>
-
-      <!-- Request booking button -->
-      <div style="padding:16px;">
-        <button class="btn-request" onclick="requestBooking()">📱 Request Booking via WhatsApp</button>
-        <div style="font-size:11px;color:var(--light);text-align:center;margin-top:6px;">Sends request to Inba for confirmation</div>
-      </div>
-
-      <!-- Upcoming -->
-      <div class="sec"><div class="sec-lbl">Upcoming Bookings</div></div>
-      <div style="padding:0 16px 20px;" id="intern-upcoming-list"></div>
-    </div>
-  </div>
-  <!-- Intern has no tab bar — single page -->
-  <div class="tabbar">
+  <!-- Intern tab bar -->
+  <div class="tabbar" id="intern-tabbar" style="display:none;">
     <button class="tab active">
       <svg width="18" height="18" viewBox="0 0 24 24" fill="none"><rect x="3" y="4" width="18" height="18" rx="2.5" stroke="white" stroke-width="2"/><path d="M16 2v4M8 2v4M3 10h18" stroke="white" stroke-width="2" stroke-linecap="round"/></svg>
       <span class="tab-lbl">Dashboard</span>
@@ -636,15 +624,19 @@ async function syncToSheets(b){
 window.login=function(name,key,role){
   currentUser=name; currentUserKey=key; userRole=role;
   document.getElementById('login-screen').style.display='none';
+  document.getElementById('main-screen').classList.add('active');
   if(role==='owner'){
-    document.getElementById('main-screen').classList.add('active');
+    document.getElementById('owner-tabbar').style.display='flex';
+    document.getElementById('intern-tabbar').style.display='none';
+    document.getElementById('page-booking').classList.add('active');
     ['b','c'].forEach(p=>{const el=document.getElementById(p+'-user-chip');if(el)el.textContent=name;});
     initDateStrip();
     renderCalendar();
   }else{
-    document.querySelector('.app').style.display='none';
-    const is=document.getElementById('intern-screen');
-    is.style.display='flex';
+    document.getElementById('owner-tabbar').style.display='none';
+    document.getElementById('intern-tabbar').style.display='flex';
+    document.getElementById('page-booking').classList.remove('active');
+    document.getElementById('page-intern').classList.add('active');
     const el=document.getElementById('i-user-chip');if(el)el.textContent=name;
     initInternDateStrip();
   }
