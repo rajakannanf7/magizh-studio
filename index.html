@@ -112,6 +112,7 @@ body{background:var(--bg);font-family:'Inter',sans-serif;font-size:14px;}
 .badge-adv{background:#fef9c3;color:#854d0e;}
 .badge-paid{background:#dcfce7;color:#166534;}
 .badge-pend{background:#fee2e2;color:#991b1b;}
+.badge-cancel{background:#f3f4f6;color:#6b7280;text-decoration:line-through;}
 
 /* MODAL */
 .modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:100;display:none;align-items:flex-end;justify-content:center;max-width:430px;margin:0 auto;}
@@ -297,7 +298,7 @@ body{background:var(--bg);font-family:'Inter',sans-serif;font-size:14px;}
       <div class="sec" id="form-section" style="display:none;">
         <div class="sec-lbl">Client Details</div>
         <div class="field"><div class="field-lbl">Client name</div><input id="f-name" type="text" placeholder="Full name"></div>
-        <div class="field"><div class="field-lbl">Contact number</div><input id="f-phone" type="tel" placeholder="+91 00000 00000"></div>
+        <div class="field"><div class="field-lbl">Contact number</div><input id="f-phone" type="tel" placeholder="+91 00000 00000" onblur="checkRepeatClient()"></div>
         <div class="field"><div class="field-lbl">Notes</div><textarea id="f-notes" placeholder="Any special requests or notes..." rows="2" style="width:100%;border:1px solid #e0dbd0;border-radius:8px;padding:10px;font-family:'Inter',sans-serif;font-size:13px;resize:vertical;"></textarea></div>
         <div class="field"><div class="field-lbl">Shoot type</div>
           <select id="f-type">
@@ -338,6 +339,9 @@ body{background:var(--bg);font-family:'Inter',sans-serif;font-size:14px;}
         <div style="height:20px;"></div>
       </div>
 
+      <!-- Daily earnings widget -->
+      <div class="sec" style="margin-top:8px;"><div class="sec-lbl">Today's Earnings</div></div>
+      <div style="padding:0 16px;" id="daily-earnings"></div>
       <!-- Booking list -->
       <div class="sec" style="margin-top:16px;">
         <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;">
@@ -431,9 +435,13 @@ body{background:var(--bg);font-family:'Inter',sans-serif;font-size:14px;}
   </div>
   <!-- Intern tab bar -->
   <div class="tabbar" id="intern-tabbar" style="display:none;">
-    <button class="tab active">
-      <svg width="18" height="18" viewBox="0 0 24 24" fill="none"><rect x="3" y="4" width="18" height="18" rx="2.5" stroke="white" stroke-width="2"/><path d="M16 2v4M8 2v4M3 10h18" stroke="white" stroke-width="2" stroke-linecap="round"/></svg>
+    <button class="tab active" id="itab-dashboard" onclick="internSwitchTab('intern')">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none"><rect x="3" y="3" width="7" height="9" rx="1.5" stroke="white" stroke-width="2"/><rect x="14" y="3" width="7" height="5" rx="1.5" stroke="white" stroke-width="2"/><rect x="3" y="16" width="7" height="5" rx="1.5" stroke="white" stroke-width="2"/><rect x="14" y="12" width="7" height="9" rx="1.5" stroke="white" stroke-width="2"/></svg>
       <span class="tab-lbl">Dashboard</span>
+    </button>
+    <button class="tab" id="itab-booking" onclick="internSwitchTab('booking')">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none"><rect x="3" y="4" width="18" height="18" rx="2.5" stroke="white" stroke-width="2"/><path d="M16 2v4M8 2v4M3 10h18" stroke="white" stroke-width="2" stroke-linecap="round"/></svg>
+      <span class="tab-lbl">Booking</span>
     </button>
     <button class="tab" onclick="internLogout()">
       <svg width="18" height="18" viewBox="0 0 24 24" fill="none"><path d="M9 21H5a2 2 0 01-2-2V5a2 2 0 012-2h4M16 17l5-5-5-5M21 12H9" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
@@ -493,6 +501,11 @@ body{background:var(--bg);font-family:'Inter',sans-serif;font-size:14px;}
       <button onclick="sendReminderWhatsApp()" style="flex:1;padding:11px;border-radius:var(--r);border:none;background:#075E54;color:#fff;font-size:12px;font-weight:700;cursor:pointer;">🔔 Remind</button>
       <button onclick="sendTeamWhatsApp()" style="flex:1;padding:11px;border-radius:var(--r);border:none;background:var(--dark);color:#fff;font-size:12px;font-weight:700;cursor:pointer;">👥 Team</button>
     </div>
+    <!-- Cancel + Postpone -->
+    <div style="display:flex;gap:8px;margin-top:8px;">
+      <button id="modal-cancel-btn" onclick="cancelBooking()" style="flex:1;padding:11px;border-radius:var(--r);border:2px solid #dc2626;background:#fff;color:#dc2626;font-size:12px;font-weight:700;cursor:pointer;font-family:Syne,sans-serif;">❌ Cancel</button>
+      <button id="modal-postpone-btn" onclick="showPostpone()" style="flex:1;padding:11px;border-radius:var(--r);border:2px solid var(--ari);background:#fff;color:var(--ari);font-size:12px;font-weight:700;cursor:pointer;font-family:Syne,sans-serif;">📅 Postpone</button>
+    </div>
   </div>
 </div>
 
@@ -506,6 +519,17 @@ body{background:var(--bg);font-family:'Inter',sans-serif;font-size:14px;}
   </div>
 </div>
 
+<!-- PIN Popup -->
+<div class="modal-overlay" id="pin-modal" onclick="closePinModal()">
+  <div class="modal-box" onclick="event.stopPropagation()" style="border-radius:20px;max-width:320px;margin:auto;padding:30px;text-align:center;">
+    <div style="font-family:Syne,sans-serif;font-size:20px;font-weight:800;margin-bottom:4px;" id="pin-title">Enter PIN</div>
+    <div style="font-size:12px;color:var(--light);margin-bottom:16px;" id="pin-sub"></div>
+    <input id="pin-input" type="password" inputmode="numeric" maxlength="4" placeholder="••••" style="width:160px;padding:14px;border:2px solid #e0dbd0;border-radius:var(--r);font-size:24px;text-align:center;letter-spacing:8px;outline:none;font-family:Inter,sans-serif;" onkeydown="if(event.key==='Enter')submitPin()">
+    <div id="pin-err" style="font-size:12px;color:#cc0000;margin-top:8px;display:none;">Wrong PIN</div>
+    <button onclick="submitPin()" style="width:160px;margin-top:12px;padding:13px;border-radius:var(--rl);border:none;background:var(--dark);color:#fff;font-family:Syne,sans-serif;font-size:14px;font-weight:700;cursor:pointer;">Unlock</button>
+    <div style="margin-top:10px;"><button onclick="closePinModal()" style="background:none;border:none;color:var(--light);font-size:12px;cursor:pointer;">Cancel</button></div>
+  </div>
+</div>
 <div class="toast" id="toast"></div>
 
 <script type="module">
@@ -519,7 +543,13 @@ const HOURLY_RATE = 750;
 const ADMIN_PW = '2023';
 const STUDIO_LOC = "https://maps.app.goo.gl/vdCkBeZE7Vg1tJra8";
 const SHEETS_URL = "https://script.google.com/macros/s/AKfycbxqTIGogoUiQRI0aDRZZmmKa9KmN_CLWv6lZAfGDMw1KGdxRmiG9XZapNLNfeNjYyymrw/exec";
-const INBA_PHONE = '918072659679'; // Inba's number for walk-in requests
+const INBA_PHONE = '918072659679';
+
+// Passwords (change these)
+const PASSWORDS = {
+  r:'1234', k:'5678', a:'9012', inba:'3456', // Squad PINs
+  manisha:'0000', abi:'0000', kamlesh:'0000' // Crew PIN (shared)
+}; // Inba's number for walk-in requests
 
 const MONTHS=['January','February','March','April','May','June','July','August','September','October','November','December'];
 const MS=['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
@@ -594,10 +624,9 @@ function initFirebase(){
     onSnapshot(doc(db,'studios',SID),snap=>{
       if(snap.exists()){const d=snap.data();bookings=d.bookings||{};}
       setSyncStatus('live');
-      if(userRole==='owner'){
-        renderSlots();renderBookingList();renderUpcomingBookings();renderCalendar();
-      }else{
-        renderInternDashboard();
+      {
+        renderSlots();renderBookingList();renderUpcomingBookings();renderCalendar();renderInternDashboard();renderDailyEarnings();
+      // intern dashboard already called above
       }
     },err=>{console.error(err);setSyncStatus('err');});
   }catch(e){console.error(e);setSyncStatus('err');}
@@ -621,7 +650,31 @@ async function syncToSheets(b){
 }
 
 // ── LOGIN ──
+// ── LOGIN ──
+let pendingLogin=null;
+
 window.login=function(name,key,role){
+  pendingLogin={name,key,role};
+  document.getElementById('pin-title').textContent='Hi '+name;
+  document.getElementById('pin-sub').textContent='Enter your PIN to continue';
+  document.getElementById('pin-input').value='';
+  document.getElementById('pin-err').style.display='none';
+  document.getElementById('pin-modal').classList.add('open');
+  setTimeout(()=>document.getElementById('pin-input').focus(),100);
+};
+
+window.submitPin=function(){
+  if(!pendingLogin)return;
+  const pin=document.getElementById('pin-input').value;
+  if(pin!==PASSWORDS[pendingLogin.key]){document.getElementById('pin-err').style.display='block';document.getElementById('pin-input').value='';return;}
+  document.getElementById('pin-modal').classList.remove('open');
+  const{name,key,role}=pendingLogin;pendingLogin=null;
+  doLogin(name,key,role);
+};
+
+window.closePinModal=function(){document.getElementById('pin-modal').classList.remove('open');pendingLogin=null;};
+
+function doLogin(name,key,role){
   currentUser=name; currentUserKey=key; userRole=role;
   document.getElementById('login-screen').style.display='none';
   document.getElementById('main-screen').classList.add('active');
@@ -645,6 +698,18 @@ window.login=function(name,key,role){
 
 window.internLogout=function(){
   location.reload();
+};
+
+window.internSwitchTab=function(tab){
+  ['intern','booking'].forEach(t=>{
+    const page=document.getElementById('page-'+t);if(page)page.classList.toggle('active',t===tab);
+  });
+  document.getElementById('itab-dashboard').classList.toggle('active',tab==='intern');
+  document.getElementById('itab-booking').classList.toggle('active',tab==='booking');
+  if(tab==='booking'){
+    if(!document.getElementById('date-strip').children.length)initDateStrip();
+    renderSlots();renderBookingList();renderUpcomingBookings();
+  }
 };
 
 // ── TABS ──
@@ -724,7 +789,7 @@ function selectDate(dateStr,el,silent=false){
 // ── SLOTS ──
 function renderSlots(){
   const grid=document.getElementById('slot-grid');if(!grid)return;
-  const dayBookings=Object.values(bookings).filter(b=>b.date===selDate&&(b.studio||'photo')===selStudio);
+  const dayBookings=Object.values(bookings).filter(b=>b.date===selDate&&(b.studio||'photo')===selStudio&&b.status!=='cancelled');
   grid.innerHTML=HOUR_LABELS.slice(0,-1).map((lbl,i)=>{
     const h=7+i;
     const isBooked=dayBookings.some(b=>{
@@ -761,7 +826,7 @@ function updateDurDisplay(){
   document.getElementById('dur-display').textContent=selDur;
   document.getElementById('dur-hrs-lbl').textContent=selDur===1?'hour':'hours';
   const endH=selStartH+selDur;
-  const dayBookings=Object.values(bookings).filter(b=>b.date===selDate&&(b.studio||'photo')===selStudio);
+  const dayBookings=Object.values(bookings).filter(b=>b.date===selDate&&(b.studio||'photo')===selStudio&&b.status!=='cancelled');
   const bookedRaw=dayBookings.map(b=>b.slotRaw||'');
   const conflict=slotOverlaps(bookedRaw,selStartH,selDur);
   const sumEl=document.getElementById('slot-summary');
@@ -791,7 +856,7 @@ window.confirmBooking=async function(){
   const phone=document.getElementById('f-phone').value.trim();
   const type=document.getElementById('f-type').value;
   if(!name||!phone||!type||!selStartH){showToast('Please fill all fields and select a start time');return;}
-  const dayBookings=Object.values(bookings).filter(b=>b.date===selDate&&(b.studio||'photo')===selStudio);
+  const dayBookings=Object.values(bookings).filter(b=>b.date===selDate&&(b.studio||'photo')===selStudio&&b.status!=='cancelled');
   if(slotOverlaps(dayBookings.map(b=>b.slotRaw||''),selStartH,selDur)){showToast('Slot conflicts with existing booking!');return;}
   const slotRaw=selStartH+'|'+selDur;const slotLabel=formatSlot(selStartH,selDur);
   const rate=getHourlyRate();const total=selDur*rate;
@@ -801,7 +866,7 @@ window.confirmBooking=async function(){
   const studioName=selStudio==='photo'?'Photography Studio':'Podcast Studio';
   const notes=(document.getElementById('f-notes')?document.getElementById('f-notes').value:'').trim();
   const id='bk-'+Date.now();
-  bookings[id]={id,name,phone,type,date:selDate,slot:slotLabel,slotRaw,studio:selStudio,studioName,total,discount:disc,advance:adv,balance,paid:false,createdBy:currentUser,createdAt:Date.now(),notes,hourlyRate:rate,podSetup:selStudio==='pod'?podSetup:null};
+  bookings[id]={id,name,phone,type,date:selDate,status:"confirmed",slot:slotLabel,slotRaw,studio:selStudio,studioName,total,discount:disc,advance:adv,balance,paid:false,createdBy:currentUser,createdAt:Date.now(),notes,hourlyRate:rate,podSetup:selStudio==='pod'?podSetup:null};
   backupBookings();await save();syncToSheets(bookings[id]);
   document.getElementById('f-name').value='';document.getElementById('f-phone').value='';
   document.getElementById('f-type').value='';document.getElementById('f-discount').value='';
@@ -833,7 +898,7 @@ function renderBookingList(){
     return '<div class="bitem" onclick="openModal(\''+b.id+'\')">'
       +'<div class="bitem-info"><div class="bitem-name">'+b.name+'</div>'
       +'<div class="bitem-meta"><span style="color:var(--raja);font-weight:600;">'+dt+'</span> · '+b.slot+' · '+b.type+(b.notes?' · 📝':'')+'</div></div>'
-      +'<span class="badge '+(b.paid?'badge-paid':b.advance>0?'badge-adv':'badge-pend')+'">'+(b.paid?'Paid':b.advance>0?'Advance':'Pending')+'</span></div>';
+      +'<span class="badge '+(b.status==='cancelled'?'badge-cancel':b.paid?'badge-paid':b.advance>0?'badge-adv':'badge-pend')+'">'+(b.status==='cancelled'?'Cancelled':b.paid?'Paid':b.advance>0?'Advance':'Pending')+'</span></div>';
   }).join('');
 }
 
@@ -850,7 +915,7 @@ function renderUpcomingBookings(){
     return '<div class="bitem" onclick="openModal(\''+b.id+'\')">'
       +'<div class="bitem-info"><div class="bitem-name">'+b.name+'</div>'
       +'<div class="bitem-meta">'+dt+' · '+b.slot+' · '+b.type+(b.notes?' · 📝':'')+'</div></div>'
-      +'<span class="badge '+(b.paid?'badge-paid':b.advance>0?'badge-adv':'badge-pend')+'">'+(b.paid?'Paid':b.advance>0?'Advance':'Pending')+'</span></div>';
+      +'<span class="badge '+(b.status==='cancelled'?'badge-cancel':b.paid?'badge-paid':b.advance>0?'badge-adv':'badge-pend')+'">'+(b.status==='cancelled'?'Cancelled':b.paid?'Paid':b.advance>0?'Advance':'Pending')+'</span></div>';
   }).join('');
 }
 
@@ -881,6 +946,11 @@ window.openModal=function(id){
     const h=7+i;return '<option value="'+h+'"'+(h===curStart?' selected':'')+'>'+HOUR_LABELS[i]+'</option>';
   }).join('');
   extendHrs=1;document.getElementById('extend-hrs').textContent=1;
+  const isCancelled=b.status==='cancelled';
+  const cBtn=document.getElementById('modal-cancel-btn');if(cBtn)cBtn.style.display=isCancelled?'none':'block';
+  const pBtn=document.getElementById('modal-postpone-btn');if(pBtn)pBtn.style.display=isCancelled?'none':'block';
+  if(isCancelled){document.getElementById('reschedule-section').style.display='none';document.getElementById('extend-section').style.display='none';}
+  document.getElementById('modal-pay-btn').style.display=(isCancelled||b.paid)?'none':'block';
   document.getElementById('payment-modal').classList.add('open');
 };
 window.closeModal=function(){document.getElementById('payment-modal').classList.remove('open');};
@@ -923,7 +993,7 @@ window.applyReschedule=async function(){
   const parts=(b.slotRaw||'9|2').split('|');const oldStart=parseInt(parts[0]),dur=parseInt(parts[1]||1);
   if(newStart===oldStart){showToast('Same time selected');return;}
   if(newStart+dur>23){showToast('Booking would go past 11pm!');return;}
-  const dayBookings=Object.values(bookings).filter(bk=>bk.date===b.date&&(bk.studio||'photo')===(b.studio||'photo')&&bk.id!==b.id);
+  const dayBookings=Object.values(bookings).filter(bk=>bk.date===b.date&&(bk.studio||'photo')===(b.studio||'photo')&&bk.id!==b.id&&bk.status!=='cancelled');
   if(slotOverlaps(dayBookings.map(bk=>bk.slotRaw||''),newStart,dur)){showToast('Conflicts with another booking!');return;}
   b.slotRaw=newStart+'|'+dur;b.slot=formatSlot(newStart,dur);
   backupBookings();await save();syncToSheets(b);
@@ -950,7 +1020,7 @@ window.applyExtension=async function(isAdd){
   const newDur=isAdd?oldDur+extendHrs:Math.max(1,oldDur-extendHrs);
   if(startH+newDur>23){showToast('Cannot go past 11pm!');return;}
   if(isAdd){
-    const dayBookings=Object.values(bookings).filter(bk=>bk.date===b.date&&(bk.studio||'photo')===(b.studio||'photo')&&bk.id!==b.id);
+    const dayBookings=Object.values(bookings).filter(bk=>bk.date===b.date&&(bk.studio||'photo')===(b.studio||'photo')&&bk.id!==b.id&&bk.status!=='cancelled');
     if(slotOverlaps(dayBookings.map(bk=>bk.slotRaw||''),startH+oldDur,extendHrs)){showToast('Conflicts with another booking!');return;}
   }
   const bRate=Number(b.hourlyRate)||HOURLY_RATE;
@@ -1215,7 +1285,7 @@ window.internSelectStudio=function(studio){
 function renderInternSlots(){
   const grid=document.getElementById('intern-slot-grid');if(!grid)return;
   const dt=internDate||todayStr();
-  const dayBookings=Object.values(bookings).filter(b=>b.date===dt&&(b.studio||'photo')===internStudio);
+  const dayBookings=Object.values(bookings).filter(b=>b.date===dt&&(b.studio||'photo')===internStudio&&b.status!=='cancelled');
   const lbl=document.getElementById('intern-avail-lbl');
   const dateLabel=new Date(dt+'T12:00:00').toLocaleDateString('en-IN',{day:'numeric',month:'short',weekday:'short'});
   if(lbl)lbl.textContent=(internStudio==='photo'?'📷':'🎙️')+' Slots · '+dateLabel;
@@ -1242,7 +1312,7 @@ function renderInternDashboard(){
       const stIcon=(b.studio||'photo')==='photo'?'📷':'🎙️';
       return '<div class="intern-bitem">'
         +'<div class="intern-bitem-name">'+stIcon+' '+b.name+'</div>'
-        +'<div class="intern-bitem-meta">'+b.slot+' · '+b.type+' · 📞 '+b.phone+'</div>'
+        +'<div class="intern-bitem-meta">'+b.slot+' · '+b.type+' · <a href="tel:'+b.phone+'" style="color:var(--intern);text-decoration:none;font-weight:600;">📞 '+b.phone+'</a></div>'
         +(b.notes?'<div class="intern-bitem-meta">📝 '+b.notes+'</div>':'')
         +'</div>';
     }).join('');
@@ -1257,7 +1327,7 @@ function renderInternDashboard(){
       const stIcon=(b.studio||'photo')==='photo'?'📷':'🎙️';
       return '<div class="intern-bitem">'
         +'<div class="intern-bitem-name">'+stIcon+' '+b.name+'</div>'
-        +'<div class="intern-bitem-meta">'+dt+' · '+b.slot+' · '+b.type+' · 📞 '+b.phone+'</div>'
+        +'<div class="intern-bitem-meta">'+dt+' · '+b.slot+' · '+b.type+' · <a href="tel:'+b.phone+'" style="color:var(--intern);text-decoration:none;font-weight:600;">📞 '+b.phone+'</a></div>'
         +'</div>';
     }).join('');
   }
@@ -1277,7 +1347,6 @@ window.requestBooking=function(){
   window.open('https://wa.me/'+INBA_PHONE+'?text='+encodeURIComponent(msg),'_blank');
 };
 
-// ── ADMIN ──
 window.checkAdminPw=function(){
   if(document.getElementById('admin-pw').value===ADMIN_PW){
     adminUnlocked=true;
@@ -1318,6 +1387,81 @@ window.factoryReset=async function(){
 };
 
 // ── BACKUP ──
+
+// ── DAILY EARNINGS ──
+function renderDailyEarnings(){
+  const el=document.getElementById('daily-earnings');if(!el)return;
+  const ts=todayStr();
+  const todayBk=Object.values(bookings).filter(b=>b.date===ts&&b.status!=='cancelled');
+  if(!todayBk.length){el.innerHTML='<div style="background:var(--surface);border-radius:var(--r);padding:14px;border:0.5px solid #e0dbd0;text-align:center;font-size:12px;color:var(--light);">No bookings today</div>';return;}
+  const total=todayBk.reduce((s,b)=>s+(Number(b.total)||0),0);
+  const collected=todayBk.reduce((s,b)=>s+(Number(b.advance)||0)+(b.paid?Number(b.balance)||0:0),0);
+  const pending=total-collected;
+  el.innerHTML='<div style="background:var(--surface);border-radius:var(--r);padding:14px;border:0.5px solid #e0dbd0;display:flex;gap:8px;text-align:center;">'
+    +'<div style="flex:1;"><div style="font-size:9px;color:var(--light);font-weight:600;text-transform:uppercase;">Bookings</div><div style="font-family:Syne,sans-serif;font-size:20px;font-weight:800;">'+todayBk.length+'</div></div>'
+    +'<div style="flex:1;"><div style="font-size:9px;color:var(--light);font-weight:600;text-transform:uppercase;">Total</div><div style="font-family:Syne,sans-serif;font-size:20px;font-weight:800;">₹'+total.toLocaleString('en-IN')+'</div></div>'
+    +'<div style="flex:1;"><div style="font-size:9px;color:var(--keer);font-weight:600;text-transform:uppercase;">Collected</div><div style="font-size:14px;font-weight:700;color:var(--keer);">₹'+collected.toLocaleString('en-IN')+'</div></div>'
+    +'<div style="flex:1;"><div style="font-size:9px;color:var(--raja);font-weight:600;text-transform:uppercase;">Pending</div><div style="font-size:14px;font-weight:700;color:var(--raja);">₹'+pending.toLocaleString('en-IN')+'</div></div>'
+    +'</div>';
+}
+
+// ── REPEAT CLIENT DETECTION ──
+window.checkRepeatClient=function(){
+  const phone=document.getElementById('f-phone').value.trim();
+  if(!phone||phone.length<7)return;
+  const cleaned=cleanPhone(phone);
+  const existing=Object.values(bookings).find(b=>cleanPhone(b.phone||'')===cleaned);
+  if(existing){
+    const nameEl=document.getElementById('f-name');
+    const typeEl=document.getElementById('f-type');
+    if(nameEl&&!nameEl.value)nameEl.value=existing.name;
+    if(typeEl&&!typeEl.value){
+      for(let i=0;i<typeEl.options.length;i++){
+        if(typeEl.options[i].text===existing.type){typeEl.selectedIndex=i;break;}
+      }
+    }
+    showToast('Returning client: '+existing.name+' 🔄',2000);
+  }
+};
+
+// ── CANCEL BOOKING ──
+window.cancelBooking=async function(){
+  if(!modalBookingId)return;
+  const b=bookings[modalBookingId];if(!b)return;
+  const reason=prompt('Reason for cancellation:\n1. Client cancelled\n2. No-show\n3. Other\n\nEnter reason:');
+  if(!reason)return;
+  if(!confirm('Cancel booking for '+b.name+'? This will free the slot.'))return;
+  b.status='cancelled';
+  b.cancelReason=reason;
+  b.cancelledBy=currentUser;
+  b.cancelledAt=Date.now();
+  backupBookings();await save();syncToSheets(b);
+  closeModal();
+  showToast('Booking cancelled ✓');
+  renderSlots();renderBookingList();renderUpcomingBookings();renderCalendar();renderInternDashboard();renderDailyEarnings();
+};
+
+// ── POSTPONE BOOKING ──
+window.showPostpone=function(){
+  if(!modalBookingId)return;
+  const newDate=prompt('Enter new date (YYYY-MM-DD):');
+  if(!newDate||!/^\d{4}-\d{2}-\d{2}$/.test(newDate)){if(newDate)showToast('Use format: YYYY-MM-DD');return;}
+  const b=bookings[modalBookingId];if(!b)return;
+  const parts=(b.slotRaw||'9|2').split('|');
+  const startH=parseInt(parts[0]),dur=parseInt(parts[1]||1);
+  const otherBookings=Object.values(bookings).filter(bk=>bk.date===newDate&&(bk.studio||'photo')===(b.studio||'photo')&&bk.id!==b.id&&bk.status!=='cancelled');
+  if(slotOverlaps(otherBookings.map(bk=>bk.slotRaw||''),startH,dur)){
+    showToast('Same time slot conflicts on '+newDate+'!');return;
+  }
+  if(!confirm('Move '+b.name+' from '+b.date+' to '+newDate+'?'))return;
+  b.postponedFrom=b.date;
+  b.date=newDate;
+  b.status='confirmed';
+  backupBookings();save();syncToSheets(b);
+  closeModal();
+  showToast('Postponed to '+newDate+' ✓');
+  renderSlots();renderBookingList();renderUpcomingBookings();renderCalendar();renderInternDashboard();renderDailyEarnings();
+};
 function backupBookings(){try{localStorage.setItem('magizh_backup_bookings',JSON.stringify(bookings));}catch(e){}}
 
 // ── INIT ──
