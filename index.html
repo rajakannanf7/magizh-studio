@@ -145,6 +145,7 @@ body{background:var(--bg);font-family:'Inter',sans-serif;font-size:14px;}
 .cal-day-count{font-family:'Syne',sans-serif;font-size:14px;font-weight:800;color:var(--raja);margin-top:2px;}
 .cal-day.has-bookings{background:#fff8f5;}
 .cal-day.past-day{opacity:.5;}
+.cal-day.blocked-day{background:#fee2e2;border-color:#fca5a5;}
 
 /* Calendar popup */
 .cal-popup-overlay{position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:100;display:none;align-items:center;justify-content:center;max-width:430px;margin:0 auto;padding:20px;}
@@ -276,7 +277,7 @@ body{background:var(--bg);font-family:'Inter',sans-serif;font-size:14px;}
 
       <!-- Slot grid -->
       <div class="sec" id="slot-section" style="display:none;">
-        <div class="sec-lbl">Start Time · 7am – 11pm</div>
+        <div class="sec-lbl">Start Time · 6am – 12am</div>
         <div class="slot-grid" id="slot-grid"></div>
       </div>
 
@@ -349,6 +350,7 @@ body{background:var(--bg);font-family:'Inter',sans-serif;font-size:14px;}
         </div>
       </div>
       <div class="booking-list" id="booking-list"></div>
+      <div style="padding:0 16px;"><button onclick="bulkReminder()" style="width:100%;padding:12px;border-radius:var(--r);border:2px solid #075E54;background:#fff;color:#075E54;font-size:12px;font-weight:700;cursor:pointer;font-family:'Syne',sans-serif;">🔔 Send Reminders to Tomorrow's Clients</button></div>
       <div class="sec" style="padding-top:8px;"><div class="sec-lbl">Upcoming Bookings</div></div>
       <div class="booking-list" id="upcoming-booking-list"></div>
     </div>
@@ -497,9 +499,19 @@ body{background:var(--bg);font-family:'Inter',sans-serif;font-size:14px;}
     </div>
     <button id="modal-invoice-btn" onclick="sendInvoicePDF()" style="display:none;width:100%;margin-top:10px;padding:13px;border-radius:var(--r);border:none;background:var(--keer);color:#fff;font-size:14px;font-weight:700;cursor:pointer;font-family:'Syne',sans-serif;">📄 Download PDF + Send Invoice</button>
     <div style="display:flex;gap:8px;margin-top:8px;">
+      <button onclick="generateBookingCard()" style="flex:1;padding:11px;border-radius:var(--r);border:none;background:var(--raja);color:#fff;font-size:12px;font-weight:700;cursor:pointer;">📸 Card</button>
       <button onclick="sendClientWhatsApp()" style="flex:1;padding:11px;border-radius:var(--r);border:none;background:#25D366;color:#fff;font-size:12px;font-weight:700;cursor:pointer;">📱 Details</button>
       <button onclick="sendReminderWhatsApp()" style="flex:1;padding:11px;border-radius:var(--r);border:none;background:#075E54;color:#fff;font-size:12px;font-weight:700;cursor:pointer;">🔔 Remind</button>
       <button onclick="sendTeamWhatsApp()" style="flex:1;padding:11px;border-radius:var(--r);border:none;background:var(--dark);color:#fff;font-size:12px;font-weight:700;cursor:pointer;">👥 Team</button>
+    </div>
+    <!-- Client Notes -->
+    <div style="margin-top:8px;">
+      <div class="sec-lbl">Client Note (for next visit)</div>
+      <div style="display:flex;gap:6px;">
+        <input id="modal-client-note" type="text" placeholder="e.g. prefers white backdrop, was 15min late..." style="flex:1;padding:10px;border:1px solid #e0dbd0;border-radius:8px;font-size:12px;font-family:Inter,sans-serif;">
+        <button onclick="saveClientNote()" style="padding:10px 14px;border-radius:8px;border:none;background:var(--keer);color:#fff;font-size:11px;font-weight:700;cursor:pointer;font-family:Syne,sans-serif;">Save</button>
+      </div>
+      <div id="modal-client-history" style="margin-top:6px;font-size:11px;color:var(--mid);"></div>
     </div>
     <!-- Cancel + Postpone -->
     <div style="display:flex;gap:8px;margin-top:8px;">
@@ -515,6 +527,7 @@ body{background:var(--bg);font-family:'Inter',sans-serif;font-size:14px;}
     <div class="cal-popup-title" id="cal-popup-title"></div>
     <div class="cal-popup-sub" id="cal-popup-sub"></div>
     <div id="cal-popup-list"></div>
+    <div id="cal-popup-block-section"></div>
     <button class="cal-popup-close" onclick="closeCalPopup()">Close</button>
   </div>
 </div>
@@ -554,7 +567,7 @@ const PASSWORDS = {
 const MONTHS=['January','February','March','April','May','June','July','August','September','October','November','December'];
 const MS=['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
 const DS=['Sun','Mon','Tue','Wed','Thu','Fri','Sat'];
-const HOUR_LABELS=['7am','8am','9am','10am','11am','12pm','1pm','2pm','3pm','4pm','5pm','6pm','7pm','8pm','9pm','10pm','11pm'];
+const HOUR_LABELS=['6am','7am','8am','9am','10am','11am','12pm','1pm','2pm','3pm','4pm','5pm','6pm','7pm','8pm','9pm','10pm','11pm'];
 
 // ── STATE ──
 let db, currentUser='', currentUserKey='', userRole='owner';
@@ -565,6 +578,7 @@ let modalBookingId=null;
 let extendHrs=1;
 let adminUnlocked=false;
 let podSetup='space';
+let blockedDates={}; // {date: reason}
 const POD_RATES={space:750,single_cam:1000,dual_cam:1500};
 function getHourlyRate(){ return selStudio==='pod'?POD_RATES[podSetup]:HOURLY_RATE; }
 const today=new Date();
@@ -587,7 +601,7 @@ function showToast(msg,dur=3000){
 }
 
 function formatSlot(start,dur){
-  return HOUR_LABELS[start-7]+' – '+HOUR_LABELS[start-7+dur]+' ('+dur+'hr'+(dur>1?'s':'')+')';
+  return HOUR_LABELS[start-6]+' – '+HOUR_LABELS[start-6+dur]+' ('+dur+'hr'+(dur>1?'s':'')+')';
 }
 
 function slotOverlaps(existingRaw,startH,dur){
@@ -605,7 +619,7 @@ function cleanPhone(p){ return p.replace(/\D/g,'').replace(/^0+/,'').replace(/^9
 // ── FIREBASE ──
 async function save(){
   if(!db)return;
-  try{ await setDoc(doc(db,'studios',SID),{bookings}); }catch(e){console.error(e);}
+  try{ await setDoc(doc(db,'studios',SID),{bookings,blockedDates}); }catch(e){console.error(e);}
 }
 
 function setSyncStatus(s){
@@ -622,7 +636,7 @@ function initFirebase(){
   try{
     const app=initializeApp(CFG); db=getFirestore(app);
     onSnapshot(doc(db,'studios',SID),snap=>{
-      if(snap.exists()){const d=snap.data();bookings=d.bookings||{};}
+      if(snap.exists()){const d=snap.data();bookings=d.bookings||{};blockedDates=d.blockedDates||{};}
       setSyncStatus('live');
       {
         renderSlots();renderBookingList();renderUpcomingBookings();renderCalendar();renderInternDashboard();renderDailyEarnings();
@@ -747,6 +761,7 @@ window.selectStudio=function(studio){
   const totalLabel=document.getElementById('f-total-label');
   if(totalLabel)totalLabel.textContent='Total (₹'+getHourlyRate().toLocaleString('en-IN')+'/hr)';
   renderSlots();renderBookingList();
+  if(blockedDates[dateStr])showToast('⚠️ This date is blocked: '+blockedDates[dateStr],3000);
 };
 
 window.selectPodSetup=function(val){
@@ -791,7 +806,7 @@ function renderSlots(){
   const grid=document.getElementById('slot-grid');if(!grid)return;
   const dayBookings=Object.values(bookings).filter(b=>b.date===selDate&&(b.studio||'photo')===selStudio&&b.status!=='cancelled');
   grid.innerHTML=HOUR_LABELS.slice(0,-1).map((lbl,i)=>{
-    const h=7+i;
+    const h=6+i;
     const isBooked=dayBookings.some(b=>{
       const p=(b.slotRaw||'').split('|');const bS=parseInt(p[0]),bD=parseInt(p[1]||1);
       return !isNaN(bS)&&h>=bS&&h<bS+bD;
@@ -817,7 +832,7 @@ window.selectStart=function(h){
 
 window.changeDur=function(delta){
   if(selStartH===null)return;
-  selDur=Math.max(1,Math.min(23-selStartH,selDur+delta));
+  selDur=Math.max(1,Math.min(24-selStartH,selDur+delta));
   updateDurDisplay();renderSlots();recalcPayment();
 };
 
@@ -832,7 +847,7 @@ function updateDurDisplay(){
   const sumEl=document.getElementById('slot-summary');
   if(sumEl){
     sumEl.textContent=conflict?'⚠️ Conflicts with existing booking — adjust hours'
-      :'✓ '+HOUR_LABELS[selStartH-7]+' to '+HOUR_LABELS[endH-7]+' · ₹'+(selDur*getHourlyRate()).toLocaleString('en-IN');
+      :'✓ '+HOUR_LABELS[selStartH-6]+' to '+HOUR_LABELS[endH-6]+' · ₹'+(selDur*getHourlyRate()).toLocaleString('en-IN');
     sumEl.style.color=conflict?'#991b1b':'var(--keer)';
   }
 }
@@ -856,6 +871,7 @@ window.confirmBooking=async function(){
   const phone=document.getElementById('f-phone').value.trim();
   const type=document.getElementById('f-type').value;
   if(!name||!phone||!type||!selStartH){showToast('Please fill all fields and select a start time');return;}
+  if(blockedDates[selDate]){showToast('This date is blocked: '+blockedDates[selDate]);return;}
   const dayBookings=Object.values(bookings).filter(b=>b.date===selDate&&(b.studio||'photo')===selStudio&&b.status!=='cancelled');
   if(slotOverlaps(dayBookings.map(b=>b.slotRaw||''),selStartH,selDur)){showToast('Slot conflicts with existing booking!');return;}
   const slotRaw=selStartH+'|'+selDur;const slotLabel=formatSlot(selStartH,selDur);
@@ -943,7 +959,7 @@ window.openModal=function(id){
   const rescheduleSelect=document.getElementById('reschedule-hour');
   const parts=(b.slotRaw||'9|2').split('|');const curStart=parseInt(parts[0]);
   rescheduleSelect.innerHTML=HOUR_LABELS.slice(0,-1).map((_,i)=>{
-    const h=7+i;return '<option value="'+h+'"'+(h===curStart?' selected':'')+'>'+HOUR_LABELS[i]+'</option>';
+    const h=6+i;return '<option value="'+h+'"'+(h===curStart?' selected':'')+'>'+HOUR_LABELS[i]+'</option>';
   }).join('');
   extendHrs=1;document.getElementById('extend-hrs').textContent=1;
   const isCancelled=b.status==='cancelled';
@@ -951,6 +967,9 @@ window.openModal=function(id){
   const pBtn=document.getElementById('modal-postpone-btn');if(pBtn)pBtn.style.display=isCancelled?'none':'block';
   if(isCancelled){document.getElementById('reschedule-section').style.display='none';document.getElementById('extend-section').style.display='none';}
   document.getElementById('modal-pay-btn').style.display=(isCancelled||b.paid)?'none':'block';
+  // Client history
+  showClientHistory(b);
+  document.getElementById('modal-client-note').value='';
   document.getElementById('payment-modal').classList.add('open');
 };
 window.closeModal=function(){document.getElementById('payment-modal').classList.remove('open');};
@@ -992,7 +1011,7 @@ window.applyReschedule=async function(){
   const newStart=parseInt(document.getElementById('reschedule-hour').value);
   const parts=(b.slotRaw||'9|2').split('|');const oldStart=parseInt(parts[0]),dur=parseInt(parts[1]||1);
   if(newStart===oldStart){showToast('Same time selected');return;}
-  if(newStart+dur>23){showToast('Booking would go past 11pm!');return;}
+  if(newStart+dur>24){showToast('Booking would go past 12am!');return;}
   const dayBookings=Object.values(bookings).filter(bk=>bk.date===b.date&&(bk.studio||'photo')===(b.studio||'photo')&&bk.id!==b.id&&bk.status!=='cancelled');
   if(slotOverlaps(dayBookings.map(bk=>bk.slotRaw||''),newStart,dur)){showToast('Conflicts with another booking!');return;}
   b.slotRaw=newStart+'|'+dur;b.slot=formatSlot(newStart,dur);
@@ -1018,7 +1037,7 @@ window.applyExtension=async function(isAdd){
   const b=bookings[modalBookingId];if(!b)return;
   const parts=(b.slotRaw||'9|2').split('|');const startH=parseInt(parts[0]),oldDur=parseInt(parts[1]);
   const newDur=isAdd?oldDur+extendHrs:Math.max(1,oldDur-extendHrs);
-  if(startH+newDur>23){showToast('Cannot go past 11pm!');return;}
+  if(startH+newDur>24){showToast('Cannot go past 12am!');return;}
   if(isAdd){
     const dayBookings=Object.values(bookings).filter(bk=>bk.date===b.date&&(bk.studio||'photo')===(b.studio||'photo')&&bk.id!==b.id&&bk.status!=='cancelled');
     if(slotOverlaps(dayBookings.map(bk=>bk.slotRaw||''),startH+oldDur,extendHrs)){showToast('Conflicts with another booking!');return;}
@@ -1181,10 +1200,12 @@ function renderCalendar(){
     const count=dayItems.length;
     const isToday=ds===ts;
     const isPast=ds<ts;
-    let cls='cal-day'+(isToday?' today':'')+(count>0?' has-bookings':'')+(isPast?' past-day':'');
+    const isBlocked=!!blockedDates[ds];
+    let cls='cal-day'+(isToday?' today':'')+(count>0?' has-bookings':'')+(isPast?' past-day':'')+(isBlocked?' blocked-day':'');
     html+='<div class="'+cls+'" onclick="openCalPopup(\''+ds+'\')">';
     html+='<div class="cal-day-num">'+d+'</div>';
-    if(count>0)html+='<div class="cal-day-count">'+count+'</div>';
+    if(isBlocked)html+='<div style="font-size:8px;color:#dc2626;font-weight:700;">🔒</div>';
+    else if(count>0)html+='<div class="cal-day-count">'+count+'</div>';
     html+='</div>';
   }
   grid.innerHTML=html;
@@ -1211,6 +1232,17 @@ function renderCalendar(){
       +'<div style="flex:1;text-align:center;"><div style="font-size:10px;color:var(--keer);font-weight:600;">Advance</div><div style="font-size:14px;font-weight:700;color:var(--keer);">₹'+totalAdv.toLocaleString('en-IN')+'</div></div>'
       +'<div style="flex:1;text-align:center;"><div style="font-size:10px;color:var(--raja);font-weight:600;">Pending</div><div style="font-size:14px;font-weight:700;color:var(--raja);">₹'+totalBal.toLocaleString('en-IN')+'</div></div>'
       +'</div>';
+    // Studio split
+    if(calFilter==='all'&&filtered.length>0){
+      const photoRev=filtered.filter(b=>(b.studio||'photo')==='photo').reduce((s,b)=>s+(Number(b.total)||0),0);
+      const podRev=filtered.filter(b=>(b.studio||'photo')==='pod').reduce((s,b)=>s+(Number(b.total)||0),0);
+      const photoCount=filtered.filter(b=>(b.studio||'photo')==='photo').length;
+      const podCount=filtered.filter(b=>(b.studio||'photo')==='pod').length;
+      summary.innerHTML+='<div style="display:flex;gap:8px;margin-top:10px;padding-top:10px;border-top:1px solid #f0ece4;">'
+        +'<div style="flex:1;text-align:center;padding:8px;background:#fff8f5;border-radius:8px;"><div style="font-size:9px;color:var(--raja);font-weight:600;">📷 PHOTO</div><div style="font-size:14px;font-weight:700;">'+photoCount+' · ₹'+photoRev.toLocaleString("en-IN")+'</div></div>'
+        +'<div style="flex:1;text-align:center;padding:8px;background:#f5f3ff;border-radius:8px;"><div style="font-size:9px;color:var(--ari);font-weight:600;">🎙️ PODCAST</div><div style="font-size:14px;font-weight:700;">'+podCount+' · ₹'+podRev.toLocaleString("en-IN")+'</div></div>'
+        +'</div>';
+    }
   }
 }
 
@@ -1230,10 +1262,20 @@ window.openCalPopup=function(dateStr){
       return '<div class="cal-popup-item" onclick="closeCalPopup();openModal(\''+b.id+'\')" style="cursor:pointer;">'
         +'<div class="cal-popup-item-name">'+stIcon+' '+b.name+'</div>'
         +'<div class="cal-popup-item-meta">'+b.slot+' · '+b.type+' · '+status+'</div>'
-        +'<div class="cal-popup-item-meta">📞 '+b.phone+(b.notes?' · 📝 '+b.notes:'')+'</div>'
+        +'<div class="cal-popup-item-meta" style="display:flex;align-items:center;gap:8px;margin-top:4px;">'
+        +'<a href="tel:'+b.phone+'" style="display:inline-flex;align-items:center;gap:4px;padding:4px 10px;border-radius:8px;background:#dcfce7;color:#166534;font-size:11px;font-weight:600;text-decoration:none;">📞 Call</a>'
+        +'<a href="https://wa.me/91'+b.phone.replace(/\D/g,"").replace(/^0+/,"").replace(/^91/,"")+'" target="_blank" style="display:inline-flex;align-items:center;gap:4px;padding:4px 10px;border-radius:8px;background:#25D366;color:#fff;font-size:11px;font-weight:600;text-decoration:none;">💬 WhatsApp</a>'
+        +(b.notes?'<span style="font-size:10px;color:var(--mid);">📝 '+b.notes+'</span>':'')
+        +'</div>'
         +'</div>';
     }).join('');
   }
+  // Block date button
+  const blockSec=document.getElementById('cal-popup-block-section');
+  if(blockSec&&userRole==='owner'){
+    const isBlocked=blockedDates[dateStr];
+    blockSec.innerHTML='<button onclick="toggleBlockDate(\''+dateStr+'\')" style="width:100%;padding:10px;border-radius:var(--r);border:2px solid '+(isBlocked?'#dc2626':'#e0dbd0')+';background:'+(isBlocked?'#fee2e2':'var(--surface)')+';color:'+(isBlocked?'#dc2626':'var(--dark)')+';font-size:12px;font-weight:700;cursor:pointer;font-family:Syne,sans-serif;margin-top:8px;">'+(isBlocked?'🔓 Unblock Date ('+isBlocked+')':'🔒 Block This Date')+'</button>';
+  }else if(blockSec){blockSec.innerHTML='';}
   document.getElementById('cal-popup').classList.add('open');
 };
 window.closeCalPopup=function(){document.getElementById('cal-popup').classList.remove('open');};
@@ -1290,7 +1332,7 @@ function renderInternSlots(){
   const dateLabel=new Date(dt+'T12:00:00').toLocaleDateString('en-IN',{day:'numeric',month:'short',weekday:'short'});
   if(lbl)lbl.textContent=(internStudio==='photo'?'📷':'🎙️')+' Slots · '+dateLabel;
   grid.innerHTML=HOUR_LABELS.slice(0,-1).map((lbl,i)=>{
-    const h=7+i;
+    const h=6+i;
     const isBooked=dayBookings.some(b=>{
       const p=(b.slotRaw||'').split('|');const bS=parseInt(p[0]),bD=parseInt(p[1]||1);
       return !isNaN(bS)&&h>=bS&&h<bS+bD;
@@ -1386,6 +1428,188 @@ window.factoryReset=async function(){
   bookings={};backupBookings();await save();showToast('Factory reset complete');location.reload();
 };
 
+
+
+// ── BLOCK DATES ──
+window.toggleBlockDate=async function(dateStr){
+  if(blockedDates[dateStr]){
+    delete blockedDates[dateStr];
+    showToast('Date unblocked ✓');
+  }else{
+    const reason=prompt('Block reason (e.g. Festival, Maintenance, Holiday):');
+    if(!reason)return;
+    blockedDates[dateStr]=reason;
+    showToast('Date blocked: '+reason+' ✓');
+  }
+  await save();renderCalendar();
+  closeCalPopup();
+};
+
+// ── BULK REMINDER ──
+window.bulkReminder=function(){
+  const tomorrow=new Date();tomorrow.setDate(tomorrow.getDate()+1);
+  const tmrStr=localDateStr(tomorrow);
+  const tmrBookings=Object.values(bookings).filter(b=>b.date===tmrStr&&b.status!=='cancelled');
+  if(!tmrBookings.length){showToast('No bookings tomorrow');return;}
+  if(!confirm('Send WhatsApp reminders to '+tmrBookings.length+' client(s) for tomorrow?'))return;
+  const dateLabel=tomorrow.toLocaleDateString('en-IN',{weekday:'long',day:'numeric',month:'long'});
+  tmrBookings.forEach((b,i)=>{
+    setTimeout(()=>{
+      const phone=cleanPhone(b.phone);
+      const bal=b.paid?0:Math.max(0,(Number(b.total)||0)-(Number(b.discount)||0)-(Number(b.advance)||0));
+      let msg='Hi '+b.name+'! 👋\n\nReminder for your shoot *tomorrow* at Magizh Studio 📸\n\n';
+      msg+='📅 *Date:* '+dateLabel+'\n⏰ *Slot:* '+b.slot+'\n';
+      if(bal>0)msg+='🔖 *Balance due:* ₹'+bal.toLocaleString('en-IN')+'\n';
+      msg+='📍 *Location:* '+STUDIO_LOC+'\n\nPlease arrive 10 minutes early!\n— Magizh Studio';
+      window.open('https://wa.me/91'+phone+'?text='+encodeURIComponent(msg),'_blank');
+    },i*1500);
+  });
+  showToast('Opening WhatsApp for '+tmrBookings.length+' client(s)...',4000);
+};
+
+// ── CLIENT NOTES ──
+window.saveClientNote=async function(){
+  if(!modalBookingId)return;
+  const note=document.getElementById('modal-client-note').value.trim();
+  if(!note){showToast('Enter a note first');return;}
+  const b=bookings[modalBookingId];if(!b)return;
+  if(!b.clientNotes)b.clientNotes=[];
+  b.clientNotes.push({note,by:currentUser,at:Date.now()});
+  document.getElementById('modal-client-note').value='';
+  backupBookings();await save();
+  showClientHistory(b);
+  showToast('Note saved ✓');
+};
+
+function showClientHistory(b){
+  const el=document.getElementById('modal-client-history');if(!el)return;
+  // Show notes from this booking
+  const notes=b.clientNotes||[];
+  // Also find past notes from same phone
+  const phone=cleanPhone(b.phone||'');
+  const pastNotes=Object.values(bookings).filter(bk=>bk.id!==b.id&&cleanPhone(bk.phone||'')===phone&&bk.clientNotes&&bk.clientNotes.length).flatMap(bk=>bk.clientNotes.map(n=>({...n,from:'prev visit'})));
+  const allNotes=[...pastNotes,...notes];
+  if(!allNotes.length){el.innerHTML='';return;}
+  el.innerHTML='<div style="font-size:10px;font-weight:600;color:var(--light);margin-bottom:4px;">CLIENT HISTORY</div>'+allNotes.map(n=>'<div style="background:var(--surface2);padding:6px 8px;border-radius:6px;margin-bottom:3px;font-size:11px;">'+n.note+' <span style="color:var(--light);font-size:9px;">— '+n.by+(n.from?' ('+n.from+')':'')+'</span></div>').join('');
+}
+
+
+
+// ── BOOKING CARD IMAGE ──
+window.generateBookingCard=function(){
+  if(!modalBookingId)return;
+  const b=bookings[modalBookingId];if(!b)return;
+  const dur=b.slotRaw?parseInt(b.slotRaw.split('|')[1]||1):1;
+  const total=Number(b.total)||(dur*HOURLY_RATE);
+  const disc=Number(b.discount)||0;
+  const adv=Number(b.advance)||0;
+  const afterDisc=Math.max(0,total-disc);
+  const bal=b.paid?0:Math.max(0,afterDisc-adv);
+  const dateStr=new Date(b.date+'T12:00:00').toLocaleDateString('en-IN',{weekday:'long',day:'numeric',month:'long',year:'numeric'});
+  const stIcon=(b.studio||'photo')==='photo'?'📷':'🎙️';
+  const stName=b.studioName||'Photography Studio';
+  const invNo='MZ-'+b.id.slice(-6).toUpperCase();
+
+  const W=1080,H=1920;
+  const canvas=document.createElement('canvas');canvas.width=W;canvas.height=H;
+  const ctx=canvas.getContext('2d');
+
+  // Background
+  ctx.fillStyle='#f5f0e8';ctx.fillRect(0,0,W,H);
+
+  // Top brand bar
+  ctx.fillStyle='#E8601A';ctx.fillRect(0,0,W,340);
+
+  // Brand text
+  ctx.fillStyle='rgba(255,255,255,0.5)';ctx.font='500 28px Inter,sans-serif';ctx.fillText('MAGIZH STUDIO',80,80);
+  ctx.fillStyle='#ffffff';ctx.font='800 72px Syne,sans-serif';ctx.fillText('Booking Confirmed ✅',80,170);
+  ctx.fillStyle='rgba(255,255,255,0.7)';ctx.font='400 30px Inter,sans-serif';ctx.fillText('Ref: #'+invNo,80,230);
+  ctx.fillText('Rental Photo Studio · Nerkundram, Chennai',80,280);
+
+  // Main card
+  const cardY=380,cardH=1100;
+  ctx.fillStyle='#ffffff';
+  roundRect(ctx,60,cardY,W-120,cardH,30);ctx.fill();
+  ctx.strokeStyle='#e0dbd0';ctx.lineWidth=2;roundRect(ctx,60,cardY,W-120,cardH,30);ctx.stroke();
+
+  let y=cardY+70;
+  const lx=120,vx=120;
+
+  // Client name
+  ctx.fillStyle='#aaaaaa';ctx.font='600 24px Inter,sans-serif';ctx.fillText('CLIENT',lx,y);
+  y+=50;
+  ctx.fillStyle='#1a1a1a';ctx.font='800 52px Syne,sans-serif';ctx.fillText(b.name,lx,y);
+  y+=40;
+  ctx.fillStyle='#666';ctx.font='400 28px Inter,sans-serif';ctx.fillText(b.phone,lx,y);
+
+  y+=80;
+  ctx.fillStyle='#f5f0e8';roundRect(ctx,100,y-10,W-200,4,2);ctx.fill();
+  y+=40;
+
+  // Date
+  ctx.fillStyle='#aaaaaa';ctx.font='600 24px Inter,sans-serif';ctx.fillText('DATE',lx,y);
+  y+=46;
+  ctx.fillStyle='#1a1a1a';ctx.font='700 38px Inter,sans-serif';ctx.fillText(dateStr,lx,y);
+
+  y+=70;
+  // Time
+  ctx.fillStyle='#aaaaaa';ctx.font='600 24px Inter,sans-serif';ctx.fillText('TIME SLOT',lx,y);
+  y+=46;
+  ctx.fillStyle='#1a1a1a';ctx.font='700 38px Inter,sans-serif';ctx.fillText(b.slot,lx,y);
+
+  y+=70;
+  // Studio + Type
+  ctx.fillStyle='#aaaaaa';ctx.font='600 24px Inter,sans-serif';ctx.fillText('STUDIO',lx,y);ctx.fillText('SHOOT TYPE',lx+460,y);
+  y+=46;
+  ctx.fillStyle='#1a1a1a';ctx.font='700 34px Inter,sans-serif';ctx.fillText(stName,lx,y);ctx.fillText(b.type,lx+460,y);
+
+  y+=80;
+  ctx.fillStyle='#f5f0e8';roundRect(ctx,100,y-10,W-200,4,2);ctx.fill();
+  y+=40;
+
+  // Payment
+  ctx.fillStyle='#aaaaaa';ctx.font='600 24px Inter,sans-serif';ctx.fillText('TOTAL',lx,y);
+  if(disc>0)ctx.fillText('DISCOUNT',lx+300,y);
+  ctx.fillText('ADVANCE',lx+560,y);
+  y+=46;
+  ctx.fillStyle='#1a1a1a';ctx.font='800 42px Syne,sans-serif';ctx.fillText('₹'+total.toLocaleString('en-IN'),lx,y);
+  if(disc>0){ctx.fillStyle='#991b1b';ctx.font='700 34px Inter,sans-serif';ctx.fillText('-₹'+disc.toLocaleString('en-IN'),lx+300,y);}
+  ctx.fillStyle='#1A7A4A';ctx.font='700 34px Inter,sans-serif';ctx.fillText('₹'+adv.toLocaleString('en-IN'),lx+560,y);
+
+  y+=70;
+  // Balance box
+  const balColor=b.paid?'#dcfce7':'#fff8f5';
+  const balText=b.paid?'#166534':'#E8601A';
+  ctx.fillStyle=balColor;roundRect(ctx,100,y,W-200,90,16);ctx.fill();
+  ctx.fillStyle=balText;ctx.font='800 36px Syne,sans-serif';
+  ctx.fillText(b.paid?'✅ FULLY PAID':'BALANCE DUE: ₹'+bal.toLocaleString('en-IN'),140,y+58);
+
+  // Footer
+  ctx.fillStyle='#aaaaaa';ctx.font='400 26px Inter,sans-serif';
+  ctx.fillText('📍 Nerkundram, Chennai',80,H-180);
+  ctx.fillText('📞 +91 80726 59679',80,H-130);
+  ctx.fillText('📸 @magizh_studio_',80,H-80);
+
+  // Logo accent
+  ctx.fillStyle='#E8601A';roundRect(ctx,W-200,H-120,120,50,12);ctx.fill();
+  ctx.fillStyle='#fff';ctx.font='800 22px Syne,sans-serif';ctx.fillText('MAGIZH',W-188,H-87);
+
+  // Download
+  canvas.toBlob(function(blob){
+    const url=URL.createObjectURL(blob);
+    const a=document.createElement('a');
+    a.href=url;a.download='Magizh_Booking_'+b.name.replace(/\s+/g,'_')+'_'+invNo+'.png';
+    a.click();URL.revokeObjectURL(url);
+    showToast('Booking card downloaded! Share on WhatsApp 📸',3000);
+  },'image/png');
+};
+
+function roundRect(ctx,x,y,w,h,r){
+  ctx.beginPath();ctx.moveTo(x+r,y);ctx.lineTo(x+w-r,y);ctx.quadraticCurveTo(x+w,y,x+w,y+r);
+  ctx.lineTo(x+w,y+h-r);ctx.quadraticCurveTo(x+w,y+h,x+w-r,y+h);ctx.lineTo(x+r,y+h);
+  ctx.quadraticCurveTo(x,y+h,x,y+h-r);ctx.lineTo(x,y+r);ctx.quadraticCurveTo(x,y,x+r,y);ctx.closePath();
+}
+
 // ── BACKUP ──
 
 // ── DAILY EARNINGS ──
@@ -1421,6 +1645,9 @@ window.checkRepeatClient=function(){
       }
     }
     showToast('Returning client: '+existing.name+' 🔄',2000);
+    // Show past notes
+    const pastNotes=Object.values(bookings).filter(bk=>cleanPhone(bk.phone||'')===cleaned&&bk.clientNotes&&bk.clientNotes.length).flatMap(bk=>bk.clientNotes);
+    if(pastNotes.length){showToast('📝 Note: '+pastNotes[pastNotes.length-1].note,4000);}
   }
 };
 
