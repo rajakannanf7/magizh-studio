@@ -761,7 +761,7 @@ window.selectStudio=function(studio){
   const totalLabel=document.getElementById('f-total-label');
   if(totalLabel)totalLabel.textContent='Total (₹'+getHourlyRate().toLocaleString('en-IN')+'/hr)';
   renderSlots();renderBookingList();
-  if(blockedDates[dateStr])showToast('⚠️ This date is blocked: '+blockedDates[dateStr],3000);
+  if(selDate&&blockedDates[selDate])showToast('⚠️ This date is blocked: '+blockedDates[selDate],3000);
 };
 
 window.selectPodSetup=function(val){
@@ -1619,8 +1619,16 @@ function renderDailyEarnings(){
   const todayBk=Object.values(bookings).filter(b=>b.date===ts&&b.status!=='cancelled');
   if(!todayBk.length){el.innerHTML='<div style="background:var(--surface);border-radius:var(--r);padding:14px;border:0.5px solid #e0dbd0;text-align:center;font-size:12px;color:var(--light);">No bookings today</div>';return;}
   const total=todayBk.reduce((s,b)=>s+(Number(b.total)||0),0);
-  const collected=todayBk.reduce((s,b)=>s+(Number(b.advance)||0)+(b.paid?Number(b.balance)||0:0),0);
-  const pending=total-collected;
+  const collected=todayBk.reduce((s,b)=>{
+    const net=Math.max(0,(Number(b.total)||0)-(Number(b.discount)||0));
+    const adv=Number(b.advance)||0;
+    return s+(b.paid?net:Math.min(adv,net));
+  },0);
+  const pending=todayBk.reduce((s,b)=>{
+    if(b.paid)return s;
+    const net=Math.max(0,(Number(b.total)||0)-(Number(b.discount)||0));
+    return s+Math.max(0,net-(Number(b.advance)||0));
+  },0);
   el.innerHTML='<div style="background:var(--surface);border-radius:var(--r);padding:14px;border:0.5px solid #e0dbd0;display:flex;gap:8px;text-align:center;">'
     +'<div style="flex:1;"><div style="font-size:9px;color:var(--light);font-weight:600;text-transform:uppercase;">Bookings</div><div style="font-family:Syne,sans-serif;font-size:20px;font-weight:800;">'+todayBk.length+'</div></div>'
     +'<div style="flex:1;"><div style="font-size:9px;color:var(--light);font-weight:600;text-transform:uppercase;">Total</div><div style="font-family:Syne,sans-serif;font-size:20px;font-weight:800;">₹'+total.toLocaleString('en-IN')+'</div></div>'
