@@ -11,14 +11,15 @@
 <meta name="theme-color" content="#E8601A">
 <title>Magizh Studio</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600;700;800;900&family=Syne:wght@400;600;700;800&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 <style>
 *{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent;}
 :root{
   --bg:#f5f0e8;--surface:#fff;--surface2:#ede9df;
-  --ari:#7C5CBF;--raja:#E8601A;--keer:#1A7A4A;--inba:#888;--intern:#3B82F6;
-  --dark:#1a1a1a;--mid:#666;--light:#aaa;--lighter:#ccc;
+  --ari:#1B7A6E;--raja:#E9574C;--keer:#1A7A4A;--inba:#888;--intern:#1B7A6E;
+  --sand:#E7B486;--gold:#C9A227;
+  --dark:#141414;--mid:#666;--light:#aaa;--lighter:#ccc;
   --r:12px;--rl:20px;
 }
 html,body{height:100%;overflow:hidden;}
@@ -28,7 +29,7 @@ body{background:var(--bg);font-family:'Inter',sans-serif;font-size:14px;}
 /* LOGIN */
 #login-screen{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:32px 24px;background:var(--bg);overflow-y:auto;}
 .login-logo{width:56px;height:56px;background:var(--raja);border-radius:18px;display:flex;align-items:center;justify-content:center;margin-bottom:16px;}
-.login-title{font-family:'Syne',sans-serif;font-size:24px;font-weight:800;color:var(--dark);margin-bottom:4px;}
+.login-title{font-family:'Playfair Display',serif;font-size:26px;font-weight:800;color:var(--dark);margin-bottom:4px;}
 .login-sub{font-size:13px;color:var(--light);margin-bottom:20px;}
 .login-section-lbl{font-size:10px;font-weight:600;letter-spacing:.12em;text-transform:uppercase;color:var(--light);margin-bottom:8px;width:100%;text-align:left;}
 .login-options{display:flex;flex-direction:column;gap:10px;width:100%;margin-bottom:20px;}
@@ -66,7 +67,7 @@ body{background:var(--bg);font-family:'Inter',sans-serif;font-size:14px;}
 .live-dot.off{background:rgba(255,255,255,.3);}
 .live-txt{font-size:9px;font-weight:500;color:rgba(255,255,255,.8);}
 .user-chip{font-size:10px;font-weight:600;color:#fff;background:rgba(255,255,255,.2);padding:3px 8px;border-radius:10px;}
-.hero-title{font-family:'Syne',sans-serif;font-size:32px;font-weight:800;color:#fff;line-height:1;}
+.hero-title{font-family:'Playfair Display',serif;font-size:34px;font-weight:800;color:#fff;line-height:1;letter-spacing:-.01em;}
 .hero-sub{font-size:12px;color:rgba(255,255,255,.5);margin-top:3px;}
 
 /* BOOKING */
@@ -182,7 +183,7 @@ body{background:var(--bg);font-family:'Inter',sans-serif;font-size:14px;}
 /* APP LOADER */
 #app-loader{position:fixed;inset:0;background:#f5f0e8;display:flex;align-items:center;justify-content:center;flex-direction:column;z-index:9999;transition:opacity .3s ease;}
 .loader-logo{width:70px;height:70px;background:#E8601A;border-radius:22px;display:flex;align-items:center;justify-content:center;margin-bottom:16px;box-shadow:0 10px 25px rgba(0,0,0,.12);}
-.loader-text{font-family:'Syne',sans-serif;font-size:22px;font-weight:800;color:#1a1a1a;}
+.loader-text{font-family:'Playfair Display',serif;font-size:24px;font-weight:800;color:#1a1a1a;}
 .loader-sub{font-size:12px;color:#666;margin-top:4px;}
 </style>
 </head>
@@ -775,7 +776,7 @@ window.selectStudio=function(studio){
     pod.querySelectorAll('div').forEach((el,i)=>{el.style.color=i===0?'var(--dark)':'var(--light)';});
     pod.querySelector('svg').querySelectorAll('*').forEach(el=>el.setAttribute('stroke','#1a1a1a'));
   }else{
-    pod.style.background='#7C5CBF';pod.style.borderColor='#7C5CBF';
+    pod.style.background='#1B7A6E';pod.style.borderColor='#1B7A6E';
     pod.querySelectorAll('div').forEach((el,i)=>{el.style.color=i===0?'#fff':'rgba(255,255,255,.7)';});
     pod.querySelector('svg').querySelectorAll('*').forEach(el=>el.setAttribute('stroke','white'));
     photo.style.background='var(--surface)';photo.style.borderColor='#e0dbd0';
@@ -1216,6 +1217,14 @@ function timeAgo(ts){
   return new Date(ts).toLocaleDateString('en-IN',{day:'numeric',month:'short'});
 }
 
+function enqHourLabel(h){h=((h%24)+24)%24;return h===0?'12am':h===12?'12pm':h<12?h+'am':(h-12)+'pm';}
+function enqSlot(e){
+  if(!e||!e.preferredTime)return'';
+  const s=parseInt(e.preferredTime);if(isNaN(s))return'';
+  const dur=Math.max(2,parseInt(e.durationHrs)||2);
+  return enqHourLabel(s)+'–'+enqHourLabel(s+dur)+' ('+dur+'h)';
+}
+
 function updateLeadsBadge(){
   const n=Object.values(enquiries).filter(e=>(e.status||'new')==='new').length;
   const badge=document.getElementById('leads-badge');
@@ -1240,13 +1249,17 @@ function renderLeads(){
   list.innerHTML=items.map(e=>{
     const st=e.status||'new';
     const stBadge=st==='converted'?'<span class="badge badge-paid">Booked</span>':st==='done'?'<span class="badge badge-cancel">Done</span>':'<span class="badge badge-adv">New</span>';
-    const preferred=e.preferredDate?('📅 '+e.preferredDate):'';
+    const preferred=e.preferredDate?new Date(e.preferredDate+'T12:00:00').toLocaleDateString('en-IN',{day:'numeric',month:'short',weekday:'short'}):'';
+    const slot=enqSlot(e);
+    const priceStr=e.quotedPrice?(' · ₹'+Number(e.quotedPrice).toLocaleString('en-IN')):'';
     const phoneClean=(e.phone||'').replace(/\D/g,'').replace(/^0+/,'').replace(/^91/,'');
-    const waMsg=encodeURIComponent('Hi '+(e.name||'')+'! 👋 Thanks for your enquiry to *Magizh Studio* 📸'+(e.type?' about your '+e.type+'.':'.')+' How can we help you plan your shoot?');
+    const offer=e.package||e.type||'General enquiry';
+    const waMsg=encodeURIComponent('Hi '+(e.name||'')+'! 👋 Thanks for your enquiry to *Magizh Studio* 📸 about the '+offer+'. How can we help you plan your shoot?');
     let card='<div class="bitem" style="flex-direction:column;align-items:stretch;gap:8px;">';
     card+='<div style="display:flex;align-items:flex-start;gap:8px;">';
     card+='<div class="bitem-info"><div class="bitem-name">'+(e.name||'Unknown')+'</div>';
-    card+='<div class="bitem-meta">'+(e.type||'General enquiry')+(preferred?' · '+preferred:'')+'</div>';
+    card+='<div class="bitem-meta"><b>'+offer+'</b>'+priceStr+'</div>';
+    if(preferred||slot)card+='<div class="bitem-meta" style="margin-top:2px;color:var(--raja);font-weight:600;">📅 '+preferred+(slot?' · '+slot:'')+'</div>';
     if(e.message)card+='<div class="bitem-meta" style="margin-top:3px;color:var(--mid);">💬 '+e.message+'</div>';
     card+='<div class="bitem-meta" style="margin-top:3px;color:var(--light);">'+(e.source||'Enquiry')+' · '+timeAgo(e.createdAt)+' · '+(e.phone||'')+'</div>';
     card+='</div>'+stBadge+'</div>';
@@ -1272,9 +1285,16 @@ window.convertLead=function(id){
     const dc=document.querySelector('#date-strip .dc[data-date="'+e.preferredDate+'"]');
     if(dc)selectDate(e.preferredDate,dc);
   }
+  // Pre-select the requested start time + duration from the enquiry
+  const sH=parseInt(e.preferredTime);
+  if(!isNaN(sH)&&sH>=6&&sH<=23){
+    window.selectStart(sH);
+    selDur=Math.max(2,Math.min(24-sH,parseInt(e.durationHrs)||2));
+    updateDurDisplay();renderSlots();recalcPayment();
+  }
   e.status='converted';e.convertedAt=Date.now();e.convertedBy=currentUser;saveEnquiry(id);
   updateLeadsBadge();
-  showToast('Lead loaded 👉 now pick a time slot to confirm the booking',4500);
+  showToast('Lead loaded 👉 review the time & confirm the booking',4500);
 };
 
 window.markLeadDone=function(id){
