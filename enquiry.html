@@ -1,0 +1,171 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<meta name="theme-color" content="#E8601A">
+<title>Book Your Shoot · Magizh Studio</title>
+<meta property="og:title" content="Magizh Studio · Book Your Photo/Podcast Shoot">
+<meta property="og:description" content="Rental photo & podcast studio in Nerkundram, Chennai. Send your enquiry and we'll get back to you on WhatsApp.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent;}
+:root{--bg:#f5f0e8;--surface:#fff;--raja:#E8601A;--dark:#1a1a1a;--mid:#666;--light:#aaa;--lighter:#ccc;--keer:#1A7A4A;--r:14px;--rl:22px;}
+body{background:var(--bg);font-family:'Inter',sans-serif;color:var(--dark);min-height:100vh;}
+.wrap{max-width:460px;margin:0 auto;min-height:100vh;display:flex;flex-direction:column;}
+.hero{background:var(--raja);padding:40px 24px 34px;border-radius:0 0 28px 28px;color:#fff;}
+.logo{width:52px;height:52px;background:rgba(255,255,255,.18);border-radius:16px;display:flex;align-items:center;justify-content:center;margin-bottom:16px;}
+.eyebrow{font-size:11px;font-weight:600;letter-spacing:.14em;text-transform:uppercase;color:rgba(255,255,255,.6);margin-bottom:6px;}
+.h1{font-family:'Syne',sans-serif;font-size:30px;font-weight:800;line-height:1.05;}
+.sub{font-size:14px;color:rgba(255,255,255,.85);margin-top:8px;line-height:1.4;}
+.pills{display:flex;gap:8px;flex-wrap:wrap;margin-top:16px;}
+.pill{background:rgba(255,255,255,.16);border-radius:20px;padding:5px 12px;font-size:11px;font-weight:600;}
+.form{padding:22px 20px 30px;flex:1;}
+.field{background:var(--surface);border-radius:var(--r);padding:12px 14px;margin-bottom:10px;border:1px solid #e8e2d6;}
+.field.focus{border-color:var(--raja);}
+.field-lbl{font-size:10px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;color:var(--light);margin-bottom:4px;}
+.field input,.field select,.field textarea{width:100%;background:transparent;border:none;outline:none;font-size:15px;font-family:'Inter',sans-serif;color:var(--dark);}
+.field select{-webkit-appearance:none;cursor:pointer;}
+.field textarea{resize:vertical;min-height:44px;}
+.field input::placeholder,.field textarea::placeholder{color:var(--lighter);}
+.req{color:var(--raja);}
+.btn{background:var(--dark);border-radius:var(--rl);padding:16px;text-align:center;font-size:16px;font-weight:700;color:#fff;cursor:pointer;font-family:'Syne',sans-serif;border:none;width:100%;margin-top:6px;transition:transform .1s;display:flex;align-items:center;justify-content:center;gap:8px;}
+.btn:active{transform:scale(.98);}
+.btn:disabled{opacity:.6;cursor:default;}
+.err{color:#cc0000;font-size:12px;margin:2px 0 10px;display:none;}
+.foot{text-align:center;font-size:11px;color:var(--light);padding:8px 20px 24px;line-height:1.6;}
+.foot a{color:var(--mid);text-decoration:none;font-weight:600;}
+/* Thank you */
+.thanks{position:fixed;inset:0;background:var(--bg);display:none;flex-direction:column;align-items:center;justify-content:center;padding:32px 28px;text-align:center;z-index:50;}
+.thanks.show{display:flex;}
+.check{width:84px;height:84px;border-radius:50%;background:var(--keer);display:flex;align-items:center;justify-content:center;margin-bottom:22px;}
+.thanks-h{font-family:'Syne',sans-serif;font-size:26px;font-weight:800;margin-bottom:8px;}
+.thanks-p{font-size:14px;color:var(--mid);line-height:1.5;max-width:320px;margin-bottom:26px;}
+.wa-btn{background:#25D366;border:none;border-radius:var(--rl);padding:15px 22px;font-size:15px;font-weight:700;color:#fff;cursor:pointer;font-family:'Syne',sans-serif;text-decoration:none;display:inline-flex;align-items:center;gap:8px;}
+.spin{width:16px;height:16px;border:2px solid rgba(255,255,255,.4);border-top-color:#fff;border-radius:50%;animation:sp .7s linear infinite;display:none;}
+@keyframes sp{to{transform:rotate(360deg);}}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="hero">
+    <div class="logo">
+      <svg width="30" height="30" viewBox="0 0 24 24" fill="none"><rect x="2" y="6" width="20" height="14" rx="2" stroke="#fff" stroke-width="2"/><circle cx="12" cy="13" r="3" stroke="#fff" stroke-width="2"/><path d="M8 6l1.5-3h5L16 6" stroke="#fff" stroke-width="2" stroke-linejoin="round"/></svg>
+    </div>
+    <div class="eyebrow">Magizh Studio · Nerkundram, Chennai</div>
+    <div class="h1">Book your studio shoot 📸</div>
+    <div class="sub">Photography & podcast studio for rent. Fill this quick form and our team will reach out to you on WhatsApp to confirm.</div>
+    <div class="pills">
+      <span class="pill">📷 Photography</span>
+      <span class="pill">🎙️ Podcast</span>
+      <span class="pill">💰 From ₹750/hr</span>
+    </div>
+  </div>
+
+  <div class="form">
+    <div class="field"><div class="field-lbl">Your name <span class="req">*</span></div><input id="f-name" type="text" placeholder="Full name" autocomplete="name"></div>
+    <div class="field"><div class="field-lbl">WhatsApp number <span class="req">*</span></div><input id="f-phone" type="tel" placeholder="10-digit mobile number" autocomplete="tel" inputmode="numeric"></div>
+    <div class="field"><div class="field-lbl">What are you looking for?</div>
+      <select id="f-type">
+        <option value="">Select shoot type</option>
+        <option>Baby shoot</option>
+        <option>Maternity shoot</option>
+        <option>Portrait</option>
+        <option>Family shoot</option>
+        <option>Product shoot</option>
+        <option>Wedding / Event</option>
+        <option>Podcast recording</option>
+        <option>Other</option>
+      </select>
+    </div>
+    <div class="field"><div class="field-lbl">Preferred date (optional)</div><input id="f-date" type="date"></div>
+    <div class="field"><div class="field-lbl">Message (optional)</div><textarea id="f-msg" rows="2" placeholder="Tell us anything — timing, number of people, ideas..."></textarea></div>
+    <div class="err" id="err">Please enter your name and a valid phone number.</div>
+    <button class="btn" id="submit-btn" onclick="submitEnquiry()"><span class="spin" id="spin"></span><span id="btn-txt">Send Enquiry →</span></button>
+  </div>
+
+  <div class="foot">
+    📍 Nerkundram, Chennai &nbsp;·&nbsp; 📞 <a href="tel:+918072659679">+91 80726 59679</a> &nbsp;·&nbsp; 📸 <a href="https://instagram.com/magizh_studio_" target="_blank">@magizh_studio_</a>
+  </div>
+</div>
+
+<!-- Thank you screen -->
+<div class="thanks" id="thanks">
+  <div class="check">
+    <svg width="42" height="42" viewBox="0 0 24 24" fill="none"><path d="M5 13l4 4L19 7" stroke="#fff" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/></svg>
+  </div>
+  <div class="thanks-h">Thank you! 🎉</div>
+  <div class="thanks-p" id="thanks-p">We've received your enquiry. Our team will message you on WhatsApp shortly to confirm your slot.</div>
+  <a class="wa-btn" id="wa-now" href="#" target="_blank">💬 Chat with us on WhatsApp now</a>
+</div>
+
+<script type="module">
+import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js';
+import { getFirestore, doc, setDoc, updateDoc } from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js';
+
+const CFG = { apiKey:"AIzaSyAygqLP1vGN5P81joBQ9AQkWhEvqvBWspU", projectId:"magizh-studio", authDomain:"magizh-studio.firebaseapp.com" };
+const SID = "magizh-nerkundram";
+const STUDIO_PHONE = '918072659679';
+
+let db;
+try { db = getFirestore(initializeApp(CFG)); } catch(e){ console.error('Firebase init failed', e); }
+
+// Where did this lead come from? e.g. enquiry.html?src=instagram
+const src = new URLSearchParams(location.search).get('src');
+const SOURCE = src ? ('Meta Ad · '+src) : 'Meta Ad';
+
+// focus styling
+document.querySelectorAll('.field input,.field select,.field textarea').forEach(el=>{
+  el.addEventListener('focus',()=>el.closest('.field').classList.add('focus'));
+  el.addEventListener('blur',()=>el.closest('.field').classList.remove('focus'));
+});
+
+window.submitEnquiry = async function(){
+  const name=document.getElementById('f-name').value.trim();
+  const phone=document.getElementById('f-phone').value.trim();
+  const digits=phone.replace(/\D/g,'');
+  if(!name || digits.length<10){ document.getElementById('err').style.display='block'; return; }
+  document.getElementById('err').style.display='none';
+
+  const btn=document.getElementById('submit-btn');
+  btn.disabled=true;
+  document.getElementById('spin').style.display='inline-block';
+  document.getElementById('btn-txt').textContent='Sending...';
+
+  const id='enq-'+Date.now();
+  const enquiry={
+    id, name,
+    phone: phone,
+    type: document.getElementById('f-type').value || '',
+    preferredDate: document.getElementById('f-date').value || '',
+    message: document.getElementById('f-msg').value.trim(),
+    source: SOURCE,
+    status: 'new',
+    createdAt: Date.now()
+  };
+
+  try{
+    if(!db) throw new Error('no db');
+    // Write into the existing studios doc under enquiries.<id> — atomic, doesn't touch bookings, no rules change needed
+    try{ await updateDoc(doc(db,'studios',SID), {['enquiries.'+id]: enquiry}); }
+    catch(inner){ await setDoc(doc(db,'studios',SID), {enquiries:{[id]:enquiry}}, {merge:true}); }
+  }catch(e){
+    console.error('Enquiry save failed', e);
+    // Don't lose the lead — still send them to WhatsApp so they can reach us
+  }
+
+  // Pre-fill a WhatsApp message to the studio as a fallback + fast contact
+  const waMsg=encodeURIComponent(
+    'Hi Magizh Studio! 👋 I just filled the enquiry form.\n\n'+
+    'Name: '+name+'\nPhone: '+phone+
+    (enquiry.type?'\nLooking for: '+enquiry.type:'')+
+    (enquiry.preferredDate?'\nPreferred date: '+enquiry.preferredDate:'')+
+    (enquiry.message?'\nMessage: '+enquiry.message:'')
+  );
+  document.getElementById('wa-now').href='https://wa.me/'+STUDIO_PHONE+'?text='+waMsg;
+  document.getElementById('thanks').classList.add('show');
+};
+</script>
+</body>
+</html>
