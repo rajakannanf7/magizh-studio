@@ -35,6 +35,19 @@ body{background:var(--cream);font-family:'Inter',sans-serif;color:var(--ink);min
 .dc.sel{background:var(--teal);color:#fff;border-color:var(--teal);}
 .dc .d{font-size:9px;font-weight:500;color:var(--light);margin-top:1px;}
 .dc.sel .d{color:rgba(255,255,255,.8);}
+.calnav{display:flex;align-items:center;justify-content:space-between;margin-bottom:10px;}
+.caltitle{font-family:'Playfair Display',serif;font-size:18px;font-weight:800;}
+.calarrow{width:34px;height:34px;border-radius:50%;border:1.5px solid var(--line);background:#fff;cursor:pointer;font-size:18px;line-height:1;color:var(--ink);}
+.calwd{display:grid;grid-template-columns:repeat(7,1fr);gap:4px;margin-bottom:5px;}
+.calwd span{text-align:center;font-size:9px;font-weight:700;color:var(--light);}
+.calgrid{display:grid;grid-template-columns:repeat(7,1fr);gap:4px;}
+.cd{aspect-ratio:1;border-radius:10px;border:1.5px solid var(--line);background:#fff;display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:700;cursor:pointer;position:relative;}
+.cd.empty{background:transparent;border:none;cursor:default;}
+.cd.past{opacity:.32;cursor:not-allowed;}
+.cd.today{border-color:var(--teal);border-width:2px;}
+.cd.sel{background:var(--teal);color:#fff;border-color:var(--teal);}
+.cd .dot{width:5px;height:5px;border-radius:50%;background:var(--coral);position:absolute;bottom:4px;left:50%;transform:translateX(-50%);}
+.cd.sel .dot{background:#fff;}
 .slots{display:grid;grid-template-columns:repeat(4,1fr);gap:6px;}
 .slot{border-radius:10px;padding:11px 4px;text-align:center;font-size:12px;font-weight:700;cursor:pointer;border:1.5px solid var(--line);background:#fff;}
 .slot.booked{background:#fee2e2;color:#991b1b;border-color:#fca5a5;cursor:not-allowed;text-decoration:line-through;}
@@ -89,8 +102,10 @@ body{background:var(--cream);font-family:'Inter',sans-serif;color:var(--ink);min
 
   <div class="sec">
     <div class="sec-title">Book a session</div>
-    <div class="sec-note">Pick a date, then a free slot (min 2 hours)</div>
-    <div class="strip" id="date-strip"></div>
+    <div class="sec-note">Pick a date this month, then a free slot (min 2 hours)</div>
+    <div class="calnav"><button class="calarrow" onclick="calMove(-1)">‹</button><div class="caltitle" id="cal-title"></div><button class="calarrow" onclick="calMove(1)">›</button></div>
+    <div class="calwd"><span>S</span><span>M</span><span>T</span><span>W</span><span>T</span><span>F</span><span>S</span></div>
+    <div class="calgrid" id="cal-grid"></div>
   </div>
   <div class="sec">
     <div class="sec-note" id="slot-lbl" style="margin-bottom:8px;">Available times</div>
@@ -124,7 +139,8 @@ const SID = "magizh-nerkundram";
 const pkgId = new URLSearchParams(location.search).get('pkg');
 
 let db, bookings={}, packages={}, podreqs={}, pkg=null;
-let selDate='', selStartH=null, selDur=2, gotSnap=false;
+let selDate='', selStartH=null, selDur=2, gotSnap=false, calYr, calMo;
+const MONTHS=['January','February','March','April','May','June','July','August','September','October','November','December'];
 
 function hourLabel(h){ if(h===24||h===0)return'12am'; if(h===12)return'12pm'; return h<12?(h+'am'):((h-12)+'pm'); }
 function localDateStr(d){ return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0'); }
@@ -142,8 +158,8 @@ else {
     if(!pkg){ showInvalid(); return; }
     document.getElementById('loading').style.display='none';
     document.getElementById('app').style.display='flex';
-    if(!selDate) initDates();
-    renderHeader(); renderSlots(); renderMine();
+    if(!selDate){ const now=new Date(); calYr=now.getFullYear(); calMo=now.getMonth(); selDate=localDateStr(now); }
+    renderHeader(); renderCal(); renderSlots(); renderMine();
   }, err=>{ console.error(err); if(!gotSnap) showInvalid(); });
 }
 
@@ -164,18 +180,27 @@ function renderHeader(){
   document.getElementById('h-rem').textContent=u.remaining;
 }
 
-function initDates(){
-  const strip=document.getElementById('date-strip'); strip.innerHTML='';
+function renderCal(){
+  const grid=document.getElementById('cal-grid'); if(!grid)return;
+  document.getElementById('cal-title').textContent=MONTHS[calMo]+' '+calYr;
+  const first=new Date(calYr,calMo,1).getDay();
+  const days=new Date(calYr,calMo+1,0).getDate();
   const ts=localDateStr(new Date());
-  for(let i=0;i<30;i++){
-    const d=new Date(); d.setDate(d.getDate()+i); const ds=localDateStr(d);
-    const div=document.createElement('div'); div.className='dc'+(i===0?' sel':'');
-    div.innerHTML='<div>'+d.getDate()+'</div><div class="d">'+DS[d.getDay()]+'</div>';
-    div.onclick=()=>{ selDate=ds; selStartH=null; selDur=2; document.querySelectorAll('#date-strip .dc').forEach(x=>x.classList.remove('sel')); div.classList.add('sel'); renderSlots(); };
-    strip.appendChild(div);
-    if(i===0) selDate=ds;
+  const mine=new Set();
+  Object.values(bookings).forEach(b=>{ if(b.pkg===pkgId&&b.status!=='cancelled') mine.add(b.date); });
+  Object.values(podreqs).forEach(r=>{ if(r.pkg===pkgId&&r.status==='pending') mine.add(r.date); });
+  let html='';
+  for(let i=0;i<first;i++) html+='<div class="cd empty"></div>';
+  for(let d=1;d<=days;d++){
+    const ds=calYr+'-'+String(calMo+1).padStart(2,'0')+'-'+String(d).padStart(2,'0');
+    const past=ds<ts;
+    const cls='cd'+(ds===ts?' today':'')+(past?' past':'')+(ds===selDate?' sel':'');
+    html+='<div class="'+cls+'"'+(past?'':' onclick="pickDate(\''+ds+'\')"')+'>'+d+(mine.has(ds)?'<span class="dot"></span>':'')+'</div>';
   }
+  grid.innerHTML=html;
 }
+window.calMove=function(delta){ calMo+=delta; if(calMo<0){calMo=11;calYr--;} if(calMo>11){calMo=0;calYr++;} renderCal(); };
+window.pickDate=function(ds){ selDate=ds; selStartH=null; selDur=2; document.getElementById('dur-box').style.display='none'; renderCal(); renderSlots(); };
 
 function bookedHours(){
   const set=new Set(), pend=new Set();
@@ -242,7 +267,7 @@ window.requestSession = async function(){
     toast('Session requested ✓ — we\'ll confirm shortly');
   }catch(e){ console.error(e); toast('Could not send — try again'); }
   selStartH=null; selDur=2;
-  renderSlots(); renderMine();
+  renderSlots(); renderMine(); renderCal();
 };
 
 function renderMine(){

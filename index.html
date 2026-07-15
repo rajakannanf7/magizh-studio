@@ -599,6 +599,13 @@ body{background:var(--bg);font-family:'Inter',sans-serif;font-size:14px;}
     <div style="margin-top:10px;"><button onclick="closeSetPin()" style="background:none;border:none;color:var(--light);font-size:12px;cursor:pointer;">Cancel</button></div>
   </div>
 </div>
+<!-- Podcast Package Detail Popup -->
+<div class="modal-overlay" id="pkg-modal" onclick="closePkgModal()">
+  <div class="modal-box" onclick="event.stopPropagation()">
+    <div class="modal-handle"></div>
+    <div id="pkg-modal-body"></div>
+  </div>
+</div>
 <!-- New Podcast Package Popup -->
 <div class="modal-overlay" id="newpkg-modal" onclick="closeNewPackage()">
   <div class="modal-box" onclick="event.stopPropagation()" style="border-radius:20px;max-width:360px;margin:auto;padding:26px;">
@@ -1449,13 +1456,53 @@ window.rejectReq=async function(id){
   showToast('Request rejected — hours returned');renderServices();updateServicesBadge();
 };
 window.cancelPkgSession=async function(bid){
-  const b=bookings[bid];if(!b)return;
+  const b=bookings[bid];if(!b)return;const pkgId=b.pkg;
   if(!confirm('Cancel this podcast session for '+(b.name||'client')+'?\nThe slot is freed and the hours go back to their package.'))return;
   // mark the originating request as cancelled so it leaves the client's list
   Object.values(podreqs).forEach(r=>{ if(r.bookingId===bid){ r.status='cancelled'; savePodReq(r.id); } });
   delete bookings[bid];
   backupBookings();await save();
   showToast('Session cancelled — hours returned ✓');
+  renderServices();updateServicesBadge();renderCalendar();renderSlots();renderBookingList();renderUpcomingBookings();
+  if(document.getElementById('pkg-modal').classList.contains('open')&&pkgId&&packages[pkgId])openPackage(pkgId);
+};
+
+// Package detail dashboard
+window.openPackage=function(id){
+  const p=packages[id];if(!p)return;const u=pkgUsage(id);
+  const sessions=[];
+  Object.values(bookings).forEach(b=>{ if(b.pkg===id&&b.status!=='cancelled') sessions.push({date:b.date,slot:b.slot,dur:parseInt((b.slotRaw||'').split('|')[1]||0)||0,st:'confirmed',bid:b.id}); });
+  Object.values(podreqs).forEach(r=>{ if(r.pkg===id&&r.status==='pending') sessions.push({date:r.date,slot:enqHourLabel(+r.startH)+'–'+enqHourLabel(+r.startH+reqDur(r)),dur:reqDur(r),st:'pending'}); });
+  sessions.sort((a,b)=>(a.date||'').localeCompare(b.date||''));
+  const box=(n,l,c)=>'<div style="flex:1;text-align:center;background:'+(c||'var(--surface2)')+';border-radius:10px;padding:10px;"><div style="font-family:\'Playfair Display\',serif;font-size:22px;font-weight:800;'+(c?'color:var(--keer);':'')+'">'+n+'</div><div style="font-size:9px;color:var(--light);text-transform:uppercase;letter-spacing:.05em;">'+l+'</div></div>';
+  let html='<div class="modal-title">🎙️ '+p.name+'</div><div class="modal-meta">'+p.phone+(p.discountPct?' · '+p.discountPct+'% off':'')+' · '+u.total+'h package</div>';
+  html+='<div style="display:flex;gap:8px;margin:8px 0 14px;">'+box(u.total,'Total')+box(u.accepted,'Used')+box(u.pending,'Pending')+box(u.remaining,'Left','#f0faf4')+'</div>';
+  html+='<div class="sec-lbl">All sessions</div>';
+  if(!sessions.length)html+='<div class="bl-empty">No sessions booked yet</div>';
+  else html+=sessions.map(s=>{
+    const dl=new Date(s.date+'T12:00:00').toLocaleDateString('en-IN',{weekday:'short',day:'numeric',month:'short',year:'numeric'});
+    const pill=s.st==='confirmed'?'<span class="badge badge-paid">Confirmed</span>':'<span class="badge badge-adv">Pending</span>';
+    return '<div style="display:flex;justify-content:space-between;align-items:center;padding:9px 0;border-bottom:0.5px solid #f0ece4;"><div><div style="font-size:13px;font-weight:600;">'+dl+'</div><div style="font-size:11px;color:var(--mid);">'+s.slot+' · '+s.dur+'h</div></div><div style="display:flex;align-items:center;gap:8px;">'+pill+(s.bid?'<button onclick="cancelPkgSession(\''+s.bid+'\')" style="border:none;background:#fee2e2;color:#991b1b;border-radius:6px;padding:5px 10px;font-size:11px;font-weight:700;cursor:pointer;">✕</button>':'')+'</div></div>';
+  }).join('');
+  html+='<div style="display:flex;gap:8px;margin-top:14px;">'
+    +'<button onclick="copyPkgLink(\''+id+'\')" style="flex:1;padding:11px;border-radius:var(--r);border:1px solid #ccc;background:var(--surface2);color:var(--dark);font-size:12px;font-weight:700;cursor:pointer;font-family:Syne,sans-serif;">🔗 Copy Link</button>'
+    +'<button onclick="sharePkgLink(\''+id+'\')" style="flex:1;padding:11px;border-radius:var(--r);border:none;background:#25D366;color:#fff;font-size:12px;font-weight:700;cursor:pointer;font-family:Syne,sans-serif;">📲 Share</button></div>';
+  html+='<button onclick="deletePackage(\''+id+'\')" style="width:100%;margin-top:10px;padding:13px;border-radius:var(--r);border:2px solid #dc2626;background:#fff;color:#dc2626;font-size:13px;font-weight:700;cursor:pointer;font-family:Syne,sans-serif;">🗑️ Remove Whole Package</button>';
+  html+='<button onclick="closePkgModal()" style="width:100%;margin-top:8px;padding:12px;border-radius:var(--r);border:none;background:var(--surface2);color:var(--dark);font-size:13px;font-weight:600;cursor:pointer;">Close</button>';
+  document.getElementById('pkg-modal-body').innerHTML=html;
+  document.getElementById('pkg-modal').classList.add('open');
+};
+window.closePkgModal=function(){document.getElementById('pkg-modal').classList.remove('open');};
+window.deletePackage=async function(id){
+  const p=packages[id];if(!p)return;
+  if(!confirm('Remove the WHOLE podcast package for '+(p.name||'client')+'?\nThis cancels their upcoming sessions and deletes the package. Past sessions stay in your records.'))return;
+  const ts=todayStr();
+  Object.keys(podreqs).forEach(k=>{ if(podreqs[k].pkg===id&&podreqs[k].status==='pending') delete podreqs[k]; });
+  Object.keys(bookings).forEach(k=>{ if(bookings[k].pkg===id&&bookings[k].status!=='cancelled'&&(bookings[k].date||'')>=ts) delete bookings[k]; });
+  delete packages[id];
+  backupBookings();
+  try{ await updateDoc(doc(db,'studios',SID),{packages,podreqs,bookings}); }catch(e){ await save(); }
+  closePkgModal();showToast('Package removed ✓');
   renderServices();updateServicesBadge();renderCalendar();renderSlots();renderBookingList();renderUpcomingBookings();
 };
 function updateServicesBadge(){
@@ -1485,18 +1532,17 @@ function renderServices(){
     if(!list.length){pl.innerHTML='<div class="bl-empty">No packages yet — tap “+ New Podcast Package”.</div>';}
     else pl.innerHTML=list.map(p=>{
       const u=pkgUsage(p.id);const pct=u.total?Math.min(100,Math.round((u.accepted+u.pending)/u.total*100)):0;
-      const sess=Object.values(bookings).filter(b=>b.pkg===p.id&&b.status!=='cancelled').sort((a,b)=>(a.date||'').localeCompare(b.date||''));
-      const sessHtml=sess.length?('<div style="border-top:1px solid #f0ece4;margin-top:2px;padding-top:6px;"><div style="font-size:9px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--light);margin-bottom:2px;">Allotted sessions</div>'+sess.map(b=>{const dl=new Date(b.date+'T12:00:00').toLocaleDateString('en-IN',{day:'numeric',month:'short'});return '<div style="display:flex;justify-content:space-between;align-items:center;font-size:11px;color:var(--mid);padding:3px 0;"><span>📅 '+dl+' · '+b.slot+'</span><button onclick="cancelPkgSession(\''+b.id+'\')" style="border:none;background:#fee2e2;color:#991b1b;border-radius:6px;padding:3px 9px;font-size:10px;font-weight:700;cursor:pointer;">✕ Cancel</button></div>';}).join('')+'</div>'):'';
-      return '<div class="bitem" style="flex-direction:column;align-items:stretch;gap:8px;">'
+      const nsess=Object.values(bookings).filter(b=>b.pkg===p.id&&b.status!=='cancelled').length;
+      return '<div class="bitem" onclick="openPackage(\''+p.id+'\')" style="flex-direction:column;align-items:stretch;gap:8px;cursor:pointer;">'
         +'<div style="display:flex;justify-content:space-between;align-items:center;"><div class="bitem-name">🎙️ '+p.name+'</div>'
         +'<span class="badge badge-adv">'+u.remaining+'h left</span></div>'
         +'<div class="bitem-meta">'+p.phone+(p.discountPct?' · '+p.discountPct+'% off':'')+'</div>'
         +'<div style="height:8px;background:#eee;border-radius:6px;overflow:hidden;"><div style="height:100%;width:'+pct+'%;background:var(--raja);"></div></div>'
         +'<div class="bitem-meta" style="display:flex;justify-content:space-between;"><span>Total '+u.total+'h</span><span>Used '+u.accepted+'h</span><span>Pending '+u.pending+'h</span></div>'
-        +sessHtml
+        +'<div style="font-size:11px;color:var(--ari);font-weight:600;">View '+nsess+' session'+(nsess===1?'':'s')+' &amp; details ›</div>'
         +'<div style="display:flex;gap:6px;">'
-        +'<button onclick="copyPkgLink(\''+p.id+'\')" style="flex:1;padding:9px;border-radius:8px;border:1px solid #ccc;background:var(--surface2);color:var(--dark);font-size:12px;font-weight:700;cursor:pointer;font-family:Syne,sans-serif;">🔗 Copy Link</button>'
-        +'<button onclick="sharePkgLink(\''+p.id+'\')" style="flex:1;padding:9px;border-radius:8px;border:none;background:#25D366;color:#fff;font-size:12px;font-weight:700;cursor:pointer;font-family:Syne,sans-serif;">📲 Share</button>'
+        +'<button onclick="event.stopPropagation();copyPkgLink(\''+p.id+'\')" style="flex:1;padding:9px;border-radius:8px;border:1px solid #ccc;background:var(--surface2);color:var(--dark);font-size:12px;font-weight:700;cursor:pointer;font-family:Syne,sans-serif;">🔗 Copy Link</button>'
+        +'<button onclick="event.stopPropagation();sharePkgLink(\''+p.id+'\')" style="flex:1;padding:9px;border-radius:8px;border:none;background:#25D366;color:#fff;font-size:12px;font-weight:700;cursor:pointer;font-family:Syne,sans-serif;">📲 Share</button>'
         +'</div></div>';
     }).join('');
   }
