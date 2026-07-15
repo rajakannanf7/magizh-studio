@@ -207,8 +207,8 @@ body{background:var(--bg);font-family:'Inter',sans-serif;font-size:14px;}
   <div class="login-title">Magizh Studio</div>
   <div class="login-sub">Who's using the app today?</div>
 
-  <div class="login-section-lbl">The Squad 🔑</div>
-  <div class="login-options">
+  <div class="login-section-lbl" id="squad-lbl">The Squad 🔑</div>
+  <div class="login-options" id="squad-options">
     <button class="login-btn" style="background:var(--raja);color:#fff;" onclick="login('Raja','r','owner')">
       <div class="login-av">R</div>Raja
     </button>
@@ -223,16 +223,10 @@ body{background:var(--bg);font-family:'Inter',sans-serif;font-size:14px;}
     </button>
   </div>
 
-  <div class="login-section-lbl">Crew 🎬</div>
-  <div class="login-options">
-    <button class="login-btn" style="background:var(--intern);color:#fff;" onclick="login('Manisha','manisha','intern')">
-      <div class="login-av">M</div>Manisha
-    </button>
-    <button class="login-btn" style="background:var(--intern);color:#fff;" onclick="login('Abi','abi','intern')">
-      <div class="login-av">A</div>Abi
-    </button>
-    <button class="login-btn" style="background:var(--intern);color:#fff;" onclick="login('Kamlesh','kamlesh','intern')">
-      <div class="login-av">K</div>Kamlesh
+  <div class="login-section-lbl" id="mgr-lbl" style="display:none;">Studio Manager 🗂️</div>
+  <div class="login-options" id="mgr-options" style="display:none;">
+    <button class="login-btn" style="background:var(--ari);color:#fff;" onclick="login('Studio Manager','manager','intern')">
+      <div class="login-av">S</div>Studio Manager
     </button>
   </div>
 </div>
@@ -409,6 +403,26 @@ body{background:var(--bg);font-family:'Inter',sans-serif;font-size:14px;}
       <div style="padding:12px 16px 20px;" id="leads-list"></div>
     </div>
 
+    <!-- SERVICES PAGE -->
+    <div class="page" id="page-services">
+      <div class="hero" style="background:#B45309;">
+        <div class="hero-top">
+          <span class="hero-eye">Magizh Studio</span>
+          <div class="live-pill"><div class="live-dot off" id="s-sync-dot"></div><span class="live-txt" id="s-sync-txt">connecting</span></div>
+          <span class="user-chip" id="s-user-chip"></span>
+        </div>
+        <div class="hero-title">Services</div>
+        <div class="hero-sub">Podcast packages &amp; session requests</div>
+      </div>
+      <div class="sec"><div class="sec-lbl">🔔 Session Requests</div></div>
+      <div style="padding:0 16px;" id="svc-requests"></div>
+      <div style="padding:14px 16px 4px;">
+        <button onclick="openNewPackage()" style="width:100%;padding:14px;border-radius:var(--r);border:none;background:var(--dark);color:#fff;font-size:14px;font-weight:700;cursor:pointer;font-family:'Syne',sans-serif;">🎙️ + New Podcast Package</button>
+      </div>
+      <div class="sec"><div class="sec-lbl">Podcast Packages</div></div>
+      <div style="padding:0 16px 24px;" id="svc-packages"></div>
+    </div>
+
     <!-- INTERN DASHBOARD PAGE -->
     <div class="page" id="page-intern">
       <div class="hero hero-intern">
@@ -454,6 +468,11 @@ body{background:var(--bg);font-family:'Inter',sans-serif;font-size:14px;}
       <svg width="18" height="18" viewBox="0 0 24 24" fill="none"><rect x="3" y="4" width="18" height="18" rx="2" stroke="white" stroke-width="2"/><path d="M3 10h18M8 2v4M16 2v4" stroke="white" stroke-width="2" stroke-linecap="round"/><circle cx="8" cy="15" r="1.5" fill="white"/><circle cx="12" cy="15" r="1.5" fill="white"/><circle cx="16" cy="15" r="1.5" fill="white"/></svg>
       <span class="tab-lbl">Calendar</span>
     </button>
+    <button class="tab" id="tab-services" onclick="switchTab('services')" style="position:relative;">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none"><path d="M12 2l2.4 4.9 5.4.8-3.9 3.8.9 5.4-4.8-2.5-4.8 2.5.9-5.4L4.1 7.7l5.4-.8z" stroke="white" stroke-width="2" stroke-linejoin="round"/></svg>
+      <span class="tab-lbl">Services</span>
+      <span id="services-badge" style="position:absolute;top:2px;right:8px;min-width:16px;height:16px;padding:0 4px;background:#ef4444;color:#fff;border-radius:8px;font-size:10px;font-weight:700;display:none;align-items:center;justify-content:center;font-family:Inter,sans-serif;">0</span>
+    </button>
     <button class="tab" id="tab-leads" onclick="switchTab('leads')" style="position:relative;">
       <svg width="18" height="18" viewBox="0 0 24 24" fill="none"><path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
       <span class="tab-lbl">Leads</span>
@@ -466,7 +485,7 @@ body{background:var(--bg);font-family:'Inter',sans-serif;font-size:14px;}
       <svg width="18" height="18" viewBox="0 0 24 24" fill="none"><rect x="3" y="3" width="7" height="9" rx="1.5" stroke="white" stroke-width="2"/><rect x="14" y="3" width="7" height="5" rx="1.5" stroke="white" stroke-width="2"/><rect x="3" y="16" width="7" height="5" rx="1.5" stroke="white" stroke-width="2"/><rect x="14" y="12" width="7" height="9" rx="1.5" stroke="white" stroke-width="2"/></svg>
       <span class="tab-lbl">Dashboard</span>
     </button>
-    <button class="tab" id="itab-booking" onclick="internSwitchTab('booking')">
+    <button class="tab" id="itab-booking" onclick="internSwitchTab('booking')" style="display:none;">
       <svg width="18" height="18" viewBox="0 0 24 24" fill="none"><rect x="3" y="4" width="18" height="18" rx="2.5" stroke="white" stroke-width="2"/><path d="M16 2v4M8 2v4M3 10h18" stroke="white" stroke-width="2" stroke-linecap="round"/></svg>
       <span class="tab-lbl">Booking</span>
     </button>
@@ -568,6 +587,32 @@ body{background:var(--bg);font-family:'Inter',sans-serif;font-size:14px;}
     <div style="margin-top:10px;"><button onclick="closePinModal()" style="background:none;border:none;color:var(--light);font-size:12px;cursor:pointer;">Cancel</button></div>
   </div>
 </div>
+<!-- Change PIN Popup (Squad only) -->
+<div class="modal-overlay" id="setpin-modal" onclick="closeSetPin()">
+  <div class="modal-box" onclick="event.stopPropagation()" style="border-radius:20px;max-width:330px;margin:auto;padding:28px;text-align:center;">
+    <div style="font-family:'Playfair Display',serif;font-size:20px;font-weight:800;margin-bottom:4px;" id="setpin-title">Change PIN</div>
+    <div style="font-size:12px;color:var(--light);margin-bottom:16px;">Set a new 4-digit login PIN</div>
+    <input id="setpin-new" type="password" inputmode="numeric" maxlength="4" placeholder="New PIN" style="width:170px;padding:12px;border:2px solid #e0dbd0;border-radius:var(--r);font-size:20px;text-align:center;letter-spacing:6px;outline:none;font-family:Inter,sans-serif;">
+    <input id="setpin-confirm" type="password" inputmode="numeric" maxlength="4" placeholder="Confirm PIN" style="width:170px;margin-top:10px;padding:12px;border:2px solid #e0dbd0;border-radius:var(--r);font-size:20px;text-align:center;letter-spacing:6px;outline:none;font-family:Inter,sans-serif;" onkeydown="if(event.key==='Enter')savePinSetup()">
+    <div id="setpin-err" style="font-size:12px;color:#cc0000;margin-top:8px;display:none;"></div>
+    <button onclick="savePinSetup()" style="width:170px;margin-top:14px;padding:13px;border-radius:var(--rl);border:none;background:var(--raja);color:#fff;font-family:'Syne',sans-serif;font-size:14px;font-weight:700;cursor:pointer;">Save PIN</button>
+    <div style="margin-top:10px;"><button onclick="closeSetPin()" style="background:none;border:none;color:var(--light);font-size:12px;cursor:pointer;">Cancel</button></div>
+  </div>
+</div>
+<!-- New Podcast Package Popup -->
+<div class="modal-overlay" id="newpkg-modal" onclick="closeNewPackage()">
+  <div class="modal-box" onclick="event.stopPropagation()" style="border-radius:20px;max-width:360px;margin:auto;padding:26px;">
+    <div style="font-family:'Playfair Display',serif;font-size:20px;font-weight:800;margin-bottom:4px;text-align:center;">New Podcast Package</div>
+    <div style="font-size:12px;color:var(--light);margin-bottom:16px;text-align:center;">Register a premium podcast client</div>
+    <div class="field"><div class="field-lbl">Client name</div><input id="np-name" type="text" placeholder="Full name"></div>
+    <div class="field"><div class="field-lbl">WhatsApp number</div><input id="np-phone" type="tel" placeholder="10-digit number" inputmode="numeric"></div>
+    <div class="field"><div class="field-lbl">Total package hours</div><input id="np-hours" type="number" min="1" placeholder="30"></div>
+    <div class="field"><div class="field-lbl">Package discount (%)</div><input id="np-disc" type="number" min="0" max="100" placeholder="0"></div>
+    <div id="np-err" style="font-size:12px;color:#cc0000;margin:4px 0;display:none;"></div>
+    <button onclick="createPackage()" style="width:100%;margin-top:8px;padding:14px;border-radius:var(--r);border:none;background:var(--raja);color:#fff;font-family:'Syne',sans-serif;font-size:14px;font-weight:700;cursor:pointer;">Create Package &amp; Get Link</button>
+    <div style="margin-top:8px;text-align:center;"><button onclick="closeNewPackage()" style="background:none;border:none;color:var(--light);font-size:12px;cursor:pointer;">Cancel</button></div>
+  </div>
+</div>
 <div class="toast" id="toast"></div>
 
 <script type="module">
@@ -586,8 +631,8 @@ const INBA_PHONE = '918072659679';
 // Passwords (change these)
 const PASSWORDS = {
   r:'1234', k:'5678', a:'9012', inba:'3456', // Squad PINs
-  manisha:'0000', abi:'0000', kamlesh:'0000' // Crew PIN (shared)
-}; // Inba's number for walk-in requests
+  manager:'4321' // Studio Manager PIN (separate ?manager link)
+};
 
 const MONTHS=['January','February','March','April','May','June','July','August','September','October','November','December'];
 const MS=['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
@@ -606,6 +651,9 @@ let podSetup='space';
 let blockedDates={}; // {date: reason}
 let enquiries={}; // {id: enquiry from public enquiry.html}
 let leadsFilter='new';
+let pins={}; // {userKey: customPin} — Squad members can set their own, overrides defaults
+let packages={}; // {pkgId: podcast package} — premium podcast clients
+let podreqs={};  // {reqId: session request from a package client's link}
 const POD_RATES={space:750,single_cam:1000,dual_cam:1500};
 function getHourlyRate(){ return selStudio==='pod'?POD_RATES[podSetup]:HOURLY_RATE; }
 const today=new Date();
@@ -652,7 +700,7 @@ async function save(){
 }
 
 function setSyncStatus(s){
-  ['b','c','i','l'].forEach(p=>{
+  ['b','c','i','l','s'].forEach(p=>{
     const dot=document.getElementById(p+'-sync-dot');
     const txt=document.getElementById(p+'-sync-txt');
     if(!dot)return;
@@ -661,14 +709,16 @@ function setSyncStatus(s){
   });
 }
 
+let fbReady=false;
 function initFirebase(){
+  if(fbReady)return; fbReady=true;
   try{
     const app=initializeApp(CFG); db=getFirestore(app);
     onSnapshot(doc(db,'studios',SID),snap=>{
-      if(snap.exists()){const d=snap.data();bookings=d.bookings||{};blockedDates=d.blockedDates||{};enquiries=d.enquiries||{};}
+      if(snap.exists()){const d=snap.data();bookings=d.bookings||{};blockedDates=d.blockedDates||{};enquiries=d.enquiries||{};pins=d.pins||{};packages=d.packages||{};podreqs=d.podreqs||{};}
       setSyncStatus('live');
       {
-        renderSlots();renderBookingList();renderUpcomingBookings();renderCalendar();renderInternDashboard();renderDailyEarnings();renderLeads();updateLeadsBadge();
+        renderSlots();renderBookingList();renderUpcomingBookings();renderCalendar();renderInternDashboard();renderDailyEarnings();renderLeads();updateLeadsBadge();renderServices();updateServicesBadge();
       }
     },err=>{console.error(err);setSyncStatus('err');});
   }catch(e){console.error(e);setSyncStatus('err');}
@@ -708,13 +758,38 @@ window.login=function(name,key,role){
 window.submitPin=function(){
   if(!pendingLogin)return;
   const pin=document.getElementById('pin-input').value;
-  if(pin!==PASSWORDS[pendingLogin.key]){document.getElementById('pin-err').style.display='block';document.getElementById('pin-input').value='';return;}
+  const validPin=(pins&&pins[pendingLogin.key])||PASSWORDS[pendingLogin.key];
+  if(pin!==validPin){document.getElementById('pin-err').style.display='block';document.getElementById('pin-input').value='';return;}
   document.getElementById('pin-modal').classList.remove('open');
   const{name,key,role}=pendingLogin;pendingLogin=null;
   doLogin(name,key,role);
 };
 
 window.closePinModal=function(){document.getElementById('pin-modal').classList.remove('open');pendingLogin=null;};
+
+// ── CHANGE PIN (Squad members set their own) ──
+window.openPinSetup=function(){
+  if(userRole!=='owner')return; // Squad only
+  document.getElementById('setpin-title').textContent='Change PIN · '+currentUser;
+  document.getElementById('setpin-new').value='';
+  document.getElementById('setpin-confirm').value='';
+  document.getElementById('setpin-err').style.display='none';
+  document.getElementById('setpin-modal').classList.add('open');
+  setTimeout(()=>document.getElementById('setpin-new').focus(),100);
+};
+window.closeSetPin=function(){document.getElementById('setpin-modal').classList.remove('open');};
+window.savePinSetup=async function(){
+  const n=(document.getElementById('setpin-new').value||'').trim();
+  const c=(document.getElementById('setpin-confirm').value||'').trim();
+  const err=document.getElementById('setpin-err');
+  if(!/^\d{4}$/.test(n)){err.textContent='PIN must be exactly 4 digits';err.style.display='block';return;}
+  if(n!==c){err.textContent='PINs do not match';err.style.display='block';return;}
+  pins[currentUserKey]=n;
+  try{ await updateDoc(doc(db,'studios',SID),{['pins.'+currentUserKey]:n}); }
+  catch(e){ try{ await setDoc(doc(db,'studios',SID),{pins:{[currentUserKey]:n}},{merge:true}); }catch(e2){console.error('PIN save failed',e2);} }
+  closeSetPin();
+  showToast('Your PIN was updated ✓');
+};
 
 function doLogin(name,key,role){
   currentUser=name; currentUserKey=key; userRole=role;
@@ -724,7 +799,7 @@ function doLogin(name,key,role){
     document.getElementById('owner-tabbar').style.display='flex';
     document.getElementById('intern-tabbar').style.display='none';
     document.getElementById('page-booking').classList.add('active');
-    ['b','c','l'].forEach(p=>{const el=document.getElementById(p+'-user-chip');if(el)el.textContent=name;});
+    ['b','c','l','s'].forEach(p=>{const el=document.getElementById(p+'-user-chip');if(el){el.innerHTML=name+' 🔑';el.onclick=openPinSetup;el.style.cursor='pointer';el.title='Tap to change your PIN';}});
     initDateStrip();
     renderCalendar();
   }else{
@@ -756,12 +831,13 @@ window.internSwitchTab=function(tab){
 
 // ── TABS ──
 window.switchTab=function(tab){
-  ['booking','calendar','leads'].forEach(t=>{
+  ['booking','calendar','leads','services'].forEach(t=>{
     const page=document.getElementById('page-'+t);if(page)page.classList.toggle('active',t===tab);
     const tabEl=document.getElementById('tab-'+t);if(tabEl)tabEl.classList.toggle('active',t===tab);
   });
   if(tab==='calendar')renderCalendar();
   if(tab==='leads')renderLeads();
+  if(tab==='services')renderServices();
 };
 
 // ── STUDIO SELECTOR ──
@@ -1253,7 +1329,8 @@ function renderLeads(){
     const slot=enqSlot(e);
     const priceStr=e.quotedPrice?(' · ₹'+Number(e.quotedPrice).toLocaleString('en-IN')):'';
     const phoneClean=(e.phone||'').replace(/\D/g,'').replace(/^0+/,'').replace(/^91/,'');
-    const offer=e.package||e.type||'General enquiry';
+    const stIcon=e.studio==='pod'?'🎙️ ':'';
+    const offer=stIcon+(e.package||e.type||'General enquiry');
     const waMsg=encodeURIComponent('Hi '+(e.name||'')+'! 👋 Thanks for your enquiry to *Magizh Studio* 📸 about the '+offer+'. How can we help you plan your shoot?');
     let card='<div class="bitem" style="flex-direction:column;align-items:stretch;gap:8px;">';
     card+='<div style="display:flex;align-items:flex-start;gap:8px;">';
@@ -1276,6 +1353,7 @@ function renderLeads(){
 window.convertLead=function(id){
   const e=enquiries[id];if(!e)return;
   switchTab('booking');
+  if(e.studio==='pod'&&typeof window.selectStudio==='function')window.selectStudio('pod');
   if(!document.getElementById('date-strip').children.length)initDateStrip();
   const nameEl=document.getElementById('f-name');if(nameEl)nameEl.value=e.name||'';
   const phoneEl=document.getElementById('f-phone');if(phoneEl)phoneEl.value=e.phone||'';
@@ -1303,6 +1381,126 @@ window.markLeadDone=function(id){
   renderLeads();updateLeadsBadge();
   showToast('Enquiry marked done ✓');
 };
+
+// ════════════════════════════════════════
+// ── SERVICES · PODCAST PACKAGES ──
+// ════════════════════════════════════════
+const CLIENT_LINK_BASE = location.origin + location.pathname.replace(/index\.html$/,'') + 'podcast.html';
+function reqDur(r){ return Math.max(0,parseInt(r.dur)||0); }
+function pkgUsage(pkgId){
+  const total=Number((packages[pkgId]||{}).totalHours)||0;
+  let accepted=0;
+  Object.values(bookings).forEach(b=>{ if(b.pkg===pkgId&&b.status!=='cancelled'){ accepted+=parseInt((b.slotRaw||'').split('|')[1]||0)||0; } });
+  let pending=0;
+  Object.values(podreqs).forEach(r=>{ if(r.pkg===pkgId&&r.status==='pending'){ pending+=reqDur(r); } });
+  return {total,accepted,pending,remaining:Math.max(0,total-accepted-pending)};
+}
+function pkgLink(pkgId){ return CLIENT_LINK_BASE+'?pkg='+pkgId; }
+async function savePackage(id){ if(!db||!packages[id])return; try{ await updateDoc(doc(db,'studios',SID),{['packages.'+id]:packages[id]}); }catch(e){ try{ await setDoc(doc(db,'studios',SID),{packages:{[id]:packages[id]}},{merge:true}); }catch(e2){console.error('pkg save failed',e2);} } }
+async function savePodReq(id){ if(!db||!podreqs[id])return; try{ await updateDoc(doc(db,'studios',SID),{['podreqs.'+id]:podreqs[id]}); }catch(e){ try{ await setDoc(doc(db,'studios',SID),{podreqs:{[id]:podreqs[id]}},{merge:true}); }catch(e2){console.error('req save failed',e2);} } }
+
+window.openNewPackage=function(){
+  ['np-name','np-phone','np-hours','np-disc'].forEach(id=>{const el=document.getElementById(id);if(el)el.value='';});
+  document.getElementById('np-err').style.display='none';
+  document.getElementById('newpkg-modal').classList.add('open');
+};
+window.closeNewPackage=function(){document.getElementById('newpkg-modal').classList.remove('open');};
+window.createPackage=async function(){
+  const name=document.getElementById('np-name').value.trim();
+  const phone=document.getElementById('np-phone').value.trim();
+  const hours=parseInt(document.getElementById('np-hours').value)||0;
+  const disc=Math.max(0,Math.min(100,parseInt(document.getElementById('np-disc').value)||0));
+  const err=document.getElementById('np-err');
+  if(!name||cleanPhone(phone).length<10||hours<1){err.textContent='Enter name, valid phone, and hours';err.style.display='block';return;}
+  const id='pkg-'+Date.now().toString(36);
+  packages[id]={id,name,phone,totalHours:hours,discountPct:disc,status:'active',createdAt:Date.now(),createdBy:currentUser};
+  await savePackage(id);
+  closeNewPackage();showToast('Package created ✓ — share the link');renderServices();
+};
+window.copyPkgLink=function(id){
+  const link=pkgLink(id);
+  if(navigator.clipboard&&navigator.clipboard.writeText){navigator.clipboard.writeText(link).then(()=>showToast('Link copied ✓')).catch(()=>prompt('Copy link:',link));}
+  else prompt('Copy link:',link);
+};
+window.sharePkgLink=function(id){
+  const p=packages[id];if(!p)return;const u=pkgUsage(id);
+  const msg='Hi '+p.name+'! 🎙️ Here is your Magizh Studio podcast package booking link:\n\n'+pkgLink(id)+'\n\nYour package: '+u.total+' hours. Book your sessions anytime from this link — see you at the studio!';
+  window.open('https://wa.me/91'+cleanPhone(p.phone)+'?text='+encodeURIComponent(msg),'_blank');
+};
+window.acceptReq=async function(id){
+  const r=podreqs[id];if(!r)return;const p=packages[r.pkg];
+  const startH=parseInt(r.startH),dur=reqDur(r);
+  const day=Object.values(bookings).filter(b=>b.date===r.date&&(b.studio||'photo')==='pod'&&b.status!=='cancelled');
+  if(slotOverlaps(day.map(b=>b.slotRaw||''),startH,dur)){ showToast('⚠️ That podcast slot is already taken — reject & ask client to re-pick'); return; }
+  const rate=POD_RATES.space;const total=dur*rate;const disc=p?Math.round(total*(Number(p.discountPct)||0)/100):0;
+  const bid='bk-'+Date.now();
+  bookings[bid]={id:bid,name:r.name,phone:r.phone,type:'Podcast Session',date:r.date,status:'confirmed',
+    slot:formatSlot(startH,dur),slotRaw:startH+'|'+dur,studio:'pod',studioName:'Podcast Studio',
+    total,discount:disc,advance:0,balance:Math.max(0,total-disc),paid:false,createdBy:currentUser,createdAt:Date.now(),
+    pkg:r.pkg,notes:'Package session'+(p?' · '+p.name:''),hourlyRate:rate,podSetup:'space'};
+  r.status='accepted';r.bookingId=bid;
+  backupBookings();await save();await savePodReq(id);syncToSheets(bookings[bid]);
+  showToast('Session allotted ✓');
+  renderServices();updateServicesBadge();renderCalendar();renderSlots();renderBookingList();
+};
+window.rejectReq=async function(id){
+  const r=podreqs[id];if(!r)return;
+  r.status='rejected';await savePodReq(id);
+  showToast('Request rejected — hours returned');renderServices();updateServicesBadge();
+};
+window.cancelPkgSession=async function(bid){
+  const b=bookings[bid];if(!b)return;
+  if(!confirm('Cancel this podcast session for '+(b.name||'client')+'?\nThe slot is freed and the hours go back to their package.'))return;
+  // mark the originating request as cancelled so it leaves the client's list
+  Object.values(podreqs).forEach(r=>{ if(r.bookingId===bid){ r.status='cancelled'; savePodReq(r.id); } });
+  delete bookings[bid];
+  backupBookings();await save();
+  showToast('Session cancelled — hours returned ✓');
+  renderServices();updateServicesBadge();renderCalendar();renderSlots();renderBookingList();renderUpcomingBookings();
+};
+function updateServicesBadge(){
+  const n=Object.values(podreqs).filter(r=>r.status==='pending').length;
+  const b=document.getElementById('services-badge');
+  if(b){b.textContent=n;b.style.display=n>0?'flex':'none';}
+}
+function renderServices(){
+  const rl=document.getElementById('svc-requests');
+  if(rl){
+    const pend=Object.values(podreqs).filter(r=>r.status==='pending').sort((a,b)=>(a.createdAt||0)-(b.createdAt||0));
+    if(!pend.length){rl.innerHTML='<div class="bl-empty">No pending requests</div>';}
+    else rl.innerHTML=pend.map(r=>{
+      const p=packages[r.pkg];const dLabel=new Date(r.date+'T12:00:00').toLocaleDateString('en-IN',{weekday:'short',day:'numeric',month:'short'});
+      return '<div class="bitem" style="flex-direction:column;align-items:stretch;gap:8px;">'
+        +'<div><div class="bitem-name">'+(r.name||'Client')+(p?' <span style="color:var(--light);font-weight:400;">· '+p.name+'</span>':'')+'</div>'
+        +'<div class="bitem-meta" style="color:var(--raja);font-weight:600;">📅 '+dLabel+' · '+enqHourLabel(parseInt(r.startH))+'–'+enqHourLabel(parseInt(r.startH)+reqDur(r))+' ('+reqDur(r)+'h)</div></div>'
+        +'<div style="display:flex;gap:6px;">'
+        +'<button onclick="acceptReq(\''+r.id+'\')" style="flex:1;padding:9px;border-radius:8px;border:none;background:var(--keer);color:#fff;font-size:12px;font-weight:700;cursor:pointer;font-family:Syne,sans-serif;">✓ Accept &amp; Allot</button>'
+        +'<button onclick="rejectReq(\''+r.id+'\')" style="flex:1;padding:9px;border-radius:8px;border:1px solid #dc2626;background:#fff;color:#dc2626;font-size:12px;font-weight:700;cursor:pointer;font-family:Syne,sans-serif;">✕ Reject</button>'
+        +'</div></div>';
+    }).join('');
+  }
+  const pl=document.getElementById('svc-packages');
+  if(pl){
+    const list=Object.values(packages).sort((a,b)=>(b.createdAt||0)-(a.createdAt||0));
+    if(!list.length){pl.innerHTML='<div class="bl-empty">No packages yet — tap “+ New Podcast Package”.</div>';}
+    else pl.innerHTML=list.map(p=>{
+      const u=pkgUsage(p.id);const pct=u.total?Math.min(100,Math.round((u.accepted+u.pending)/u.total*100)):0;
+      const sess=Object.values(bookings).filter(b=>b.pkg===p.id&&b.status!=='cancelled').sort((a,b)=>(a.date||'').localeCompare(b.date||''));
+      const sessHtml=sess.length?('<div style="border-top:1px solid #f0ece4;margin-top:2px;padding-top:6px;"><div style="font-size:9px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--light);margin-bottom:2px;">Allotted sessions</div>'+sess.map(b=>{const dl=new Date(b.date+'T12:00:00').toLocaleDateString('en-IN',{day:'numeric',month:'short'});return '<div style="display:flex;justify-content:space-between;align-items:center;font-size:11px;color:var(--mid);padding:3px 0;"><span>📅 '+dl+' · '+b.slot+'</span><button onclick="cancelPkgSession(\''+b.id+'\')" style="border:none;background:#fee2e2;color:#991b1b;border-radius:6px;padding:3px 9px;font-size:10px;font-weight:700;cursor:pointer;">✕ Cancel</button></div>';}).join('')+'</div>'):'';
+      return '<div class="bitem" style="flex-direction:column;align-items:stretch;gap:8px;">'
+        +'<div style="display:flex;justify-content:space-between;align-items:center;"><div class="bitem-name">🎙️ '+p.name+'</div>'
+        +'<span class="badge badge-adv">'+u.remaining+'h left</span></div>'
+        +'<div class="bitem-meta">'+p.phone+(p.discountPct?' · '+p.discountPct+'% off':'')+'</div>'
+        +'<div style="height:8px;background:#eee;border-radius:6px;overflow:hidden;"><div style="height:100%;width:'+pct+'%;background:var(--raja);"></div></div>'
+        +'<div class="bitem-meta" style="display:flex;justify-content:space-between;"><span>Total '+u.total+'h</span><span>Used '+u.accepted+'h</span><span>Pending '+u.pending+'h</span></div>'
+        +sessHtml
+        +'<div style="display:flex;gap:6px;">'
+        +'<button onclick="copyPkgLink(\''+p.id+'\')" style="flex:1;padding:9px;border-radius:8px;border:1px solid #ccc;background:var(--surface2);color:var(--dark);font-size:12px;font-weight:700;cursor:pointer;font-family:Syne,sans-serif;">🔗 Copy Link</button>'
+        +'<button onclick="sharePkgLink(\''+p.id+'\')" style="flex:1;padding:9px;border-radius:8px;border:none;background:#25D366;color:#fff;font-size:12px;font-weight:700;cursor:pointer;font-family:Syne,sans-serif;">📲 Share</button>'
+        +'</div></div>';
+    }).join('');
+  }
+}
 
 // ════════════════════════════════════════
 // ── CALENDAR TAB ──
@@ -1837,6 +2035,14 @@ function backupBookings(){try{localStorage.setItem('magizh_backup_bookings',JSON
 window.onerror=function(message){if(String(message).includes('Script error'))return;console.error('App Error:',message);};
 
 window.addEventListener('load',()=>{
+  initFirebase(); // connect early so custom PINs are loaded before anyone logs in
+  // Studio Manager link: magizh-studio.vercel.app/?manager
+  if(new URLSearchParams(location.search).has('manager')){
+    ['squad-lbl','squad-options'].forEach(id=>{const el=document.getElementById(id);if(el)el.style.display='none';});
+    const ml=document.getElementById('mgr-lbl');if(ml)ml.style.display='block';
+    const mo=document.getElementById('mgr-options');if(mo)mo.style.display='flex';
+    const sub=document.querySelector('.login-sub');if(sub)sub.textContent='Studio Manager sign-in';
+  }
   setTimeout(()=>{const loader=document.getElementById('app-loader');if(loader){loader.style.opacity='0';setTimeout(()=>loader.remove(),300);}},700);
 });
 

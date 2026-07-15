@@ -1,0 +1,262 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<meta name="theme-color" content="#1B7A6E">
+<title>Your Podcast Package · Magizh Studio</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600;700;800;900&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<style>
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent;}
+:root{--coral:#E9574C;--teal:#1B7A6E;--sand:#E7B486;--cream:#F5F1EA;--ink:#141414;--mid:#5f5f5f;--light:#a6a29b;--line:#e8e2d6;--r:16px;--rl:26px;}
+body{background:var(--cream);font-family:'Inter',sans-serif;color:var(--ink);min-height:100vh;}
+.serif{font-family:'Playfair Display',serif;}
+.wrap{max-width:480px;margin:0 auto;min-height:100vh;display:flex;flex-direction:column;}
+.hero{position:relative;background:var(--teal);padding:32px 24px 26px;overflow:hidden;color:#fff;}
+.hero-block{position:absolute;top:-40px;right:-30px;width:150px;height:150px;background:var(--coral);border-radius:50%;opacity:.85;}
+.hero-inner{position:relative;z-index:2;}
+.brandrow{display:flex;align-items:center;gap:10px;margin-bottom:14px;}
+.logo{width:40px;height:40px;background:rgba(255,255,255,.18);border-radius:12px;display:flex;align-items:center;justify-content:center;}
+.brandname{font-family:'Playfair Display',serif;font-weight:800;font-size:18px;}
+.eyebrow{font-size:11px;font-weight:600;letter-spacing:.14em;text-transform:uppercase;color:rgba(255,255,255,.7);margin-bottom:4px;}
+.hi{font-family:'Playfair Display',serif;font-size:28px;font-weight:800;line-height:1.05;}
+.hours{display:flex;gap:10px;margin-top:16px;}
+.hbox{flex:1;background:rgba(255,255,255,.14);border-radius:14px;padding:12px;text-align:center;}
+.hbox .n{font-family:'Playfair Display',serif;font-size:26px;font-weight:800;}
+.hbox .l{font-size:10px;letter-spacing:.06em;text-transform:uppercase;color:rgba(255,255,255,.75);margin-top:2px;}
+.hbox.rem{background:#fff;color:var(--teal);}
+.sec{padding:18px 18px 0;}
+.sec-title{font-family:'Playfair Display',serif;font-size:18px;font-weight:700;margin-bottom:2px;}
+.sec-note{font-size:12px;color:var(--light);margin-bottom:12px;}
+.strip{display:flex;gap:6px;overflow-x:auto;padding-bottom:4px;}
+.strip::-webkit-scrollbar{display:none;}
+.dc{background:#fff;border:1.5px solid var(--line);border-radius:12px;padding:9px 11px;text-align:center;font-size:13px;font-weight:700;min-width:50px;cursor:pointer;flex-shrink:0;}
+.dc.sel{background:var(--teal);color:#fff;border-color:var(--teal);}
+.dc .d{font-size:9px;font-weight:500;color:var(--light);margin-top:1px;}
+.dc.sel .d{color:rgba(255,255,255,.8);}
+.slots{display:grid;grid-template-columns:repeat(4,1fr);gap:6px;}
+.slot{border-radius:10px;padding:11px 4px;text-align:center;font-size:12px;font-weight:700;cursor:pointer;border:1.5px solid var(--line);background:#fff;}
+.slot.booked{background:#fee2e2;color:#991b1b;border-color:#fca5a5;cursor:not-allowed;text-decoration:line-through;}
+.slot.pend{background:#fef9c3;color:#854d0e;border-color:#fde68a;cursor:not-allowed;}
+.slot.sel{background:var(--teal);color:#fff;border-color:var(--teal);}
+.dur{display:flex;align-items:center;gap:14px;background:#fff;border:1.5px solid var(--line);border-radius:var(--r);padding:12px 14px;margin-top:10px;}
+.step{width:38px;height:38px;border-radius:50%;border:1.5px solid var(--line);background:var(--cream);font-size:20px;font-weight:700;cursor:pointer;}
+.dur-mid{flex:1;text-align:center;}
+.dur-num{font-family:'Playfair Display',serif;font-size:26px;font-weight:800;}
+.dur-sub{font-size:10px;color:var(--light);}
+.summary{background:var(--teal);color:#fff;border-radius:var(--r);padding:13px 16px;margin:12px 0 0;text-align:center;font-family:'Playfair Display',serif;font-size:16px;font-weight:700;}
+.btn{background:var(--ink);border-radius:var(--rl);padding:16px;text-align:center;font-size:16px;font-weight:700;color:#fff;cursor:pointer;border:none;width:100%;margin-top:12px;font-family:'Inter',sans-serif;}
+.btn:disabled{opacity:.45;}
+.mine{background:#fff;border:1.5px solid var(--line);border-radius:var(--r);padding:11px 13px;margin-bottom:8px;}
+.mine .nm{font-size:13px;font-weight:600;}
+.mine .mt{font-size:11px;color:var(--mid);margin-top:2px;}
+.pill{font-size:10px;font-weight:700;padding:3px 8px;border-radius:20px;}
+.pill.p{background:#fef9c3;color:#854d0e;}
+.pill.a{background:#dcfce7;color:#166534;}
+.foot{text-align:center;font-size:11.5px;color:var(--light);padding:18px 20px 26px;line-height:1.7;}
+.foot a{color:var(--mid);text-decoration:none;font-weight:600;}
+.center{min-height:100vh;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:32px;}
+.toast{position:fixed;bottom:24px;left:50%;transform:translateX(-50%);background:var(--ink);color:#fff;padding:11px 20px;border-radius:20px;font-size:13px;opacity:0;transition:opacity .3s;z-index:50;}
+.toast.show{opacity:1;}
+</style>
+</head>
+<body>
+<div id="loading" class="center"><div class="serif" style="font-size:22px;font-weight:800;">Loading your package…</div></div>
+<div id="invalid" class="center" style="display:none;">
+  <div style="font-size:40px;margin-bottom:12px;">🔗</div>
+  <div class="serif" style="font-size:22px;font-weight:800;margin-bottom:6px;">Link not found</div>
+  <div style="font-size:14px;color:var(--mid);max-width:300px;">This podcast package link is invalid or has expired. Please contact Magizh Studio for a new link.</div>
+</div>
+
+<div class="wrap" id="app" style="display:none;">
+  <div class="hero">
+    <div class="hero-block"></div>
+    <div class="hero-inner">
+      <div class="brandrow">
+        <div class="logo"><svg width="22" height="22" viewBox="0 0 24 24" fill="none"><rect x="9" y="2" width="6" height="10" rx="3" stroke="#fff" stroke-width="2"/><path d="M5 10a7 7 0 0014 0" stroke="#fff" stroke-width="2" stroke-linecap="round"/><line x1="12" y1="17" x2="12" y2="21" stroke="#fff" stroke-width="2" stroke-linecap="round"/><line x1="8" y1="21" x2="16" y2="21" stroke="#fff" stroke-width="2" stroke-linecap="round"/></svg></div>
+        <div class="brandname">Magizh Podcast Studio</div>
+      </div>
+      <div class="eyebrow">Your Podcast Package</div>
+      <div class="hi" id="cli-name">Hi!</div>
+      <div class="hours">
+        <div class="hbox"><div class="n" id="h-total">0</div><div class="l">Total hrs</div></div>
+        <div class="hbox"><div class="n" id="h-used">0</div><div class="l">Used</div></div>
+        <div class="hbox rem"><div class="n" id="h-rem">0</div><div class="l">Remaining</div></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="sec">
+    <div class="sec-title">Book a session</div>
+    <div class="sec-note">Pick a date, then a free slot (min 2 hours)</div>
+    <div class="strip" id="date-strip"></div>
+  </div>
+  <div class="sec">
+    <div class="sec-note" id="slot-lbl" style="margin-bottom:8px;">Available times</div>
+    <div class="slots" id="slot-grid"></div>
+    <div class="dur" id="dur-box" style="display:none;">
+      <button class="step" type="button" onclick="changeDur(-1)">−</button>
+      <div class="dur-mid"><div class="dur-num serif"><span id="dur-num">2</span></div><div class="dur-sub">hours (min 2)</div></div>
+      <button class="step" type="button" onclick="changeDur(1)">+</button>
+    </div>
+    <div class="summary" id="summary" style="display:none;"></div>
+    <button class="btn" id="book-btn" onclick="requestSession()" disabled>Select a slot to request</button>
+  </div>
+
+  <div class="sec" style="padding-bottom:8px;">
+    <div class="sec-title">My sessions</div>
+    <div class="sec-note">&nbsp;</div>
+    <div id="my-list"></div>
+  </div>
+
+  <div class="foot">
+    📍 Nerkundram, Chennai &nbsp;·&nbsp; 📞 <a href="tel:+918072659679">+91 80726 59679</a> &nbsp;·&nbsp; 📸 <a href="https://instagram.com/magizh_studio_" target="_blank">@magizh_studio_</a>
+  </div>
+</div>
+<div class="toast" id="toast"></div>
+
+<script type="module">
+import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js';
+import { getFirestore, doc, onSnapshot, setDoc, updateDoc } from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js';
+const CFG = { apiKey:"AIzaSyAygqLP1vGN5P81joBQ9AQkWhEvqvBWspU", projectId:"magizh-studio", authDomain:"magizh-studio.firebaseapp.com" };
+const SID = "magizh-nerkundram";
+const pkgId = new URLSearchParams(location.search).get('pkg');
+
+let db, bookings={}, packages={}, podreqs={}, pkg=null;
+let selDate='', selStartH=null, selDur=2, gotSnap=false;
+
+function hourLabel(h){ if(h===24||h===0)return'12am'; if(h===12)return'12pm'; return h<12?(h+'am'):((h-12)+'pm'); }
+function localDateStr(d){ return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0'); }
+const DS=['Sun','Mon','Tue','Wed','Thu','Fri','Sat'];
+function toast(m){ const t=document.getElementById('toast'); t.textContent=m; t.classList.add('show'); setTimeout(()=>t.classList.remove('show'),2600); }
+
+try { db = getFirestore(initializeApp(CFG)); } catch(e){ console.error(e); }
+
+if(!pkgId || !db){ showInvalid(); }
+else {
+  onSnapshot(doc(db,'studios',SID), snap=>{
+    if(snap.exists()){ const d=snap.data(); bookings=d.bookings||{}; packages=d.packages||{}; podreqs=d.podreqs||{}; }
+    pkg = packages[pkgId] || null;
+    gotSnap=true;
+    if(!pkg){ showInvalid(); return; }
+    document.getElementById('loading').style.display='none';
+    document.getElementById('app').style.display='flex';
+    if(!selDate) initDates();
+    renderHeader(); renderSlots(); renderMine();
+  }, err=>{ console.error(err); if(!gotSnap) showInvalid(); });
+}
+
+function showInvalid(){ document.getElementById('loading').style.display='none'; document.getElementById('invalid').style.display='flex'; }
+
+function usage(){
+  const total=Number(pkg.totalHours)||0;
+  let used=0; Object.values(bookings).forEach(b=>{ if(b.pkg===pkgId&&b.status!=='cancelled') used+=parseInt((b.slotRaw||'').split('|')[1]||0)||0; });
+  let pending=0; Object.values(podreqs).forEach(r=>{ if(r.pkg===pkgId&&r.status==='pending') pending+=Math.max(0,parseInt(r.dur)||0); });
+  return { total, used, pending, remaining: Math.max(0, total-used-pending) };
+}
+
+function renderHeader(){
+  const u=usage();
+  document.getElementById('cli-name').textContent='Hi '+(pkg.name||'')+'!';
+  document.getElementById('h-total').textContent=u.total;
+  document.getElementById('h-used').textContent=u.used+u.pending;
+  document.getElementById('h-rem').textContent=u.remaining;
+}
+
+function initDates(){
+  const strip=document.getElementById('date-strip'); strip.innerHTML='';
+  const ts=localDateStr(new Date());
+  for(let i=0;i<30;i++){
+    const d=new Date(); d.setDate(d.getDate()+i); const ds=localDateStr(d);
+    const div=document.createElement('div'); div.className='dc'+(i===0?' sel':'');
+    div.innerHTML='<div>'+d.getDate()+'</div><div class="d">'+DS[d.getDay()]+'</div>';
+    div.onclick=()=>{ selDate=ds; selStartH=null; selDur=2; document.querySelectorAll('#date-strip .dc').forEach(x=>x.classList.remove('sel')); div.classList.add('sel'); renderSlots(); };
+    strip.appendChild(div);
+    if(i===0) selDate=ds;
+  }
+}
+
+function bookedHours(){
+  const set=new Set(), pend=new Set();
+  Object.values(bookings).forEach(b=>{ if(b.date===selDate&&(b.studio||'photo')==='pod'&&b.status!=='cancelled'){ const p=(b.slotRaw||'').split('|'); const s=+p[0],dd=+(p[1]||1); for(let h=s;h<s+dd;h++) set.add(h); } });
+  Object.values(podreqs).forEach(r=>{ if(r.pkg===pkgId&&r.status==='pending'&&r.date===selDate){ const s=+r.startH,dd=+(r.dur||0); for(let h=s;h<s+dd;h++) pend.add(h); } });
+  return { set, pend };
+}
+
+window.changeDur=function(delta){
+  if(selStartH===null)return;
+  const u=usage(); const {set}=bookedHours();
+  let max=Math.min(u.remaining, 12, 24-selStartH);
+  for(let h=selStartH+1;h<selStartH+max;h++){ if(set.has(h)){ max=h-selStartH; break; } } // stop at next booked hour
+  selDur=Math.max(2, Math.min(max, selDur+delta));
+  document.getElementById('dur-num').textContent=selDur;
+  updateSummary();
+};
+
+function renderSlots(){
+  const grid=document.getElementById('slot-grid'); const {set,pend}=bookedHours(); const u=usage();
+  const dLabel=new Date(selDate+'T12:00:00').toLocaleDateString('en-IN',{weekday:'short',day:'numeric',month:'short'});
+  document.getElementById('slot-lbl').textContent='Available times · '+dLabel;
+  grid.innerHTML='';
+  for(let h=6;h<=21;h++){
+    const cls = set.has(h)?'booked' : pend.has(h)?'pend' : (selStartH===h?'sel':'');
+    const div=document.createElement('div'); div.className='slot '+cls; div.textContent=hourLabel(h);
+    if(!set.has(h)&&!pend.has(h)) div.onclick=()=>selectStart(h);
+    grid.appendChild(div);
+  }
+  const canBook=u.remaining>=2;
+  const box=document.getElementById('dur-box'), sum=document.getElementById('summary'), btn=document.getElementById('book-btn');
+  if(selStartH===null){ box.style.display='none'; sum.style.display='none'; btn.disabled=true; btn.textContent=canBook?'Select a slot to request':'No hours remaining'; }
+  updateSummary();
+}
+
+function selectStart(h){
+  const u=usage(); if(u.remaining<2){ toast('No hours remaining in your package'); return; }
+  selStartH=h; selDur=2; renderSlots();
+  document.getElementById('dur-box').style.display='flex';
+  document.getElementById('dur-num').textContent=selDur;
+  updateSummary();
+}
+
+function updateSummary(){
+  const sum=document.getElementById('summary'), btn=document.getElementById('book-btn');
+  if(selStartH===null)return;
+  sum.style.display='block';
+  sum.textContent=hourLabel(selStartH)+' – '+hourLabel(selStartH+selDur)+' · '+selDur+' hrs';
+  btn.disabled=false; btn.textContent='Request this session →';
+}
+
+window.requestSession = async function(){
+  if(selStartH===null||!pkg) return;
+  const u=usage();
+  if(selDur>u.remaining){ toast('Only '+u.remaining+' hrs left in your package'); return; }
+  const {set}=bookedHours();
+  for(let h=selStartH;h<selStartH+selDur;h++){ if(set.has(h)){ toast('That slot was just taken — pick another'); renderSlots(); return; } }
+  const btn=document.getElementById('book-btn'); btn.disabled=true; btn.textContent='Sending…';
+  const id='req-'+Date.now();
+  const req={ id, pkg:pkgId, name:pkg.name, phone:pkg.phone, date:selDate, startH:String(selStartH), dur:selDur, status:'pending', createdAt:Date.now() };
+  try{
+    try{ await updateDoc(doc(db,'studios',SID), {['podreqs.'+id]: req}); }
+    catch(inner){ await setDoc(doc(db,'studios',SID), {podreqs:{[id]:req}}, {merge:true}); }
+    toast('Session requested ✓ — we\'ll confirm shortly');
+  }catch(e){ console.error(e); toast('Could not send — try again'); }
+  selStartH=null; selDur=2;
+  renderSlots(); renderMine();
+};
+
+function renderMine(){
+  const list=document.getElementById('my-list');
+  const items=[];
+  Object.values(podreqs).forEach(r=>{ if(r.pkg===pkgId&&r.status!=='rejected'&&r.status!=='cancelled') items.push({date:r.date,startH:+r.startH,dur:+r.dur,st:r.status,at:r.createdAt}); });
+  items.sort((a,b)=> a.date===b.date ? a.startH-b.startH : a.date.localeCompare(b.date));
+  if(!items.length){ list.innerHTML='<div style="text-align:center;color:var(--light);font-size:13px;padding:10px;">No sessions yet</div>'; return; }
+  list.innerHTML=items.map(it=>{
+    const dLabel=new Date(it.date+'T12:00:00').toLocaleDateString('en-IN',{weekday:'short',day:'numeric',month:'short'});
+    const pill=it.st==='accepted'?'<span class="pill a">Confirmed</span>':'<span class="pill p">Pending</span>';
+    return '<div class="mine" style="display:flex;justify-content:space-between;align-items:center;"><div><div class="nm">'+dLabel+'</div><div class="mt">'+hourLabel(it.startH)+' – '+hourLabel(it.startH+it.dur)+' · '+it.dur+' hrs</div></div>'+pill+'</div>';
+  }).join('');
+}
+</script>
+</body>
+</html>
