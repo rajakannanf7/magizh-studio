@@ -1,0 +1,257 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<meta name="theme-color" content="#E9574C">
+<title>Team · Magizh Studio</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600;700;800;900&family=Syne:wght@600;700;800&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<style>
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent;}
+:root{--coral:#E9574C;--teal:#1B7A6E;--sand:#E7B486;--cream:#F5F1EA;--ink:#141414;--mid:#5f5f5f;--light:#a6a29b;--line:#e8e2d6;--r:16px;--rl:26px;}
+body{background:var(--cream);font-family:'Inter',sans-serif;color:var(--ink);min-height:100vh;}
+.serif{font-family:'Playfair Display',serif;}
+.wrap{max-width:480px;margin:0 auto;min-height:100vh;display:flex;flex-direction:column;}
+.hero{position:relative;background:var(--coral);padding:30px 24px 24px;overflow:hidden;color:#fff;}
+.hero-block{position:absolute;top:-40px;right:-30px;width:150px;height:150px;background:var(--teal);border-radius:50%;opacity:.85;}
+.hero-inner{position:relative;z-index:2;}
+.brandrow{display:flex;align-items:center;gap:10px;margin-bottom:12px;}
+.logo{width:40px;height:40px;background:rgba(255,255,255,.18);border-radius:12px;display:flex;align-items:center;justify-content:center;}
+.brandname{font-family:'Playfair Display',serif;font-weight:800;font-size:18px;}
+.eyebrow{font-size:11px;font-weight:600;letter-spacing:.14em;text-transform:uppercase;color:rgba(255,255,255,.7);margin-bottom:4px;}
+.h1{font-family:'Playfair Display',serif;font-size:30px;font-weight:800;line-height:1.05;}
+.sec{padding:18px 18px 0;}
+.sec-title{font-family:'Playfair Display',serif;font-size:19px;font-weight:700;margin-bottom:2px;}
+.sec-note{font-size:12px;color:var(--light);margin-bottom:12px;}
+.lbl{font-size:10px;font-weight:600;letter-spacing:.09em;text-transform:uppercase;color:var(--light);margin-bottom:6px;}
+.shoot{background:#fff;border:1.5px solid var(--line);border-left:5px solid var(--coral);border-radius:var(--r);padding:12px 14px;margin-bottom:8px;}
+.shoot.pod{border-left-color:var(--teal);}
+.shoot-top{display:flex;justify-content:space-between;align-items:center;}
+.shoot-date{font-size:13px;font-weight:700;}
+.shoot-badge{font-size:10px;font-weight:700;padding:3px 9px;border-radius:20px;background:#fff5f2;color:var(--coral);}
+.shoot.pod .shoot-badge{background:#e9f5f2;color:var(--teal);}
+.shoot-meta{font-size:12px;color:var(--mid);margin-top:3px;}
+/* Studio cards (like the app) */
+.studio-row{display:flex;gap:8px;}
+.studio-card{flex:1;padding:14px 10px;border-radius:12px;border:2px solid var(--line);background:#fff;text-align:center;cursor:pointer;transition:all .15s;}
+.studio-card svg{display:block;margin:0 auto 6px;}
+.studio-card .st-name{font-family:'Syne',sans-serif;font-size:13px;font-weight:700;color:var(--ink);}
+.studio-card .st-sub{font-size:10px;color:var(--light);margin-top:2px;}
+.studio-card.sel{border-color:var(--coral);background:var(--coral);}
+.studio-card.sel .st-name,.studio-card.sel .st-sub{color:#fff;}
+#st-pod.sel{border-color:var(--teal);background:var(--teal);}
+/* Date strip (like the app) */
+.tstrip{display:flex;gap:6px;overflow-x:auto;padding-bottom:4px;}
+.tstrip::-webkit-scrollbar{display:none;}
+.tdc{background:#fff;border:1.5px solid var(--line);border-radius:12px;padding:9px 11px;text-align:center;font-size:14px;font-weight:700;min-width:50px;cursor:pointer;flex-shrink:0;}
+.tdc.sel{background:var(--coral);color:#fff;border-color:var(--coral);}
+.tdc .wd{font-size:9px;font-weight:500;color:var(--light);margin-top:1px;}
+.tdc.sel .wd{color:rgba(255,255,255,.8);}
+/* Slot grid (like the app) */
+.tslots{display:grid;grid-template-columns:repeat(4,1fr);gap:6px;}
+.tslot{border-radius:10px;padding:11px 4px;text-align:center;font-size:12px;font-weight:700;cursor:pointer;border:1.5px solid var(--line);background:#fff;}
+.tslot.booked{background:#fee2e2;color:#991b1b;border-color:#fca5a5;cursor:not-allowed;text-decoration:line-through;}
+.tslot.sel{background:var(--coral);color:#fff;border-color:var(--coral);}
+.card{background:#fff;border:1.5px solid var(--line);border-radius:var(--r);padding:13px 15px;margin-bottom:10px;}
+select,input,textarea{width:100%;background:transparent;border:none;outline:none;font-size:15px;font-family:'Inter',sans-serif;color:var(--ink);}
+select{-webkit-appearance:none;cursor:pointer;}
+input::placeholder{color:#c7c2b9;}
+.req{color:var(--coral);}
+.dur{display:flex;align-items:center;gap:14px;}
+.step{width:38px;height:38px;border-radius:50%;border:1.5px solid var(--line);background:var(--cream);font-size:20px;font-weight:700;cursor:pointer;}
+.dur-mid{flex:1;text-align:center;}
+.dur-num{font-family:'Playfair Display',serif;font-size:24px;font-weight:800;}
+.dur-sub{font-size:10px;color:var(--light);}
+.btn{background:var(--ink);border-radius:var(--rl);padding:16px;text-align:center;font-size:16px;font-weight:700;color:#fff;cursor:pointer;border:none;width:100%;margin-top:6px;font-family:'Inter',sans-serif;display:flex;align-items:center;justify-content:center;gap:9px;}
+.btn:disabled{opacity:.5;}
+.err{color:#cc2222;font-size:12.5px;margin:4px 2px 0;display:none;}
+.foot{text-align:center;font-size:11.5px;color:var(--light);padding:18px 20px 26px;line-height:1.7;}
+.foot a{color:var(--mid);text-decoration:none;font-weight:600;}
+.spin{width:16px;height:16px;border:2px solid rgba(255,255,255,.4);border-top-color:#fff;border-radius:50%;animation:sp .7s linear infinite;display:none;}
+@keyframes sp{to{transform:rotate(360deg);}}
+.gate{position:fixed;inset:0;background:var(--cream);display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:32px;z-index:60;}
+.gate.hide{display:none;}
+.pinbox{width:170px;padding:13px;border:2px solid var(--line);border-radius:var(--r);font-size:22px;text-align:center;letter-spacing:8px;outline:none;font-family:Inter,sans-serif;}
+.thanks{position:fixed;inset:0;background:var(--cream);display:none;flex-direction:column;align-items:center;justify-content:center;padding:32px 28px;text-align:center;z-index:70;}
+.thanks.show{display:flex;}
+.check{width:86px;height:86px;border-radius:50%;background:var(--teal);display:flex;align-items:center;justify-content:center;margin-bottom:20px;}
+.wa-btn{background:#25D366;border:none;border-radius:var(--rl);padding:14px 22px;font-size:15px;font-weight:700;color:#fff;text-decoration:none;display:inline-flex;align-items:center;gap:8px;font-family:'Inter',sans-serif;margin-top:8px;}
+</style>
+</head>
+<body>
+<div class="gate" id="gate">
+  <div style="font-size:40px;margin-bottom:10px;">🔒</div>
+  <div class="serif" style="font-size:24px;font-weight:800;margin-bottom:4px;">Magizh Team</div>
+  <div style="font-size:13px;color:var(--mid);margin-bottom:18px;">Enter the team PIN to continue</div>
+  <input id="pin" class="pinbox" type="password" inputmode="numeric" maxlength="4" placeholder="••••" onkeydown="if(event.key==='Enter')unlock()">
+  <div id="pin-err" style="color:#cc2222;font-size:12px;margin-top:8px;display:none;">Wrong PIN</div>
+  <button class="btn" style="width:170px;margin-top:14px;" onclick="unlock()">Unlock</button>
+</div>
+
+<div class="wrap" id="app" style="display:none;">
+  <div class="hero">
+    <div class="hero-block"></div>
+    <div class="hero-inner">
+      <div class="brandrow">
+        <div class="logo"><svg width="22" height="22" viewBox="0 0 24 24" fill="none"><rect x="2" y="6" width="20" height="14" rx="2" stroke="#fff" stroke-width="2"/><circle cx="12" cy="13" r="3" stroke="#fff" stroke-width="2"/><path d="M8 6l1.5-3h5L16 6" stroke="#fff" stroke-width="2" stroke-linejoin="round"/></svg></div>
+        <div class="brandname">Magizh Studio</div>
+      </div>
+      <div class="eyebrow">Team Portal</div>
+      <div class="h1">Upcoming shoots</div>
+    </div>
+  </div>
+
+  <div class="sec">
+    <div class="sec-title">Schedule</div>
+    <div class="sec-note" id="up-note">Loading…</div>
+    <div id="up-list"></div>
+  </div>
+
+  <div class="sec" style="padding-bottom:6px;">
+    <div class="sec-title">Request a booking</div>
+    <div class="sec-note">Pick studio, date &amp; time — the studio team will confirm</div>
+
+    <div class="lbl">Select studio</div>
+    <div class="studio-row">
+      <div class="studio-card sel" id="st-photo" onclick="pickStudio('photo')">
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none"><rect x="2" y="6" width="20" height="14" rx="2" stroke="currentColor" stroke-width="2"/><circle cx="12" cy="13" r="3" stroke="currentColor" stroke-width="2"/><path d="M8 6l1.5-3h5L16 6" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/></svg>
+        <div class="st-name">Photography</div><div class="st-sub">Studio 1</div>
+      </div>
+      <div class="studio-card" id="st-pod" onclick="pickStudio('pod')">
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none"><rect x="9" y="2" width="6" height="10" rx="3" stroke="currentColor" stroke-width="2"/><path d="M5 10a7 7 0 0014 0" stroke="currentColor" stroke-width="2" stroke-linecap="round"/><line x1="12" y1="17" x2="12" y2="21" stroke="currentColor" stroke-width="2" stroke-linecap="round"/><line x1="8" y1="21" x2="16" y2="21" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+        <div class="st-name">Podcast</div><div class="st-sub">Studio 2</div>
+      </div>
+    </div>
+
+    <div class="lbl" style="margin-top:16px;">Pick a date</div>
+    <div class="tstrip" id="t-strip"></div>
+
+    <div class="lbl" id="t-slot-lbl" style="margin-top:16px;">Start time · 6am – 12am</div>
+    <div class="tslots" id="t-slots"></div>
+
+    <div class="card" style="margin-top:14px;"><div class="lbl">Duration</div><div class="dur"><button class="step" type="button" onclick="changeDur(-1)">−</button><div class="dur-mid"><div class="dur-num serif"><span id="dur-num">2</span></div><div class="dur-sub">hours (min 2)</div></div><button class="step" type="button" onclick="changeDur(1)">+</button></div></div>
+
+    <div class="card"><div class="lbl">Client name <span class="req">*</span></div><input id="f-name" type="text" placeholder="Client's full name"></div>
+    <div class="card"><div class="lbl">Client phone <span class="req">*</span></div><input id="f-phone" type="tel" placeholder="10-digit number" inputmode="numeric"></div>
+    <div class="card"><div class="lbl">Shoot type</div>
+      <select id="f-type"><option value="">Select type</option><option>Baby shoot</option><option>Maternity shoot</option><option>Portrait</option><option>Family shoot</option><option>Product shoot</option><option>Wedding / Event</option><option>Podcast recording</option><option>Other</option></select>
+    </div>
+    <div class="card"><div class="lbl">Your name (team member)</div><input id="f-by" type="text" placeholder="Who's requesting?"></div>
+    <div class="err" id="err">Please pick a time slot and add client name, phone &amp; date.</div>
+    <button class="btn" id="submit-btn" onclick="submitRequest()"><span class="spin" id="spin"></span><span id="btn-txt">Send Booking Request →</span></button>
+  </div>
+
+  <div class="foot">📍 Nerkundram, Chennai &nbsp;·&nbsp; 📞 <a href="tel:+918072659679">+91 80726 59679</a> &nbsp;·&nbsp; 📸 <a href="https://instagram.com/magizh_studio_" target="_blank">@magizh_studio_</a></div>
+</div>
+
+<div class="thanks" id="thanks">
+  <div class="check"><svg width="42" height="42" viewBox="0 0 24 24" fill="none"><path d="M5 13l4 4L19 7" stroke="#fff" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+  <div class="serif" style="font-size:28px;font-weight:800;margin-bottom:8px;">Request sent! 🎉</div>
+  <div style="font-size:14px;color:var(--mid);max-width:320px;margin-bottom:8px;">The studio team will review and confirm this booking.</div>
+  <a class="wa-btn" id="wa-now" href="#" target="_blank">💬 Also ping on WhatsApp</a>
+  <button class="btn" style="width:200px;margin-top:14px;" onclick="location.reload()">Done</button>
+</div>
+
+<script type="module">
+import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js';
+import { getFirestore, doc, onSnapshot, setDoc, updateDoc } from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js';
+const CFG = { apiKey:"AIzaSyAygqLP1vGN5P81joBQ9AQkWhEvqvBWspU", projectId:"magizh-studio", authDomain:"magizh-studio.firebaseapp.com" };
+const SID = "magizh-nerkundram";
+const TEAM_PIN = "1111";           // ← team members use this PIN (change anytime)
+const INBA_PHONE = "918072659679";
+const HOUR_LABELS=['6am','7am','8am','9am','10am','11am','12pm','1pm','2pm','3pm','4pm','5pm','6pm','7pm','8pm','9pm','10pm','11pm'];
+const DS=['Sun','Mon','Tue','Wed','Thu','Fri','Sat'];
+
+let db, bookings={}, unlocked=false;
+let selStudio='photo', selDate='', selStartH=null, durH=2;
+function localDateStr(d){ return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0'); }
+
+try { db = getFirestore(initializeApp(CFG)); } catch(e){ console.error(e); }
+if(db){ onSnapshot(doc(db,'studios',SID), snap=>{ if(snap.exists()) bookings=snap.data().bookings||{}; if(unlocked){ renderUpcoming(); renderTSlots(); } }, e=>console.error(e)); }
+
+window.unlock=function(){
+  if(document.getElementById('pin').value===TEAM_PIN){
+    unlocked=true;
+    document.getElementById('gate').classList.add('hide');
+    document.getElementById('app').style.display='flex';
+    initStrip(); renderUpcoming(); renderTSlots();
+  } else { document.getElementById('pin-err').style.display='block'; document.getElementById('pin').value=''; }
+};
+
+window.pickStudio=function(v){
+  selStudio=v; selStartH=null;
+  document.getElementById('st-photo').classList.toggle('sel',v==='photo');
+  document.getElementById('st-pod').classList.toggle('sel',v==='pod');
+  renderTSlots();
+};
+window.changeDur=function(d){ durH=Math.max(2,Math.min(12,durH+d)); document.getElementById('dur-num').textContent=durH; };
+
+function initStrip(){
+  const strip=document.getElementById('t-strip'); strip.innerHTML='';
+  const ts=localDateStr(new Date());
+  for(let i=0;i<30;i++){
+    const d=new Date(); d.setDate(d.getDate()+i); const ds=localDateStr(d);
+    const div=document.createElement('div'); div.className='tdc'+(i===0?' sel':'');
+    div.innerHTML='<div>'+d.getDate()+'</div><div class="wd">'+DS[d.getDay()]+'</div>';
+    div.onclick=()=>{ selDate=ds; selStartH=null; document.querySelectorAll('#t-strip .tdc').forEach(x=>x.classList.remove('sel')); div.classList.add('sel'); renderTSlots(); };
+    strip.appendChild(div);
+    if(i===0) selDate=ds;
+  }
+}
+
+function bookedSet(){
+  const set=new Set();
+  Object.values(bookings).forEach(b=>{ if(b.date===selDate&&(b.studio||'photo')===selStudio&&b.status!=='cancelled'){ const p=(b.slotRaw||'').split('|'); const s=+p[0],dd=+(p[1]||1); for(let h=s;h<s+dd;h++) set.add(h); } });
+  return set;
+}
+function renderTSlots(){
+  const grid=document.getElementById('t-slots'); if(!grid)return;
+  const set=bookedSet();
+  grid.innerHTML=HOUR_LABELS.slice(0,-1).map((lbl,i)=>{
+    const h=6+i; const booked=set.has(h); const sel=selStartH===h;
+    return '<div class="tslot '+(booked?'booked':sel?'sel':'')+'" '+(booked?'':'data-h="'+h+'"')+'>'+lbl+'</div>';
+  }).join('');
+  grid.querySelectorAll('.tslot[data-h]').forEach(el=>el.onclick=()=>{ selStartH=parseInt(el.dataset.h); renderTSlots(); });
+}
+
+function renderUpcoming(){
+  const list=document.getElementById('up-list'), note=document.getElementById('up-note'); if(!list)return;
+  const ts=localDateStr(new Date());
+  const items=Object.values(bookings).filter(b=>b.date>=ts&&b.status!=='cancelled').sort((a,b)=> a.date===b.date ? (parseInt((a.slotRaw||'0|1').split('|')[0])-parseInt((b.slotRaw||'0|1').split('|')[0])) : a.date.localeCompare(b.date)).slice(0,40);
+  note.textContent=items.length?items.length+' upcoming shoot'+(items.length!==1?'s':''):'';
+  if(!items.length){ list.innerHTML='<div style="text-align:center;color:var(--light);font-size:13px;padding:14px;">No upcoming shoots</div>'; return; }
+  list.innerHTML=items.map(b=>{
+    const pod=(b.studio||'photo')==='pod';
+    const dl=new Date(b.date+'T12:00:00').toLocaleDateString('en-IN',{weekday:'short',day:'numeric',month:'short'});
+    return '<div class="shoot'+(pod?' pod':'')+'"><div class="shoot-top"><div class="shoot-date">'+dl+' · '+(b.slot||'')+'</div><span class="shoot-badge">'+(pod?'🎙️ Podcast':'📷 Photo')+'</span></div>'
+      +'<div class="shoot-meta">'+(b.name||'')+(b.type?' · '+b.type:'')+'</div></div>';
+  }).join('');
+}
+
+function hourLabel(h){ if(h===24||h===0)return'12 AM'; if(h===12)return'12 PM'; return h<12?(h+' AM'):((h-12)+' PM'); }
+window.submitRequest = async function(){
+  const name=document.getElementById('f-name').value.trim();
+  const phone=document.getElementById('f-phone').value.trim();
+  if(selStartH===null || !name || phone.replace(/\D/g,'').length<10 || !selDate){ document.getElementById('err').style.display='block'; return; }
+  document.getElementById('err').style.display='none';
+  const btn=document.getElementById('submit-btn'); btn.disabled=true;
+  document.getElementById('spin').style.display='inline-block'; document.getElementById('btn-txt').textContent='Sending…';
+  const type=document.getElementById('f-type').value||'Shoot';
+  const by=document.getElementById('f-by').value.trim();
+  const id='enq-'+Date.now();
+  const enquiry={ id, name, phone, studio:selStudio, type, package:type,
+    preferredDate:selDate, preferredTime:String(selStartH), durationHrs:durH,
+    message:(by?'Requested by '+by:'')+' (team)', source:'Team Request'+(by?' · '+by:''), status:'new', createdAt:Date.now() };
+  try{
+    if(!db) throw new Error('no db');
+    try{ await updateDoc(doc(db,'studios',SID), {['enquiries.'+id]: enquiry}); }
+    catch(inner){ await setDoc(doc(db,'studios',SID), {enquiries:{[id]:enquiry}}, {merge:true}); }
+  }catch(e){ console.error(e); }
+  const waMsg=encodeURIComponent('🎬 *Team Booking Request*\n\nClient: '+name+'\nPhone: '+phone+'\nStudio: '+(selStudio==='pod'?'Podcast':'Photography')+'\nType: '+type+'\nDate: '+new Date(selDate+'T12:00:00').toLocaleDateString('en-IN',{weekday:'short',day:'numeric',month:'short'})+'\nTime: '+hourLabel(selStartH)+' – '+hourLabel(selStartH+durH)+' ('+durH+'h)'+(by?'\nRequested by: '+by:''));
+  document.getElementById('wa-now').href='https://wa.me/'+INBA_PHONE+'?text='+waMsg;
+  document.getElementById('thanks').classList.add('show');
+};
+</script>
+</body>
+</html>
