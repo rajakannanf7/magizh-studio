@@ -11,14 +11,15 @@
 <meta name="theme-color" content="#E8601A">
 <title>Magizh Studio</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600;700;800;900&family=Syne:wght@400;600;700;800&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 <style>
 *{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent;}
 :root{
   --bg:#f5f0e8;--surface:#fff;--surface2:#ede9df;
-  --ari:#7C5CBF;--raja:#E8601A;--keer:#1A7A4A;--inba:#888;--intern:#3B82F6;
-  --dark:#1a1a1a;--mid:#666;--light:#aaa;--lighter:#ccc;
+  --ari:#1B7A6E;--raja:#E9574C;--keer:#1A7A4A;--inba:#888;--intern:#1B7A6E;
+  --sand:#E7B486;--gold:#C9A227;
+  --dark:#141414;--mid:#666;--light:#aaa;--lighter:#ccc;
   --r:12px;--rl:20px;
 }
 html,body{height:100%;overflow:hidden;}
@@ -28,7 +29,7 @@ body{background:var(--bg);font-family:'Inter',sans-serif;font-size:14px;}
 /* LOGIN */
 #login-screen{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:32px 24px;background:var(--bg);overflow-y:auto;}
 .login-logo{width:56px;height:56px;background:var(--raja);border-radius:18px;display:flex;align-items:center;justify-content:center;margin-bottom:16px;}
-.login-title{font-family:'Syne',sans-serif;font-size:24px;font-weight:800;color:var(--dark);margin-bottom:4px;}
+.login-title{font-family:'Playfair Display',serif;font-size:26px;font-weight:800;color:var(--dark);margin-bottom:4px;}
 .login-sub{font-size:13px;color:var(--light);margin-bottom:20px;}
 .login-section-lbl{font-size:10px;font-weight:600;letter-spacing:.12em;text-transform:uppercase;color:var(--light);margin-bottom:8px;width:100%;text-align:left;}
 .login-options{display:flex;flex-direction:column;gap:10px;width:100%;margin-bottom:20px;}
@@ -66,7 +67,7 @@ body{background:var(--bg);font-family:'Inter',sans-serif;font-size:14px;}
 .live-dot.off{background:rgba(255,255,255,.3);}
 .live-txt{font-size:9px;font-weight:500;color:rgba(255,255,255,.8);}
 .user-chip{font-size:10px;font-weight:600;color:#fff;background:rgba(255,255,255,.2);padding:3px 8px;border-radius:10px;}
-.hero-title{font-family:'Syne',sans-serif;font-size:32px;font-weight:800;color:#fff;line-height:1;}
+.hero-title{font-family:'Playfair Display',serif;font-size:34px;font-weight:800;color:#fff;line-height:1;letter-spacing:-.01em;}
 .hero-sub{font-size:12px;color:rgba(255,255,255,.5);margin-top:3px;}
 
 /* BOOKING */
@@ -182,7 +183,7 @@ body{background:var(--bg);font-family:'Inter',sans-serif;font-size:14px;}
 /* APP LOADER */
 #app-loader{position:fixed;inset:0;background:#f5f0e8;display:flex;align-items:center;justify-content:center;flex-direction:column;z-index:9999;transition:opacity .3s ease;}
 .loader-logo{width:70px;height:70px;background:#E8601A;border-radius:22px;display:flex;align-items:center;justify-content:center;margin-bottom:16px;box-shadow:0 10px 25px rgba(0,0,0,.12);}
-.loader-text{font-family:'Syne',sans-serif;font-size:22px;font-weight:800;color:#1a1a1a;}
+.loader-text{font-family:'Playfair Display',serif;font-size:24px;font-weight:800;color:#1a1a1a;}
 .loader-sub{font-size:12px;color:#666;margin-top:4px;}
 </style>
 </head>
@@ -206,8 +207,8 @@ body{background:var(--bg);font-family:'Inter',sans-serif;font-size:14px;}
   <div class="login-title">Magizh Studio</div>
   <div class="login-sub">Who's using the app today?</div>
 
-  <div class="login-section-lbl">The Squad 🔑</div>
-  <div class="login-options">
+  <div class="login-section-lbl" id="squad-lbl">The Squad 🔑</div>
+  <div class="login-options" id="squad-options">
     <button class="login-btn" style="background:var(--raja);color:#fff;" onclick="login('Raja','r','owner')">
       <div class="login-av">R</div>Raja
     </button>
@@ -222,16 +223,10 @@ body{background:var(--bg);font-family:'Inter',sans-serif;font-size:14px;}
     </button>
   </div>
 
-  <div class="login-section-lbl">Crew 🎬</div>
-  <div class="login-options">
-    <button class="login-btn" style="background:var(--intern);color:#fff;" onclick="login('Manisha','manisha','intern')">
-      <div class="login-av">M</div>Manisha
-    </button>
-    <button class="login-btn" style="background:var(--intern);color:#fff;" onclick="login('Abi','abi','intern')">
-      <div class="login-av">A</div>Abi
-    </button>
-    <button class="login-btn" style="background:var(--intern);color:#fff;" onclick="login('Kamlesh','kamlesh','intern')">
-      <div class="login-av">K</div>Kamlesh
+  <div class="login-section-lbl" id="mgr-lbl" style="display:none;">Studio Manager 🗂️</div>
+  <div class="login-options" id="mgr-options" style="display:none;">
+    <button class="login-btn" style="background:var(--ari);color:#fff;" onclick="login('Studio Manager','manager','intern')">
+      <div class="login-av">S</div>Studio Manager
     </button>
   </div>
 </div>
@@ -396,6 +391,45 @@ body{background:var(--bg);font-family:'Inter',sans-serif;font-size:14px;}
       </div>
     </div>
 
+    <!-- LEADS PAGE -->
+    <div class="page" id="page-leads">
+      <div class="hero" style="background:#0F766E;">
+        <div class="hero-top">
+          <span class="hero-eye">Magizh Studio</span>
+          <div class="live-pill"><div class="live-dot off" id="l-sync-dot"></div><span class="live-txt" id="l-sync-txt">connecting</span></div>
+          <span class="user-chip" id="l-user-chip"></span>
+        </div>
+        <div class="hero-title">Leads</div>
+        <div class="hero-sub">Enquiries from your ads &amp; page</div>
+      </div>
+      <div style="display:flex;gap:6px;padding:12px 16px 0;">
+        <button class="lead-filter-btn" id="leads-filter-new" onclick="setLeadsFilter('new')" style="flex:1;padding:8px;border-radius:8px;border:1.5px solid #0F766E;background:#0F766E;color:#fff;font-size:11px;font-weight:700;cursor:pointer;font-family:Syne,sans-serif;">🆕 New</button>
+        <button class="lead-filter-btn" id="leads-filter-all" onclick="setLeadsFilter('all')" style="flex:1;padding:8px;border-radius:8px;border:1.5px solid #e0dbd0;background:var(--surface);color:var(--dark);font-size:11px;font-weight:700;cursor:pointer;font-family:Syne,sans-serif;">All</button>
+        <button class="lead-filter-btn" id="leads-filter-done" onclick="setLeadsFilter('done')" style="flex:1;padding:8px;border-radius:8px;border:1.5px solid #e0dbd0;background:var(--surface);color:var(--dark);font-size:11px;font-weight:700;cursor:pointer;font-family:Syne,sans-serif;">Done</button>
+      </div>
+      <div style="padding:12px 16px 20px;" id="leads-list"></div>
+    </div>
+
+    <!-- SERVICES PAGE -->
+    <div class="page" id="page-services">
+      <div class="hero" style="background:#B45309;">
+        <div class="hero-top">
+          <span class="hero-eye">Magizh Studio</span>
+          <div class="live-pill"><div class="live-dot off" id="s-sync-dot"></div><span class="live-txt" id="s-sync-txt">connecting</span></div>
+          <span class="user-chip" id="s-user-chip"></span>
+        </div>
+        <div class="hero-title">Services</div>
+        <div class="hero-sub">Podcast packages &amp; session requests</div>
+      </div>
+      <div class="sec"><div class="sec-lbl">🔔 Session Requests</div></div>
+      <div style="padding:0 16px;" id="svc-requests"></div>
+      <div style="padding:14px 16px 4px;">
+        <button onclick="openNewPackage()" style="width:100%;padding:14px;border-radius:var(--r);border:none;background:var(--dark);color:#fff;font-size:14px;font-weight:700;cursor:pointer;font-family:'Syne',sans-serif;">🎙️ + New Podcast Package</button>
+      </div>
+      <div class="sec"><div class="sec-lbl">Podcast Packages</div></div>
+      <div style="padding:0 16px 24px;" id="svc-packages"></div>
+    </div>
+
     <!-- INTERN DASHBOARD PAGE -->
     <div class="page" id="page-intern">
       <div class="hero hero-intern">
@@ -441,6 +475,16 @@ body{background:var(--bg);font-family:'Inter',sans-serif;font-size:14px;}
       <svg width="18" height="18" viewBox="0 0 24 24" fill="none"><rect x="3" y="4" width="18" height="18" rx="2" stroke="white" stroke-width="2"/><path d="M3 10h18M8 2v4M16 2v4" stroke="white" stroke-width="2" stroke-linecap="round"/><circle cx="8" cy="15" r="1.5" fill="white"/><circle cx="12" cy="15" r="1.5" fill="white"/><circle cx="16" cy="15" r="1.5" fill="white"/></svg>
       <span class="tab-lbl">Calendar</span>
     </button>
+    <button class="tab" id="tab-services" onclick="switchTab('services')" style="position:relative;">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none"><path d="M12 2l2.4 4.9 5.4.8-3.9 3.8.9 5.4-4.8-2.5-4.8 2.5.9-5.4L4.1 7.7l5.4-.8z" stroke="white" stroke-width="2" stroke-linejoin="round"/></svg>
+      <span class="tab-lbl">Services</span>
+      <span id="services-badge" style="position:absolute;top:2px;right:8px;min-width:16px;height:16px;padding:0 4px;background:#ef4444;color:#fff;border-radius:8px;font-size:10px;font-weight:700;display:none;align-items:center;justify-content:center;font-family:Inter,sans-serif;">0</span>
+    </button>
+    <button class="tab" id="tab-leads" onclick="switchTab('leads')" style="position:relative;">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none"><path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      <span class="tab-lbl">Leads</span>
+      <span id="leads-badge" style="position:absolute;top:2px;right:12px;min-width:16px;height:16px;padding:0 4px;background:#ef4444;color:#fff;border-radius:8px;font-size:10px;font-weight:700;display:none;align-items:center;justify-content:center;font-family:Inter,sans-serif;">0</span>
+    </button>
   </div>
   <!-- Intern tab bar -->
   <div class="tabbar" id="intern-tabbar" style="display:none;">
@@ -448,7 +492,7 @@ body{background:var(--bg);font-family:'Inter',sans-serif;font-size:14px;}
       <svg width="18" height="18" viewBox="0 0 24 24" fill="none"><rect x="3" y="3" width="7" height="9" rx="1.5" stroke="white" stroke-width="2"/><rect x="14" y="3" width="7" height="5" rx="1.5" stroke="white" stroke-width="2"/><rect x="3" y="16" width="7" height="5" rx="1.5" stroke="white" stroke-width="2"/><rect x="14" y="12" width="7" height="9" rx="1.5" stroke="white" stroke-width="2"/></svg>
       <span class="tab-lbl">Dashboard</span>
     </button>
-    <button class="tab" id="itab-booking" onclick="internSwitchTab('booking')">
+    <button class="tab" id="itab-booking" onclick="internSwitchTab('booking')" style="display:none;">
       <svg width="18" height="18" viewBox="0 0 24 24" fill="none"><rect x="3" y="4" width="18" height="18" rx="2.5" stroke="white" stroke-width="2"/><path d="M16 2v4M8 2v4M3 10h18" stroke="white" stroke-width="2" stroke-linecap="round"/></svg>
       <span class="tab-lbl">Booking</span>
     </button>
@@ -550,11 +594,44 @@ body{background:var(--bg);font-family:'Inter',sans-serif;font-size:14px;}
     <div style="margin-top:10px;"><button onclick="closePinModal()" style="background:none;border:none;color:var(--light);font-size:12px;cursor:pointer;">Cancel</button></div>
   </div>
 </div>
+<!-- Change PIN Popup (Squad only) -->
+<div class="modal-overlay" id="setpin-modal" onclick="closeSetPin()">
+  <div class="modal-box" onclick="event.stopPropagation()" style="border-radius:20px;max-width:330px;margin:auto;padding:28px;text-align:center;">
+    <div style="font-family:'Playfair Display',serif;font-size:20px;font-weight:800;margin-bottom:4px;" id="setpin-title">Change PIN</div>
+    <div style="font-size:12px;color:var(--light);margin-bottom:16px;">Set a new 4-digit login PIN</div>
+    <input id="setpin-new" type="password" inputmode="numeric" maxlength="4" placeholder="New PIN" style="width:170px;padding:12px;border:2px solid #e0dbd0;border-radius:var(--r);font-size:20px;text-align:center;letter-spacing:6px;outline:none;font-family:Inter,sans-serif;">
+    <input id="setpin-confirm" type="password" inputmode="numeric" maxlength="4" placeholder="Confirm PIN" style="width:170px;margin-top:10px;padding:12px;border:2px solid #e0dbd0;border-radius:var(--r);font-size:20px;text-align:center;letter-spacing:6px;outline:none;font-family:Inter,sans-serif;" onkeydown="if(event.key==='Enter')savePinSetup()">
+    <div id="setpin-err" style="font-size:12px;color:#cc0000;margin-top:8px;display:none;"></div>
+    <button onclick="savePinSetup()" style="width:170px;margin-top:14px;padding:13px;border-radius:var(--rl);border:none;background:var(--raja);color:#fff;font-family:'Syne',sans-serif;font-size:14px;font-weight:700;cursor:pointer;">Save PIN</button>
+    <div style="margin-top:10px;"><button onclick="closeSetPin()" style="background:none;border:none;color:var(--light);font-size:12px;cursor:pointer;">Cancel</button></div>
+  </div>
+</div>
+<!-- Podcast Package Detail Popup -->
+<div class="modal-overlay" id="pkg-modal" onclick="closePkgModal()">
+  <div class="modal-box" onclick="event.stopPropagation()">
+    <div class="modal-handle"></div>
+    <div id="pkg-modal-body"></div>
+  </div>
+</div>
+<!-- New Podcast Package Popup -->
+<div class="modal-overlay" id="newpkg-modal" onclick="closeNewPackage()">
+  <div class="modal-box" onclick="event.stopPropagation()" style="border-radius:20px;max-width:360px;margin:auto;padding:26px;">
+    <div style="font-family:'Playfair Display',serif;font-size:20px;font-weight:800;margin-bottom:4px;text-align:center;">New Podcast Package</div>
+    <div style="font-size:12px;color:var(--light);margin-bottom:16px;text-align:center;">Register a premium podcast client</div>
+    <div class="field"><div class="field-lbl">Client name</div><input id="np-name" type="text" placeholder="Full name"></div>
+    <div class="field"><div class="field-lbl">WhatsApp number</div><input id="np-phone" type="tel" placeholder="10-digit number" inputmode="numeric"></div>
+    <div class="field"><div class="field-lbl">Total package hours</div><input id="np-hours" type="number" min="1" placeholder="30"></div>
+    <div class="field"><div class="field-lbl">Package discount (%)</div><input id="np-disc" type="number" min="0" max="100" placeholder="0"></div>
+    <div id="np-err" style="font-size:12px;color:#cc0000;margin:4px 0;display:none;"></div>
+    <button onclick="createPackage()" style="width:100%;margin-top:8px;padding:14px;border-radius:var(--r);border:none;background:var(--raja);color:#fff;font-family:'Syne',sans-serif;font-size:14px;font-weight:700;cursor:pointer;">Create Package &amp; Get Link</button>
+    <div style="margin-top:8px;text-align:center;"><button onclick="closeNewPackage()" style="background:none;border:none;color:var(--light);font-size:12px;cursor:pointer;">Cancel</button></div>
+  </div>
+</div>
 <div class="toast" id="toast"></div>
 
 <script type="module">
 import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js';
-import { getFirestore, doc, onSnapshot, setDoc } from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js';
+import { getFirestore, doc, onSnapshot, setDoc, updateDoc } from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js';
 
 // ── CONFIG ──
 const CFG = { apiKey:"AIzaSyAygqLP1vGN5P81joBQ9AQkWhEvqvBWspU", projectId:"magizh-studio", authDomain:"magizh-studio.firebaseapp.com" };
@@ -568,8 +645,8 @@ const INBA_PHONE = '918072659679';
 // Passwords (change these)
 const PASSWORDS = {
   r:'1234', k:'5678', a:'9012', inba:'3456', // Squad PINs
-  manisha:'0000', abi:'0000', kamlesh:'0000' // Crew PIN (shared)
-}; // Inba's number for walk-in requests
+  manager:'4321' // Studio Manager PIN (separate ?manager link)
+};
 
 const MONTHS=['January','February','March','April','May','June','July','August','September','October','November','December'];
 const MS=['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
@@ -587,6 +664,11 @@ let extendHrs=1;
 let adminUnlocked=false;
 let podSetup='space';
 let blockedDates={}; // {date: reason}
+let enquiries={}; // {id: enquiry from public enquiry.html}
+let leadsFilter='new';
+let pins={}; // {userKey: customPin} — Squad members can set their own, overrides defaults
+let packages={}; // {pkgId: podcast package} — premium podcast clients
+let podreqs={};  // {reqId: session request from a package client's link}
 const POD_RATES={space:750,single_cam:1000,dual_cam:1500};
 function getHourlyRate(){ return selStudio==='pod'?POD_RATES[podSetup]:HOURLY_RATE; }
 const today=new Date();
@@ -627,11 +709,13 @@ function cleanPhone(p){ return p.replace(/\D/g,'').replace(/^0+/,'').replace(/^9
 // ── FIREBASE ──
 async function save(){
   if(!db)return;
-  try{ await setDoc(doc(db,'studios',SID),{bookings,blockedDates}); }catch(e){console.error(e);}
+  // updateDoc replaces only bookings+blockedDates and leaves the enquiries field untouched (no clobber)
+  try{ await updateDoc(doc(db,'studios',SID),{bookings,blockedDates}); }
+  catch(e){ try{ await setDoc(doc(db,'studios',SID),{bookings,blockedDates},{merge:true}); }catch(e2){console.error(e2);} }
 }
 
 function setSyncStatus(s){
-  ['b','c','i'].forEach(p=>{
+  ['b','c','i','l','s'].forEach(p=>{
     const dot=document.getElementById(p+'-sync-dot');
     const txt=document.getElementById(p+'-sync-txt');
     if(!dot)return;
@@ -640,15 +724,16 @@ function setSyncStatus(s){
   });
 }
 
+let fbReady=false;
 function initFirebase(){
+  if(fbReady)return; fbReady=true;
   try{
     const app=initializeApp(CFG); db=getFirestore(app);
     onSnapshot(doc(db,'studios',SID),snap=>{
-      if(snap.exists()){const d=snap.data();bookings=d.bookings||{};blockedDates=d.blockedDates||{};}
+      if(snap.exists()){const d=snap.data();bookings=d.bookings||{};blockedDates=d.blockedDates||{};enquiries=d.enquiries||{};pins=d.pins||{};packages=d.packages||{};podreqs=d.podreqs||{};}
       setSyncStatus('live');
       {
-        renderSlots();renderBookingList();renderUpcomingBookings();renderCalendar();renderInternDashboard();renderDailyEarnings();
-      // intern dashboard already called above
+        renderSlots();renderBookingList();renderUpcomingBookings();renderCalendar();renderInternDashboard();renderDailyEarnings();renderLeads();updateLeadsBadge();renderServices();updateServicesBadge();
       }
     },err=>{console.error(err);setSyncStatus('err');});
   }catch(e){console.error(e);setSyncStatus('err');}
@@ -688,13 +773,38 @@ window.login=function(name,key,role){
 window.submitPin=function(){
   if(!pendingLogin)return;
   const pin=document.getElementById('pin-input').value;
-  if(pin!==PASSWORDS[pendingLogin.key]){document.getElementById('pin-err').style.display='block';document.getElementById('pin-input').value='';return;}
+  const validPin=(pins&&pins[pendingLogin.key])||PASSWORDS[pendingLogin.key];
+  if(pin!==validPin){document.getElementById('pin-err').style.display='block';document.getElementById('pin-input').value='';return;}
   document.getElementById('pin-modal').classList.remove('open');
   const{name,key,role}=pendingLogin;pendingLogin=null;
   doLogin(name,key,role);
 };
 
 window.closePinModal=function(){document.getElementById('pin-modal').classList.remove('open');pendingLogin=null;};
+
+// ── CHANGE PIN (Squad members set their own) ──
+window.openPinSetup=function(){
+  if(userRole!=='owner')return; // Squad only
+  document.getElementById('setpin-title').textContent='Change PIN · '+currentUser;
+  document.getElementById('setpin-new').value='';
+  document.getElementById('setpin-confirm').value='';
+  document.getElementById('setpin-err').style.display='none';
+  document.getElementById('setpin-modal').classList.add('open');
+  setTimeout(()=>document.getElementById('setpin-new').focus(),100);
+};
+window.closeSetPin=function(){document.getElementById('setpin-modal').classList.remove('open');};
+window.savePinSetup=async function(){
+  const n=(document.getElementById('setpin-new').value||'').trim();
+  const c=(document.getElementById('setpin-confirm').value||'').trim();
+  const err=document.getElementById('setpin-err');
+  if(!/^\d{4}$/.test(n)){err.textContent='PIN must be exactly 4 digits';err.style.display='block';return;}
+  if(n!==c){err.textContent='PINs do not match';err.style.display='block';return;}
+  pins[currentUserKey]=n;
+  try{ await updateDoc(doc(db,'studios',SID),{['pins.'+currentUserKey]:n}); }
+  catch(e){ try{ await setDoc(doc(db,'studios',SID),{pins:{[currentUserKey]:n}},{merge:true}); }catch(e2){console.error('PIN save failed',e2);} }
+  closeSetPin();
+  showToast('Your PIN was updated ✓');
+};
 
 function doLogin(name,key,role){
   currentUser=name; currentUserKey=key; userRole=role;
@@ -704,7 +814,7 @@ function doLogin(name,key,role){
     document.getElementById('owner-tabbar').style.display='flex';
     document.getElementById('intern-tabbar').style.display='none';
     document.getElementById('page-booking').classList.add('active');
-    ['b','c'].forEach(p=>{const el=document.getElementById(p+'-user-chip');if(el)el.textContent=name;});
+    ['b','c','l','s'].forEach(p=>{const el=document.getElementById(p+'-user-chip');if(el){el.innerHTML=name+' 🔑';el.onclick=openPinSetup;el.style.cursor='pointer';el.title='Tap to change your PIN';}});
     initDateStrip();
     renderCalendar();
   }else{
@@ -736,11 +846,13 @@ window.internSwitchTab=function(tab){
 
 // ── TABS ──
 window.switchTab=function(tab){
-  ['booking','calendar'].forEach(t=>{
+  ['booking','calendar','leads','services'].forEach(t=>{
     const page=document.getElementById('page-'+t);if(page)page.classList.toggle('active',t===tab);
     const tabEl=document.getElementById('tab-'+t);if(tabEl)tabEl.classList.toggle('active',t===tab);
   });
   if(tab==='calendar')renderCalendar();
+  if(tab==='leads')renderLeads();
+  if(tab==='services')renderServices();
 };
 
 // ── STUDIO SELECTOR ──
@@ -755,7 +867,7 @@ window.selectStudio=function(studio){
     pod.querySelectorAll('div').forEach((el,i)=>{el.style.color=i===0?'var(--dark)':'var(--light)';});
     pod.querySelector('svg').querySelectorAll('*').forEach(el=>el.setAttribute('stroke','#1a1a1a'));
   }else{
-    pod.style.background='#7C5CBF';pod.style.borderColor='#7C5CBF';
+    pod.style.background='#1B7A6E';pod.style.borderColor='#1B7A6E';
     pod.querySelectorAll('div').forEach((el,i)=>{el.style.color=i===0?'#fff':'rgba(255,255,255,.7)';});
     pod.querySelector('svg').querySelectorAll('*').forEach(el=>el.setAttribute('stroke','white'));
     photo.style.background='var(--surface)';photo.style.borderColor='#e0dbd0';
@@ -769,7 +881,7 @@ window.selectStudio=function(studio){
   const totalLabel=document.getElementById('f-total-label');
   if(totalLabel)totalLabel.textContent='Total (₹'+getHourlyRate().toLocaleString('en-IN')+'/hr)';
   renderSlots();renderBookingList();
-  if(blockedDates[dateStr])showToast('⚠️ This date is blocked: '+blockedDates[dateStr],3000);
+  if(selDate&&blockedDates[selDate])showToast('⚠️ This date is blocked: '+blockedDates[selDate],3000);
 };
 
 window.selectPodSetup=function(val){
@@ -813,9 +925,9 @@ function selectDate(dateStr,el,silent=false){
 
 window.toggleSlotMode=function(isNight){
   showLateNight=isNight;
-  const dayBtn=document.getElementById('btn-day-slots');
-  const nightBtn=document.getElementById('btn-night-slots');
-  const rangeLbl=document.getElementById('slot-range-lbl');
+  var dayBtn=document.getElementById('btn-day-slots');
+  var nightBtn=document.getElementById('btn-night-slots');
+  var rangeLbl=document.getElementById('slot-range-lbl');
   if(dayBtn&&nightBtn){
     dayBtn.style.background=isNight?'var(--surface)':'var(--raja)';
     dayBtn.style.color=isNight?'var(--dark)':'#fff';
@@ -831,10 +943,9 @@ window.toggleSlotMode=function(isNight){
 function renderSlots(){
   const grid=document.getElementById('slot-grid');if(!grid)return;
   const dayBookings=Object.values(bookings).filter(b=>b.date===selDate&&(b.studio||'photo')===selStudio&&b.status!=='cancelled');
-  const sStart=showLateNight?0:6;
-  const sEnd=showLateNight?6:24;
-  const slotLabels=HOUR_LABELS.slice(sStart,sEnd);
-  grid.innerHTML=slotLabels.map((lbl,i)=>{
+  var sStart=showLateNight?0:6;
+  var sEnd=showLateNight?6:24;
+  grid.innerHTML=HOUR_LABELS.slice(sStart,sEnd).map((lbl,i)=>{
     const h=sStart+i;
     const isBooked=dayBookings.some(b=>{
       const p=(b.slotRaw||'').split('|');const bS=parseInt(p[0]),bD=parseInt(p[1]||1);
@@ -987,8 +1098,8 @@ window.openModal=function(id){
   if(b.notes){notesRow.style.display='flex';notesEl.textContent=b.notes;}else{notesRow.style.display='none';}
   const rescheduleSelect=document.getElementById('reschedule-hour');
   const parts=(b.slotRaw||'9|2').split('|');const curStart=parseInt(parts[0]);
-  rescheduleSelect.innerHTML=HOUR_LABELS.slice(0,-1).map((_,i)=>{
-    const h=sStart+i;return '<option value="'+h+'"'+(h===curStart?' selected':'')+'>'+HOUR_LABELS[i]+'</option>';
+  rescheduleSelect.innerHTML=HOUR_LABELS.map((lbl,i)=>{
+    return '<option value="'+i+'"'+(i===curStart?' selected':'')+'>'+lbl+'</option>';
   }).join('');
   extendHrs=1;document.getElementById('extend-hrs').textContent=1;
   const isCancelled=b.status==='cancelled';
@@ -1198,6 +1309,272 @@ window.sendInvoicePDF=async function(){
     backupBookings();save();
   }catch(e){console.error(e);showToast('PDF error — try again');}
 };
+
+// ════════════════════════════════════════
+// ── LEADS / ENQUIRIES ──
+// ════════════════════════════════════════
+async function saveEnquiry(id){ if(!db||!enquiries[id])return;
+  try{ await updateDoc(doc(db,'studios',SID),{['enquiries.'+id]:enquiries[id]}); }
+  catch(err){ try{ await setDoc(doc(db,'studios',SID),{enquiries:{[id]:enquiries[id]}},{merge:true}); }catch(e2){console.error('Enquiry save failed',e2);} }
+}
+
+function timeAgo(ts){
+  if(!ts)return'';
+  const s=Math.floor((Date.now()-ts)/1000);
+  if(s<60)return'just now';
+  const m=Math.floor(s/60);if(m<60)return m+'m ago';
+  const h=Math.floor(m/60);if(h<24)return h+'h ago';
+  const d=Math.floor(h/24);if(d<7)return d+'d ago';
+  return new Date(ts).toLocaleDateString('en-IN',{day:'numeric',month:'short'});
+}
+
+function enqHourLabel(h){h=((h%24)+24)%24;return h===0?'12am':h===12?'12pm':h<12?h+'am':(h-12)+'pm';}
+function enqSlot(e){
+  if(!e||!e.preferredTime)return'';
+  const s=parseInt(e.preferredTime);if(isNaN(s))return'';
+  const dur=Math.max(2,parseInt(e.durationHrs)||2);
+  return enqHourLabel(s)+'–'+enqHourLabel(s+dur)+' ('+dur+'h)';
+}
+
+function updateLeadsBadge(){
+  const n=Object.values(enquiries).filter(e=>(e.status||'new')==='new').length;
+  const badge=document.getElementById('leads-badge');
+  if(badge){badge.textContent=n;badge.style.display=n>0?'flex':'none';}
+}
+
+window.setLeadsFilter=function(f){
+  leadsFilter=f;
+  ['new','all','done'].forEach(t=>{
+    const btn=document.getElementById('leads-filter-'+t);
+    if(btn){const on=t===f;btn.style.background=on?'#0F766E':'var(--surface)';btn.style.color=on?'#fff':'var(--dark)';btn.style.borderColor=on?'#0F766E':'#e0dbd0';}
+  });
+  renderLeads();
+};
+
+function renderLeads(){
+  const list=document.getElementById('leads-list');if(!list)return;
+  let items=Object.values(enquiries).sort((a,b)=>(b.createdAt||0)-(a.createdAt||0));
+  if(leadsFilter==='new')items=items.filter(e=>(e.status||'new')==='new');
+  else if(leadsFilter==='done')items=items.filter(e=>e.status==='done'||e.status==='converted');
+  if(!items.length){list.innerHTML='<div class="bl-empty">No '+(leadsFilter==='new'?'new ':'')+'enquiries yet</div>';return;}
+  list.innerHTML=items.map(e=>{
+    const st=e.status||'new';
+    const stBadge=st==='converted'?'<span class="badge badge-paid">Booked</span>':st==='done'?'<span class="badge badge-cancel">Done</span>':'<span class="badge badge-adv">New</span>';
+    const preferred=e.preferredDate?new Date(e.preferredDate+'T12:00:00').toLocaleDateString('en-IN',{day:'numeric',month:'short',weekday:'short'}):'';
+    const slot=enqSlot(e);
+    const priceStr=e.quotedPrice?(' · ₹'+Number(e.quotedPrice).toLocaleString('en-IN')):'';
+    const phoneClean=(e.phone||'').replace(/\D/g,'').replace(/^0+/,'').replace(/^91/,'');
+    const stIcon=e.studio==='pod'?'🎙️ ':'';
+    const offer=stIcon+(e.package||e.type||'General enquiry');
+    const waMsg=encodeURIComponent('Hi '+(e.name||'')+'! 👋 Thanks for your enquiry to *Magizh Studio* 📸 about the '+offer+'. How can we help you plan your shoot?');
+    let card='<div class="bitem" style="flex-direction:column;align-items:stretch;gap:8px;">';
+    card+='<div style="display:flex;align-items:flex-start;gap:8px;">';
+    card+='<div class="bitem-info"><div class="bitem-name">'+(e.name||'Unknown')+'</div>';
+    card+='<div class="bitem-meta"><b>'+offer+'</b>'+priceStr+'</div>';
+    if(preferred||slot)card+='<div class="bitem-meta" style="margin-top:2px;color:var(--raja);font-weight:600;">📅 '+preferred+(slot?' · '+slot:'')+'</div>';
+    if(e.message)card+='<div class="bitem-meta" style="margin-top:3px;color:var(--mid);">💬 '+e.message+'</div>';
+    card+='<div class="bitem-meta" style="margin-top:3px;color:var(--light);">'+(e.source||'Enquiry')+' · '+timeAgo(e.createdAt)+' · '+(e.phone||'')+'</div>';
+    card+='</div>'+stBadge+'</div>';
+    card+='<div style="display:flex;gap:6px;flex-wrap:wrap;">';
+    card+='<a href="https://wa.me/91'+phoneClean+'?text='+waMsg+'" target="_blank" style="flex:1;min-width:82px;text-align:center;padding:9px;border-radius:8px;background:#25D366;color:#fff;font-size:12px;font-weight:700;text-decoration:none;font-family:Syne,sans-serif;">💬 WhatsApp</a>';
+    card+='<a href="tel:'+(e.phone||'')+'" style="flex:1;min-width:66px;text-align:center;padding:9px;border-radius:8px;background:#dcfce7;color:#166534;font-size:12px;font-weight:700;text-decoration:none;font-family:Syne,sans-serif;">📞 Call</a>';
+    if(st!=='converted')card+='<button onclick="convertLead(\''+e.id+'\')" style="flex:1;min-width:82px;padding:9px;border-radius:8px;border:none;background:var(--raja);color:#fff;font-size:12px;font-weight:700;cursor:pointer;font-family:Syne,sans-serif;">➕ Book</button>';
+    if(st==='new')card+='<button onclick="markLeadDone(\''+e.id+'\')" style="flex:1;min-width:66px;padding:9px;border-radius:8px;border:1px solid #ccc;background:var(--surface2);color:var(--mid);font-size:12px;font-weight:600;cursor:pointer;font-family:Syne,sans-serif;">✓ Done</button>';
+    card+='</div></div>';
+    return card;
+  }).join('');
+}
+
+window.convertLead=function(id){
+  const e=enquiries[id];if(!e)return;
+  switchTab('booking');
+  if(e.studio==='pod'&&typeof window.selectStudio==='function')window.selectStudio('pod');
+  if(!document.getElementById('date-strip').children.length)initDateStrip();
+  const nameEl=document.getElementById('f-name');if(nameEl)nameEl.value=e.name||'';
+  const phoneEl=document.getElementById('f-phone');if(phoneEl)phoneEl.value=e.phone||'';
+  const typeEl=document.getElementById('f-type');
+  if(typeEl&&e.type){for(let i=0;i<typeEl.options.length;i++){if(typeEl.options[i].text===e.type){typeEl.selectedIndex=i;break;}}}
+  if(e.preferredDate&&/^\d{4}-\d{2}-\d{2}$/.test(e.preferredDate)){
+    const dc=document.querySelector('#date-strip .dc[data-date="'+e.preferredDate+'"]');
+    if(dc)selectDate(e.preferredDate,dc);
+  }
+  // Pre-select the requested start time + duration from the enquiry
+  const sH=parseInt(e.preferredTime);
+  if(!isNaN(sH)&&sH>=6&&sH<=23){
+    window.selectStart(sH);
+    selDur=Math.max(2,Math.min(24-sH,parseInt(e.durationHrs)||2));
+    updateDurDisplay();renderSlots();recalcPayment();
+  }
+  e.status='converted';e.convertedAt=Date.now();e.convertedBy=currentUser;saveEnquiry(id);
+  updateLeadsBadge();
+  showToast('Lead loaded 👉 review the time & confirm the booking',4500);
+};
+
+window.markLeadDone=function(id){
+  const e=enquiries[id];if(!e)return;
+  e.status='done';e.doneAt=Date.now();e.doneBy=currentUser;saveEnquiry(id);
+  renderLeads();updateLeadsBadge();
+  showToast('Enquiry marked done ✓');
+};
+
+// ════════════════════════════════════════
+// ── SERVICES · PODCAST PACKAGES ──
+// ════════════════════════════════════════
+const CLIENT_LINK_BASE = location.origin + location.pathname.replace(/index\.html$/,'') + 'podcast.html';
+function reqDur(r){ return Math.max(0,parseInt(r.dur)||0); }
+function pkgUsage(pkgId){
+  const total=Number((packages[pkgId]||{}).totalHours)||0;
+  let accepted=0;
+  Object.values(bookings).forEach(b=>{ if(b.pkg===pkgId&&b.status!=='cancelled'){ accepted+=parseInt((b.slotRaw||'').split('|')[1]||0)||0; } });
+  let pending=0;
+  Object.values(podreqs).forEach(r=>{ if(r.pkg===pkgId&&r.status==='pending'){ pending+=reqDur(r); } });
+  return {total,accepted,pending,remaining:Math.max(0,total-accepted-pending)};
+}
+function pkgLink(pkgId){ return CLIENT_LINK_BASE+'?pkg='+pkgId; }
+async function savePackage(id){ if(!db||!packages[id])return; try{ await updateDoc(doc(db,'studios',SID),{['packages.'+id]:packages[id]}); }catch(e){ try{ await setDoc(doc(db,'studios',SID),{packages:{[id]:packages[id]}},{merge:true}); }catch(e2){console.error('pkg save failed',e2);} } }
+async function savePodReq(id){ if(!db||!podreqs[id])return; try{ await updateDoc(doc(db,'studios',SID),{['podreqs.'+id]:podreqs[id]}); }catch(e){ try{ await setDoc(doc(db,'studios',SID),{podreqs:{[id]:podreqs[id]}},{merge:true}); }catch(e2){console.error('req save failed',e2);} } }
+
+window.openNewPackage=function(){
+  ['np-name','np-phone','np-hours','np-disc'].forEach(id=>{const el=document.getElementById(id);if(el)el.value='';});
+  document.getElementById('np-err').style.display='none';
+  document.getElementById('newpkg-modal').classList.add('open');
+};
+window.closeNewPackage=function(){document.getElementById('newpkg-modal').classList.remove('open');};
+window.createPackage=async function(){
+  const name=document.getElementById('np-name').value.trim();
+  const phone=document.getElementById('np-phone').value.trim();
+  const hours=parseInt(document.getElementById('np-hours').value)||0;
+  const disc=Math.max(0,Math.min(100,parseInt(document.getElementById('np-disc').value)||0));
+  const err=document.getElementById('np-err');
+  if(!name||cleanPhone(phone).length<10||hours<1){err.textContent='Enter name, valid phone, and hours';err.style.display='block';return;}
+  const id='pkg-'+Date.now().toString(36);
+  packages[id]={id,name,phone,totalHours:hours,discountPct:disc,status:'active',createdAt:Date.now(),createdBy:currentUser};
+  await savePackage(id);
+  closeNewPackage();showToast('Package created ✓ — share the link');renderServices();
+};
+window.copyPkgLink=function(id){
+  const link=pkgLink(id);
+  if(navigator.clipboard&&navigator.clipboard.writeText){navigator.clipboard.writeText(link).then(()=>showToast('Link copied ✓')).catch(()=>prompt('Copy link:',link));}
+  else prompt('Copy link:',link);
+};
+window.sharePkgLink=function(id){
+  const p=packages[id];if(!p)return;const u=pkgUsage(id);
+  const msg='Hi '+p.name+'! 🎙️ Here is your Magizh Studio podcast package booking link:\n\n'+pkgLink(id)+'\n\nYour package: '+u.total+' hours. Book your sessions anytime from this link — see you at the studio!';
+  window.open('https://wa.me/91'+cleanPhone(p.phone)+'?text='+encodeURIComponent(msg),'_blank');
+};
+window.acceptReq=async function(id){
+  const r=podreqs[id];if(!r)return;const p=packages[r.pkg];
+  const startH=parseInt(r.startH),dur=reqDur(r);
+  const day=Object.values(bookings).filter(b=>b.date===r.date&&(b.studio||'photo')==='pod'&&b.status!=='cancelled');
+  if(slotOverlaps(day.map(b=>b.slotRaw||''),startH,dur)){ showToast('⚠️ That podcast slot is already taken — reject & ask client to re-pick'); return; }
+  const rate=POD_RATES.space;const total=dur*rate;const disc=p?Math.round(total*(Number(p.discountPct)||0)/100):0;
+  const bid='bk-'+Date.now();
+  bookings[bid]={id:bid,name:r.name,phone:r.phone,type:'Podcast Session',date:r.date,status:'confirmed',
+    slot:formatSlot(startH,dur),slotRaw:startH+'|'+dur,studio:'pod',studioName:'Podcast Studio',
+    total,discount:disc,advance:0,balance:Math.max(0,total-disc),paid:false,createdBy:currentUser,createdAt:Date.now(),
+    pkg:r.pkg,notes:'Package session'+(p?' · '+p.name:''),hourlyRate:rate,podSetup:'space'};
+  r.status='accepted';r.bookingId=bid;
+  backupBookings();await save();await savePodReq(id);syncToSheets(bookings[bid]);
+  showToast('Session allotted ✓');
+  renderServices();updateServicesBadge();renderCalendar();renderSlots();renderBookingList();
+};
+window.rejectReq=async function(id){
+  const r=podreqs[id];if(!r)return;
+  r.status='rejected';await savePodReq(id);
+  showToast('Request rejected — hours returned');renderServices();updateServicesBadge();
+};
+window.cancelPkgSession=async function(bid){
+  const b=bookings[bid];if(!b)return;const pkgId=b.pkg;
+  if(!confirm('Cancel this podcast session for '+(b.name||'client')+'?\nThe slot is freed and the hours go back to their package.'))return;
+  // mark the originating request as cancelled so it leaves the client's list
+  Object.values(podreqs).forEach(r=>{ if(r.bookingId===bid){ r.status='cancelled'; savePodReq(r.id); } });
+  delete bookings[bid];
+  backupBookings();await save();
+  showToast('Session cancelled — hours returned ✓');
+  renderServices();updateServicesBadge();renderCalendar();renderSlots();renderBookingList();renderUpcomingBookings();
+  if(document.getElementById('pkg-modal').classList.contains('open')&&pkgId&&packages[pkgId])openPackage(pkgId);
+};
+
+// Package detail dashboard
+window.openPackage=function(id){
+  const p=packages[id];if(!p)return;const u=pkgUsage(id);
+  const sessions=[];
+  Object.values(bookings).forEach(b=>{ if(b.pkg===id&&b.status!=='cancelled') sessions.push({date:b.date,slot:b.slot,dur:parseInt((b.slotRaw||'').split('|')[1]||0)||0,st:'confirmed',bid:b.id}); });
+  Object.values(podreqs).forEach(r=>{ if(r.pkg===id&&r.status==='pending') sessions.push({date:r.date,slot:enqHourLabel(+r.startH)+'–'+enqHourLabel(+r.startH+reqDur(r)),dur:reqDur(r),st:'pending'}); });
+  sessions.sort((a,b)=>(a.date||'').localeCompare(b.date||''));
+  const box=(n,l,c)=>'<div style="flex:1;text-align:center;background:'+(c||'var(--surface2)')+';border-radius:10px;padding:10px;"><div style="font-family:\'Playfair Display\',serif;font-size:22px;font-weight:800;'+(c?'color:var(--keer);':'')+'">'+n+'</div><div style="font-size:9px;color:var(--light);text-transform:uppercase;letter-spacing:.05em;">'+l+'</div></div>';
+  let html='<div class="modal-title">🎙️ '+p.name+'</div><div class="modal-meta">'+p.phone+(p.discountPct?' · '+p.discountPct+'% off':'')+' · '+u.total+'h package</div>';
+  html+='<div style="display:flex;gap:8px;margin:8px 0 14px;">'+box(u.total,'Total')+box(u.accepted,'Used')+box(u.pending,'Pending')+box(u.remaining,'Left','#f0faf4')+'</div>';
+  html+='<div class="sec-lbl">All sessions</div>';
+  if(!sessions.length)html+='<div class="bl-empty">No sessions booked yet</div>';
+  else html+=sessions.map(s=>{
+    const dl=new Date(s.date+'T12:00:00').toLocaleDateString('en-IN',{weekday:'short',day:'numeric',month:'short',year:'numeric'});
+    const pill=s.st==='confirmed'?'<span class="badge badge-paid">Confirmed</span>':'<span class="badge badge-adv">Pending</span>';
+    return '<div style="display:flex;justify-content:space-between;align-items:center;padding:9px 0;border-bottom:0.5px solid #f0ece4;"><div><div style="font-size:13px;font-weight:600;">'+dl+'</div><div style="font-size:11px;color:var(--mid);">'+s.slot+' · '+s.dur+'h</div></div><div style="display:flex;align-items:center;gap:8px;">'+pill+(s.bid?'<button onclick="cancelPkgSession(\''+s.bid+'\')" style="border:none;background:#fee2e2;color:#991b1b;border-radius:6px;padding:5px 10px;font-size:11px;font-weight:700;cursor:pointer;">✕</button>':'')+'</div></div>';
+  }).join('');
+  html+='<div style="display:flex;gap:8px;margin-top:14px;">'
+    +'<button onclick="copyPkgLink(\''+id+'\')" style="flex:1;padding:11px;border-radius:var(--r);border:1px solid #ccc;background:var(--surface2);color:var(--dark);font-size:12px;font-weight:700;cursor:pointer;font-family:Syne,sans-serif;">🔗 Copy Link</button>'
+    +'<button onclick="sharePkgLink(\''+id+'\')" style="flex:1;padding:11px;border-radius:var(--r);border:none;background:#25D366;color:#fff;font-size:12px;font-weight:700;cursor:pointer;font-family:Syne,sans-serif;">📲 Share</button></div>';
+  html+='<button onclick="deletePackage(\''+id+'\')" style="width:100%;margin-top:10px;padding:13px;border-radius:var(--r);border:2px solid #dc2626;background:#fff;color:#dc2626;font-size:13px;font-weight:700;cursor:pointer;font-family:Syne,sans-serif;">🗑️ Remove Whole Package</button>';
+  html+='<button onclick="closePkgModal()" style="width:100%;margin-top:8px;padding:12px;border-radius:var(--r);border:none;background:var(--surface2);color:var(--dark);font-size:13px;font-weight:600;cursor:pointer;">Close</button>';
+  document.getElementById('pkg-modal-body').innerHTML=html;
+  document.getElementById('pkg-modal').classList.add('open');
+};
+window.closePkgModal=function(){document.getElementById('pkg-modal').classList.remove('open');};
+window.deletePackage=async function(id){
+  const p=packages[id];if(!p)return;
+  if(!confirm('Remove the WHOLE podcast package for '+(p.name||'client')+'?\nThis cancels their upcoming sessions and deletes the package. Past sessions stay in your records.'))return;
+  const ts=todayStr();
+  Object.keys(podreqs).forEach(k=>{ if(podreqs[k].pkg===id&&podreqs[k].status==='pending') delete podreqs[k]; });
+  Object.keys(bookings).forEach(k=>{ if(bookings[k].pkg===id&&bookings[k].status!=='cancelled'&&(bookings[k].date||'')>=ts) delete bookings[k]; });
+  delete packages[id];
+  backupBookings();
+  try{ await updateDoc(doc(db,'studios',SID),{packages,podreqs,bookings}); }catch(e){ await save(); }
+  closePkgModal();showToast('Package removed ✓');
+  renderServices();updateServicesBadge();renderCalendar();renderSlots();renderBookingList();renderUpcomingBookings();
+};
+function updateServicesBadge(){
+  const n=Object.values(podreqs).filter(r=>r.status==='pending').length;
+  const b=document.getElementById('services-badge');
+  if(b){b.textContent=n;b.style.display=n>0?'flex':'none';}
+}
+function renderServices(){
+  const rl=document.getElementById('svc-requests');
+  if(rl){
+    const pend=Object.values(podreqs).filter(r=>r.status==='pending').sort((a,b)=>(a.createdAt||0)-(b.createdAt||0));
+    if(!pend.length){rl.innerHTML='<div class="bl-empty">No pending requests</div>';}
+    else rl.innerHTML=pend.map(r=>{
+      const p=packages[r.pkg];const dLabel=new Date(r.date+'T12:00:00').toLocaleDateString('en-IN',{weekday:'short',day:'numeric',month:'short'});
+      return '<div class="bitem" style="flex-direction:column;align-items:stretch;gap:8px;">'
+        +'<div><div class="bitem-name">'+(r.name||'Client')+(p?' <span style="color:var(--light);font-weight:400;">· '+p.name+'</span>':'')+'</div>'
+        +'<div class="bitem-meta" style="color:var(--raja);font-weight:600;">📅 '+dLabel+' · '+enqHourLabel(parseInt(r.startH))+'–'+enqHourLabel(parseInt(r.startH)+reqDur(r))+' ('+reqDur(r)+'h)</div></div>'
+        +'<div style="display:flex;gap:6px;">'
+        +'<button onclick="acceptReq(\''+r.id+'\')" style="flex:1;padding:9px;border-radius:8px;border:none;background:var(--keer);color:#fff;font-size:12px;font-weight:700;cursor:pointer;font-family:Syne,sans-serif;">✓ Accept &amp; Allot</button>'
+        +'<button onclick="rejectReq(\''+r.id+'\')" style="flex:1;padding:9px;border-radius:8px;border:1px solid #dc2626;background:#fff;color:#dc2626;font-size:12px;font-weight:700;cursor:pointer;font-family:Syne,sans-serif;">✕ Reject</button>'
+        +'</div></div>';
+    }).join('');
+  }
+  const pl=document.getElementById('svc-packages');
+  if(pl){
+    const list=Object.values(packages).sort((a,b)=>(b.createdAt||0)-(a.createdAt||0));
+    if(!list.length){pl.innerHTML='<div class="bl-empty">No packages yet — tap “+ New Podcast Package”.</div>';}
+    else pl.innerHTML=list.map(p=>{
+      const u=pkgUsage(p.id);const pct=u.total?Math.min(100,Math.round((u.accepted+u.pending)/u.total*100)):0;
+      const nsess=Object.values(bookings).filter(b=>b.pkg===p.id&&b.status!=='cancelled').length;
+      return '<div class="bitem" onclick="openPackage(\''+p.id+'\')" style="flex-direction:column;align-items:stretch;gap:8px;cursor:pointer;">'
+        +'<div style="display:flex;justify-content:space-between;align-items:center;"><div class="bitem-name">🎙️ '+p.name+'</div>'
+        +'<span class="badge badge-adv">'+u.remaining+'h left</span></div>'
+        +'<div class="bitem-meta">'+p.phone+(p.discountPct?' · '+p.discountPct+'% off':'')+'</div>'
+        +'<div style="height:8px;background:#eee;border-radius:6px;overflow:hidden;"><div style="height:100%;width:'+pct+'%;background:var(--raja);"></div></div>'
+        +'<div class="bitem-meta" style="display:flex;justify-content:space-between;"><span>Total '+u.total+'h</span><span>Used '+u.accepted+'h</span><span>Pending '+u.pending+'h</span></div>'
+        +'<div style="font-size:11px;color:var(--ari);font-weight:600;">View '+nsess+' session'+(nsess===1?'':'s')+' &amp; details ›</div>'
+        +'<div style="display:flex;gap:6px;">'
+        +'<button onclick="event.stopPropagation();copyPkgLink(\''+p.id+'\')" style="flex:1;padding:9px;border-radius:8px;border:1px solid #ccc;background:var(--surface2);color:var(--dark);font-size:12px;font-weight:700;cursor:pointer;font-family:Syne,sans-serif;">🔗 Copy Link</button>'
+        +'<button onclick="event.stopPropagation();sharePkgLink(\''+p.id+'\')" style="flex:1;padding:9px;border-radius:8px;border:none;background:#25D366;color:#fff;font-size:12px;font-weight:700;cursor:pointer;font-family:Syne,sans-serif;">📲 Share</button>'
+        +'</div></div>';
+    }).join('');
+  }
+}
 
 // ════════════════════════════════════════
 // ── CALENDAR TAB ──
@@ -1648,8 +2025,16 @@ function renderDailyEarnings(){
   const todayBk=Object.values(bookings).filter(b=>b.date===ts&&b.status!=='cancelled');
   if(!todayBk.length){el.innerHTML='<div style="background:var(--surface);border-radius:var(--r);padding:14px;border:0.5px solid #e0dbd0;text-align:center;font-size:12px;color:var(--light);">No bookings today</div>';return;}
   const total=todayBk.reduce((s,b)=>s+(Number(b.total)||0),0);
-  const collected=todayBk.reduce((s,b)=>s+(Number(b.advance)||0)+(b.paid?Number(b.balance)||0:0),0);
-  const pending=total-collected;
+  const collected=todayBk.reduce((s,b)=>{
+    const net=Math.max(0,(Number(b.total)||0)-(Number(b.discount)||0));
+    const adv=Number(b.advance)||0;
+    return s+(b.paid?net:Math.min(adv,net));
+  },0);
+  const pending=todayBk.reduce((s,b)=>{
+    if(b.paid)return s;
+    const net=Math.max(0,(Number(b.total)||0)-(Number(b.discount)||0));
+    return s+Math.max(0,net-(Number(b.advance)||0));
+  },0);
   el.innerHTML='<div style="background:var(--surface);border-radius:var(--r);padding:14px;border:0.5px solid #e0dbd0;display:flex;gap:8px;text-align:center;">'
     +'<div style="flex:1;"><div style="font-size:9px;color:var(--light);font-weight:600;text-transform:uppercase;">Bookings</div><div style="font-family:Syne,sans-serif;font-size:20px;font-weight:800;">'+todayBk.length+'</div></div>'
     +'<div style="flex:1;"><div style="font-size:9px;color:var(--light);font-weight:600;text-transform:uppercase;">Total</div><div style="font-family:Syne,sans-serif;font-size:20px;font-weight:800;">₹'+total.toLocaleString('en-IN')+'</div></div>'
@@ -1724,6 +2109,14 @@ function backupBookings(){try{localStorage.setItem('magizh_backup_bookings',JSON
 window.onerror=function(message){if(String(message).includes('Script error'))return;console.error('App Error:',message);};
 
 window.addEventListener('load',()=>{
+  initFirebase(); // connect early so custom PINs are loaded before anyone logs in
+  // Studio Manager link: magizh-studio.vercel.app/?manager
+  if(new URLSearchParams(location.search).has('manager')){
+    ['squad-lbl','squad-options'].forEach(id=>{const el=document.getElementById(id);if(el)el.style.display='none';});
+    const ml=document.getElementById('mgr-lbl');if(ml)ml.style.display='block';
+    const mo=document.getElementById('mgr-options');if(mo)mo.style.display='flex';
+    const sub=document.querySelector('.login-sub');if(sub)sub.textContent='Studio Manager sign-in';
+  }
   setTimeout(()=>{const loader=document.getElementById('app-loader');if(loader){loader.style.opacity='0';setTimeout(()=>loader.remove(),300);}},700);
 });
 
