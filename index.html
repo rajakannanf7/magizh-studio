@@ -262,6 +262,12 @@ body{background:var(--bg);font-family:'Inter',sans-serif;font-size:14px;}
             <div style="font-size:10px;color:var(--light);margin-top:2px;">Studio 2</div>
           </div>
         </div>
+        <!-- Full Studio (Both) -->
+        <div id="studio-full" onclick="selectStudio('full')" style="flex:1;padding:14px 12px;border-radius:var(--r);background:var(--surface);cursor:pointer;text-align:center;border:3px solid #e0dbd0;transition:all .15s;">
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" style="display:block;margin:0 auto 6px;"><rect x="1" y="6" width="10" height="8" rx="1.5" stroke="#1a1a1a" stroke-width="1.5"/><circle cx="6" cy="10" r="2" stroke="#1a1a1a" stroke-width="1.5"/><rect x="13" y="4" width="4" height="7" rx="2" stroke="#1a1a1a" stroke-width="1.5"/><path d="M11 8a5 5 0 008 0" stroke="#1a1a1a" stroke-width="1.5" stroke-linecap="round"/><line x1="15" y1="12" x2="15" y2="15" stroke="#1a1a1a" stroke-width="1.5"/></svg>
+          <div style="font-family:'Syne',sans-serif;font-size:11px;font-weight:700;color:var(--dark);">Both</div>
+          <div style="font-size:9px;color:var(--light);margin-top:2px;">Full Studio</div>
+        </div>
       </div>
 
       <!-- Date strip -->
@@ -670,7 +676,8 @@ let pins={}; // {userKey: customPin} — Squad members can set their own, overri
 let packages={}; // {pkgId: podcast package} — premium podcast clients
 let podreqs={};  // {reqId: session request from a package client's link}
 const POD_RATES={space:750,single_cam:1000,dual_cam:1500};
-function getHourlyRate(){ return selStudio==='pod'?POD_RATES[podSetup]:HOURLY_RATE; }
+const FULL_STUDIO_RATE=1500;
+function getHourlyRate(){ return selStudio==='full'?FULL_STUDIO_RATE:selStudio==='pod'?POD_RATES[podSetup]:HOURLY_RATE; }
 const today=new Date();
 
 // Calendar state
@@ -857,6 +864,20 @@ window.switchTab=function(tab){
 
 // ── STUDIO SELECTOR ──
 window.selectStudio=function(studio){
+  // Reset full studio button
+  const fullEl=document.getElementById('studio-full');
+  if(fullEl){
+    if(studio==='full'){
+      fullEl.style.background='var(--gold)';fullEl.style.borderColor='var(--gold)';
+      fullEl.querySelectorAll('div').forEach((el,i)=>{el.style.color=i===0?'#fff':'rgba(255,255,255,.7)';});
+      fullEl.querySelector('svg').querySelectorAll('*').forEach(el=>{el.setAttribute('stroke','white');});
+    }else{
+      fullEl.style.background='var(--surface)';fullEl.style.borderColor='#e0dbd0';
+      fullEl.querySelectorAll('div').forEach((el,i)=>{el.style.color=i===0?'var(--dark)':'var(--light)';});
+      fullEl.querySelector('svg').querySelectorAll('*').forEach(el=>{el.setAttribute('stroke','#1a1a1a');});
+    }
+  }
+
   selStudio=studio; selStartH=null; selDur=2;
   const photo=document.getElementById('studio-photo'),pod=document.getElementById('studio-pod');
   if(studio==='photo'){
@@ -942,7 +963,12 @@ window.toggleSlotMode=function(isNight){
 
 function renderSlots(){
   const grid=document.getElementById('slot-grid');if(!grid)return;
-  const dayBookings=Object.values(bookings).filter(b=>b.date===selDate&&(b.studio||'photo')===selStudio&&b.status!=='cancelled');
+  const dayBookings=Object.values(bookings).filter(b=>{
+    if(b.date!==selDate||b.status==='cancelled')return false;
+    const bs=b.studio||'photo';
+    if(selStudio==='full')return true; // full studio: any booking on either studio conflicts
+    return bs===selStudio||bs==='full'; // photo/pod: own bookings + full studio bookings conflict
+  });
   var sStart=showLateNight?0:6;
   var sEnd=showLateNight?6:24;
   grid.innerHTML=HOUR_LABELS.slice(sStart,sEnd).map((lbl,i)=>{
@@ -981,7 +1007,13 @@ function updateDurDisplay(){
   document.getElementById('dur-display').textContent=selDur;
   document.getElementById('dur-hrs-lbl').textContent=selDur===1?'hour':'hours';
   const endH=selStartH+selDur;
-  const dayBookings=Object.values(bookings).filter(b=>b.date===selDate&&(b.studio||'photo')===selStudio&&b.status!=='cancelled');
+  const dayBookings=Object.values(bookings).filter(b=>{
+    if(b.date!==selDate)return false;
+    if(b.status==='cancelled')return false;
+    const bs=b.studio||'photo';
+    if(selStudio==='full')return true;
+    return bs===selStudio||bs==='full';
+  });
   const bookedRaw=dayBookings.map(b=>b.slotRaw||'');
   const conflict=slotOverlaps(bookedRaw,selStartH,selDur);
   const sumEl=document.getElementById('slot-summary');
@@ -1019,7 +1051,7 @@ window.confirmBooking=async function(){
   const disc=parseFloat(document.getElementById('f-discount').value)||0;
   const adv=parseFloat(document.getElementById('f-adv').value)||0;
   const balance=Math.max(0,total-disc-adv);
-  const studioName=selStudio==='photo'?'Photography Studio':'Podcast Studio';
+  const studioName=selStudio==='full'?'Full Studio (Both)':selStudio==='photo'?'Photography Studio':'Podcast Studio';
   const notes=(document.getElementById('f-notes')?document.getElementById('f-notes').value:'').trim();
   const id='bk-'+Date.now();
   bookings[id]={id,name,phone,type,date:selDate,status:"confirmed",slot:slotLabel,slotRaw,studio:selStudio,studioName,total,discount:disc,advance:adv,balance,paid:false,createdBy:currentUser,createdAt:Date.now(),notes,hourlyRate:rate,podSetup:selStudio==='pod'?podSetup:null};
@@ -1041,12 +1073,17 @@ window.confirmBooking=async function(){
 // ── BOOKING LIST ──
 function renderBookingList(){
   const list=document.getElementById('booking-list');
-  const studioLabel=selStudio==='photo'?'📷 Photography':'🎙️ Podcast';
+  const studioLabel=selStudio==='full'?'🎬 Full Studio':selStudio==='photo'?'📷 Photography':'🎙️ Podcast';
   const lbl=document.getElementById('booking-list-label');
   const selectedDateLabel=selDate?new Date(selDate+'T12:00:00').toLocaleDateString('en-IN',{day:'numeric',month:'short',weekday:'short'}):'Selected Day';
   if(lbl)lbl.textContent=studioLabel+' · '+selectedDateLabel+' Bookings';
   const ts=todayStr();
-  let items=Object.values(bookings).filter(b=>(b.studio||'photo')===selStudio&&b.date===selDate);
+  let items=Object.values(bookings).filter(b=>{
+    const bs=b.studio||'photo';
+    if(b.date!==selDate)return false;
+    if(selStudio==='full')return bs==='full';
+    return bs===selStudio||bs==='full';
+  });
   items.sort((a,b)=>parseInt((a.slotRaw||'0|1').split('|')[0])-parseInt((b.slotRaw||'0|1').split('|')[0]));
   if(!items.length){list.innerHTML='<div class="bl-empty">No bookings found</div>';return;}
   list.innerHTML=items.map(b=>{
@@ -1733,7 +1770,11 @@ window.internSelectStudio=function(studio){
 function renderInternSlots(){
   const grid=document.getElementById('intern-slot-grid');if(!grid)return;
   const dt=internDate||todayStr();
-  const dayBookings=Object.values(bookings).filter(b=>b.date===dt&&(b.studio||'photo')===internStudio&&b.status!=='cancelled');
+  const dayBookings=Object.values(bookings).filter(b=>{
+    if(b.date!==dt||b.status==='cancelled')return false;
+    const bs=b.studio||'photo';
+    return bs===internStudio||bs==='full';
+  });
   const lbl=document.getElementById('intern-avail-lbl');
   const dateLabel=new Date(dt+'T12:00:00').toLocaleDateString('en-IN',{day:'numeric',month:'short',weekday:'short'});
   if(lbl)lbl.textContent=(internStudio==='photo'?'📷':'🎙️')+' Slots · '+dateLabel;
