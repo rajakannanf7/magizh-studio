@@ -262,11 +262,10 @@ body{background:var(--bg);font-family:'Inter',sans-serif;font-size:14px;}
             <div style="font-size:10px;color:var(--light);margin-top:2px;">Studio 2</div>
           </div>
         </div>
-        <!-- Full Studio (Both) -->
-        <div id="studio-full" onclick="selectStudio('full')" style="flex:1;padding:14px 12px;border-radius:var(--r);background:var(--surface);cursor:pointer;text-align:center;border:3px solid #e0dbd0;transition:all .15s;">
-          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" style="display:block;margin:0 auto 6px;"><rect x="1" y="6" width="10" height="8" rx="1.5" stroke="#1a1a1a" stroke-width="1.5"/><circle cx="6" cy="10" r="2" stroke="#1a1a1a" stroke-width="1.5"/><rect x="13" y="4" width="4" height="7" rx="2" stroke="#1a1a1a" stroke-width="1.5"/><path d="M11 8a5 5 0 008 0" stroke="#1a1a1a" stroke-width="1.5" stroke-linecap="round"/><line x1="15" y1="12" x2="15" y2="15" stroke="#1a1a1a" stroke-width="1.5"/></svg>
-          <div style="font-family:'Syne',sans-serif;font-size:11px;font-weight:700;color:var(--dark);">Both</div>
-          <div style="font-size:9px;color:var(--light);margin-top:2px;">Full Studio</div>
+        <div id="studio-full" onclick="selectStudio('full')" style="margin-top:8px;padding:10px 16px;border-radius:var(--r);background:var(--surface);cursor:pointer;text-align:center;border:2px solid #e0dbd0;transition:all .15s;display:flex;align-items:center;justify-content:center;gap:8px;">
+          <span style="font-size:14px;">📷+🎙️</span>
+          <span id="full-label" style="font-family:'Syne',sans-serif;font-size:12px;font-weight:700;color:var(--dark);">Both Studios</span>
+          <span id="full-rate" style="font-size:10px;color:var(--light);">₹1,500/hr</span>
         </div>
       </div>
 
@@ -866,15 +865,17 @@ window.switchTab=function(tab){
 window.selectStudio=function(studio){
   // Reset full studio button
   const fullEl=document.getElementById('studio-full');
+  const fullLbl=document.getElementById('full-label');
+  const fullRate=document.getElementById('full-rate');
   if(fullEl){
     if(studio==='full'){
-      fullEl.style.background='var(--gold)';fullEl.style.borderColor='var(--gold)';
-      fullEl.querySelectorAll('div').forEach((el,i)=>{el.style.color=i===0?'#fff':'rgba(255,255,255,.7)';});
-      fullEl.querySelector('svg').querySelectorAll('*').forEach(el=>{el.setAttribute('stroke','white');});
+      fullEl.style.background='var(--dark)';fullEl.style.borderColor='var(--dark)';
+      if(fullLbl)fullLbl.style.color='#fff';
+      if(fullRate)fullRate.style.color='rgba(255,255,255,.5)';
     }else{
       fullEl.style.background='var(--surface)';fullEl.style.borderColor='#e0dbd0';
-      fullEl.querySelectorAll('div').forEach((el,i)=>{el.style.color=i===0?'var(--dark)':'var(--light)';});
-      fullEl.querySelector('svg').querySelectorAll('*').forEach(el=>{el.setAttribute('stroke','#1a1a1a');});
+      if(fullLbl)fullLbl.style.color='var(--dark)';
+      if(fullRate)fullRate.style.color='var(--light)';
     }
   }
 
@@ -998,7 +999,7 @@ window.selectStart=function(h){
 
 window.changeDur=function(delta){
   if(selStartH===null)return;
-  selDur=Math.max(1,Math.min(24-selStartH,selDur+delta));
+  selDur=Math.max(1,Math.min(24,selDur+delta));
   updateDurDisplay();renderSlots();recalcPayment();
 };
 
